@@ -161,9 +161,9 @@ Após a configuração no Debian, o compartilhamento pode ser acessado em qualqu
 
 ### 2.2. Credenciais do Windows
 Precisamos que o Windows memorize as credenciais de nossa máquina hospedeira, digamos que neste exemplo, o ip dela seja 192.168.1.50, então vá no Windows, procure pelo **Gerenciador de Credenciais**, depois vá em **Credenciais do Windows** e então clique em **Adicionar uma credencial do Windows**:   
-![Gerenciador de Credenciais](../img/debian_qemu_kvm_windows_smb01.png)  
+![Gerenciador de Credenciais](img/debian_qemu_kvm_windows_smb01.png)  
 E então informe as suas credenciais para o host(192.168.1.50):  
-![Adicionando Credenciail](../img/debian_qemu_kvm_windows_smb02.png)  
+![Adicionando Credenciail](img/debian_qemu_kvm_windows_smb02.png)  
 Agora que nossa credencial está incluída, vamos aos links simbolicos...
 
 
@@ -173,7 +173,7 @@ Uma vez que você manteve sua senha(credencial) "lembrada", o Windows guardará 
 Isso é muito bom, mas pode ficar ainda melhor, para um acesso mais integrado e transparente, crie um link simbólico que aponta o caminho de rede para um diretório local.  
 Iremos criar uma pasta C:\mnt e dentro dela links simbólicos que apontam para nosso compartilhamento e com isso, voce não precisa mais usar letras de drives para acessá-los.  
 Mas antes de prosseguir, é importante que letras de drivers mapeadas para nosso hospedeiro sejam removidas porque se o Windows Explorer perceber que c:\mnt\work é o mesmo que Z:, tanto o explorer como também as janelas de dialogo dos programas vão tratar como um simples atalho, fazendo o salto para a letra Z: ao inves de tratar c:\mnt\work como uma pasta igual as demais, então a letra Z: deve ser removida. Simplesmente desconecte-a e remova-a, assim o seus aplicativos, janelas de dialogo tratarão c:\mnt como se fossem pastas reais.
-![desconectando a unidade](../img/debian_qemu_kvm_windows_smb03.png)
+![desconectando a unidade](img/debian_qemu_kvm_windows_smb03.png)
 
 **Requer: Prompt de Comando executado como Administrador.**
 
@@ -204,7 +204,7 @@ Mas antes de prosseguir, é importante que letras de drivers mapeadas para nosso
 
 6.  **Resultado:**
     A pasta compartilhada do Linux agora é acessível diretamente no seu sistema Windows através do caminho local **`C:\mnt\work`** :
-![A pasta compartilhada do Linux agora é acessível diretamente no seu sistema Windows através do caminho local](../img/debian_qemu_kvm_windows_smb04.png)
+![A pasta compartilhada do Linux agora é acessível diretamente no seu sistema Windows através do caminho local](img/debian_qemu_kvm_windows_smb04.png)
 
 -----
 ## 3\. Configuração do Firewall (UFW) no Debian/Ubuntu
@@ -213,7 +213,7 @@ Se você tem o firewall instalado, então vai precisar liberar as seguintes port
   * **Porta SMB/CIFS:** TCP 139 (para compatibilidade legada)
   * **Porta Net Logon/Replication:** TCP 445 (a porta SMB moderna e mais comum)
 
-Recapitule o documento a página sobre [Firewall](debian_firewall.md).    
+[Recapitule o documento a página sobre Firewall no Debian](https://github.com/gladiston/debianlinux/blob/main/docs/debian_firewall.md)
 
 -----
 [Retornar à página de Virtualização nativa com QAEMU+KVM Usando VM/Windows](debian_qemu_kvm_windows.md)
