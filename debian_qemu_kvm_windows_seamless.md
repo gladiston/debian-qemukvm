@@ -258,6 +258,6 @@ xfreerdp3 \
 Vejamos:  
 ![Bloco de notas](img/debian_qemu_kvm_windows_seamless05.png)   
 
-```
+----
 
 [Retornando a página anterior](debian_qemu_kvm_windows.md#virt-manager---seamless)
