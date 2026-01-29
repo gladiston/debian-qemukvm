@@ -14,14 +14,14 @@ Tenha certeza de ter instalado dentro da VM WIndows o programa `WinFsp`.
 Depois de iniciar a VM, acesse a a página WinSFP no link abaixo:  
 [https://github.com/winfsp/winfsp/releases](https://github.com/winfsp/winfsp/releases)  
 E baixe a ultima versão disponivel:   
-![página WinSFP](../img/debian_qemu_kvm_windows59.png)  
+![página WinSFP](img/debian_qemu_kvm_windows59.png)  
 
 Execute `services.msc` e veja se os serviços estão habilitados:  
 **VirtIO-FS Service**  
-![VirtIO-FS Service](../img/debian_qemu_kvm_windows60.png)   
+![VirtIO-FS Service](img/debian_qemu_kvm_windows60.png)   
 
 **WinFsp.Launcher**  
-![WinFsp.Launcher Service](../img/debian_qemu_kvm_windows61.png)   
+![WinFsp.Launcher Service](img/debian_qemu_kvm_windows61.png)   
 
 Sem O `WinFsp`, o serviço `Virtio-FS` não inicia, e portanto, a unidade que representa o `Source Path` escolhido não aparecerá. Voce até pode chamar o `services.msc` no menu do Windows e verá que este serviço não inicializa sem o `WinFsp` instalado.  
 Isso acontece porque o programa `WinFsp` é convocado assim que o serviço `Virtio-FS`  é iniciado, e então ele lê o `Source Path` e cria então a unidade como Z:, mas temos um problema, ele lê o primeiro `Source Path`, mas não executa os demais se existirem. Caso crie um outro `Source Path` com o nome de `docs` apontando para algum lugar do hospedeiro, essa unidade não será mostrada. Isso corre porque dentro do Windows, o `WinFsp` só consegue executar uma instância de cada vez quando o serviço `Virtio-FS` é iniciado. Assim, caso precise de mais unidades, temos duas soluções alternativas:  
@@ -55,7 +55,7 @@ Isso criará a letra Z: (ou que estiver disponível) para `Source Path` definido
 
 Assim, que estes serviços forem iniciados, olhe novamente para o explorer e notará que as pastas que foram exportadas, em nosso exemplo apenas a pasta `Downloads` serão reconhecidas como unidades:  
 
-![Novas iunidades no Windows](../img/debian_qemu_kvm_windows62.png)   
+![Novas iunidades no Windows](img/debian_qemu_kvm_windows62.png)   
 
 ## SEGURANÇA
 Para a segurança de seu sistema hospedeiro e convidado:  
