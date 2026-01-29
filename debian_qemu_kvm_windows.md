@@ -242,7 +242,6 @@ Para trabalhos extensos e mais profissionais com VMs é impossivel viver apenas 
 
 [Criando conexões bridge pelo terminal](debian_qemu_kvm_bridge.md)  
 
-
 ---
 
 ## CONCLUSÃO
