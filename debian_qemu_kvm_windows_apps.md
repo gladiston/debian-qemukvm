@@ -50,7 +50,7 @@ Download:
 [https://code.visualstudio.com/](https://code.visualstudio.com/)    
 
 **ALERTA**:  Muito cuidado com o download, a maioria das pessoas vai institivamente na primeira opção que é **User Installer** que se autoinstala no perfil do usuário, no entanto, é melhor baixar a versão **System Installer** que beneficia todos os perfís existentes:  
-![Instale o VSCode System Installer](../img/debian_qemu_kvm_windows_vscode1.png)   
+![Instale o VSCode System Installer](img/debian_qemu_kvm_windows_vscode1.png)   
 
 ---
 
@@ -167,7 +167,7 @@ Download:
 
 Aproveite este momento para fazer uma **Limpeza profunda** usando o PC Manager:  
 
-![Realizando a primeira Limpeza Profunda](../img/debian_qemu_kvm_windows_pcmanager1.png)  
+![Realizando a primeira Limpeza Profunda](img/debian_qemu_kvm_windows_pcmanager1.png)  
 
 
 
