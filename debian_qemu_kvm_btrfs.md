@@ -36,10 +36,15 @@ Se não aparecer a palavra “*Compressed*” então significa que nenhum dado c
 **DESFRAGMENTAÇÃO DE PASTA BTRFS**  
 Algo também muito recomendado é a desfragmentação da pasta, pois a propriedades CoW do Btrfs causam fragmentação, o que não é nenhum problema para arquivos normais já que o algoritimo do CoW resolve isso, mas as imagens de VMs costumam ser grandes e mudam seu conteúdo a cada uso então nesta situação é bom desfragmentar de tempos em tempos. Isso pode ser feito com o comando:   
 ```
-sudo btrfs filesystem defragment -r "/home/$USER/libvirt/images"
+sudo btrfs filesystem defragment -r "/home/libvirt/images"
 ```
 Se for possivel, use o agendador de tarefas do Linux para rodá-lo num horário programado, execute o comando **crontab -e** e adicione a linha:  
 ```
 0 12 * * * /bin/bash -c '/usr/bin/btrfs filesystem defragment -r "/home/gsantana/libvirt/images"'
 ```
 O comando acima, no horário 12:00 (almoço) fará a desfragmentação da pasta mencionada.  
+
+
+----
+
+[Clique aqui para retornar a página principal](README.md)
