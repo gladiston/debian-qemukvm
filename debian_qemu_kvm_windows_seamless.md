@@ -256,7 +256,7 @@ xfreerdp3 \
   +clipboard /dynamic-resolution
 ```
 Vejamos:  
-![Bloco de notas](../img/debian_qemu_kvm_windows_seamless05.png)  
+![Bloco de notas](img/debian_qemu_kvm_windows_seamless05.png)  
 
 ```
 
