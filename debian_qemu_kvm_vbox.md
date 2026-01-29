@@ -1,4 +1,4 @@
-# 🧭 Introdução
+# Introdução
 
 O **VirtualBox** é um hipervisor do tipo 2 amplamente utilizado para virtualização em desktops.  
 Ele armazena os discos virtuais no formato **VDI (Virtual Disk Image)**, um contêiner eficiente e fácil de expandir, projetado pela Oracle.  
@@ -209,7 +209,7 @@ bcdboot C:\Windows /s S: /f UEFI
 
 ## Primeiro boot com o Windows bem sucedido
 Ao iniciar o Windows, voce precisa remover os drivers e programas relacionados ao VirtualBox:  
-![Remover programas relacionados ao VirtualBox](../img/debian_qemu_kvm_vbox01.png)  
+![Remover programas relacionados ao VirtualBox](img/debian_qemu_kvm_vbox01.png)  
 
 A cada programa removido, provavelmente precisará reiniciar.  
 
@@ -222,7 +222,7 @@ Com o nosso boot de Windows bem sucedido, vá nas **Configurações da VM>Opçõ
 Desligue a VM.  
 Depois vá nas configurações de nossa VM e verifique se uma unidade de **CD ROM SATA** está presente, precisaremos dela para instalar as ferramentas de convidado. Se não existir, então o que precisaremos adicioná-la. Vá em **Adicionar hardware**, e mude o **Tipo de dispositivo** para **Dispositivo CDROM**: 
 
-![Dispositivo CDROM](../img/debian_qemu_kvm_windows16.png)   
+![Dispositivo CDROM](img/debian_qemu_kvm_windows16.png)   
 
 Uma vez selecionado o dispositivo **CDROM SATA**, então clique em **Gerenciar...** e escolha **virtio-win.iso** que baixamos em etapas anteriores. Depois clique em **Concluir** como mostra a imagem.
 
@@ -232,11 +232,11 @@ Dentro do Windows vá até a unidade de CDROM onde estãos os drivers para convi
 E:\virtio-win-guest-tools.exe
 ```
 Execute-o e siga as instruções na tela:
-![Incluindo o driver de rede VirtIO](../img/debian_qemu_kvm_windows32.png)   
+![Incluindo o driver de rede VirtIO](img/debian_qemu_kvm_windows32.png)   
 
 A tela piscará algumas vezes, não se assuste. Não é necessário reiniciar a VM depois dessas ferramentas serem instaldas.   
 Para verificar se os drivers já estão funcionando, vá no topo da janela do virt-manager em **Exibir|Escalonar a exibição|** e marque a opção **Redimensionar automaticamente a VM com janela***:  
-![Incluindo o driver de rede VirtIO](../img/debian_qemu_kvm_windows33.png)   
+![Incluindo o driver de rede VirtIO](img/debian_qemu_kvm_windows33.png)   
 
 Depois disso, notará que pode sair da janela sem precisar teclar Ctrl+Alt esquerdos e o Windows muda sua resolução a medida que redimencionamos a janela do virt-manager.   
 Se você for no topo ao centro e ficar com o ponteiro do mouse ali parado por 1s, aparecerá dois botões que estavam camuflados, um deles é para sair de tela cheia e o outro para enviar combinações de tecla como Ctrl+Alt+Del.  
@@ -246,11 +246,11 @@ Visite à página:
 [https://github.com/winfsp/winfsp/releases](https://github.com/winfsp/winfsp/releases)   
 
 E então baixe a versão mais recente.  
-![página WinSFP](../img/debian_qemu_kvm_windows59.png)   
+![página WinSFP](img/debian_qemu_kvm_windows59.png)   
 
 Depois de instalado, execute `services.msc` como administrador e procure pelo serviço **VirtIO-FS Service**, e habilite-o para iniciar junto com o Windows:  
 
-![VirtIO-FS Service](../img/debian_qemu_kvm_windows60.png)   
+![VirtIO-FS Service](img/debian_qemu_kvm_windows60.png)   
 
 Se você tentar iniciar o serviço **VirtIO-FS Service** é provavel que ainda não consiga, isso pode acontecer porque você ainda não usou o recurso de compartilhamento de pastas, então por não haver pastas para compartilhar, o serviço não inicie. Mas deixe-o habilitado porque nas próximas etapas faremos isso.  
 
@@ -295,7 +295,7 @@ Se tiver uma CPU Intel, dentro do bloco `hyperv` acrescente também:
 ```
 Ficando mais ou menos assim:  
 
-![Habilitar edição de XML](../img/debian_qemu_kvm_windows13.png)    
+![Habilitar edição de XML](img/debian_qemu_kvm_windows13.png)    
 
 Confirme também se a bloco **clock** está assim:  
 ```
@@ -306,12 +306,12 @@ Confirme também se a bloco **clock** está assim:
 ```  
 ### CPU
 Vá na guia **CPUs** e ligue a opção **Copiar configurações de CPU do hospedeiro(host-passthrough)**:
-![Copiar configurações de CPU do hospedeiro(host-passthrough)](../img/debian_qemu_kvm_windows14.png)
+![Copiar configurações de CPU do hospedeiro(host-passthrough)](img/debian_qemu_kvm_windows14.png)
 
 ### MEMÓRIA
 Vá em Memória, em nosso exemplo, a memória minima e máxima é 8192MB. Sei que está tentando em colocar a memória mínima abaixo da máxima, mas não faça isso porque VMs Windows ficam malucas. Precisamos apenas marcar a opção **Habilitar memória compartilhada**, apenas isso. Essa opção é um recurso para que quando várias máquinas virtuais com o mesmo sistema operacional o hypervisor possa manter um nucleo compartilhado, por exemplo, se tiver 4 VMs Windows rodando é como se apenas 1 delas realmente ocupasse memória, as demais estão simplesmente reutilizando os programas da primeira, essa é apenas forma simples de explicar porque debaixo dos panos não é exatamente assim. Mas o motivo de habilitarmos este recurso é porque ele é um pré-requisito para que possamos mais tarde compartilhar arquivos entre o ambiente hospedeiro e convidado:  
    
-![Habilitando memória compartilhada](../img/debian_qemu_kvm_windows57.png)    
+![Habilitando memória compartilhada](img/debian_qemu_kvm_windows57.png)    
 
 ### DISCO SATA 1
 Vá para a opção **Disco SATA 1**, e provavelmente o barramento estará configurado como **SATA**, para obter maior desempenho, vamos trocar para **VirtIO**, depois disso, expanda **Opçoes Avançadas** e troque:
@@ -319,7 +319,7 @@ Vá para a opção **Disco SATA 1**, e provavelmente o barramento estará config
 **Modo de cache** troque para **none**(nenhum);  
 **Modo de descarte** troque para **unmap**(desmapear);
    
-![Disco SATA 1](../img/debian_qemu_kvm_windows15.png)   
+![Disco SATA 1](img/debian_qemu_kvm_windows15.png)   
 
 Clique em **Aplicar**.  
 
