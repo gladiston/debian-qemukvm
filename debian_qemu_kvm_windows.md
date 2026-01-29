@@ -70,13 +70,13 @@ Vamos renomear o computador para um nome mais apropriado, ex: **ti-01a**.  Aqui 
 ## VIRT-MANAGER - WINDOWS - CRIANDO A PRIMEIRA CONTA DE LOGIN
 Não podemos usar a conta **Admnistrador** o tempo todo, então precisamos criar uma conta, ex: **gsantana**. Eu imagino que não tenha dificuldade com isso, mas se estiver usando o Windows Server, é um pouco diferente, neste sistema vá até o **Gerenciador do servidor|Ferramentas|Gerenciamento do computador**:  
 
-![Gerenciamento do computador](../img/debian_qemu_kvm_windows46.png)  
+![Gerenciamento do computador](img/debian_qemu_kvm_windows46.png)  
 
 E então usar o gerenciador de computador para criar a conta:  
-![Criando um novo usuário](../img/debian_qemu_kvm_windows47.png)  
+![Criando um novo usuário](img/debian_qemu_kvm_windows47.png)  
 
 Lembre-se de colocar o novo usuário no grupo de **Administradores**, assim não precisará ficar trocando de conta quando precisar ajustar algo administrativamente no sistema:  
-![Novo usuário como membro de administradores](../img/debian_qemu_kvm_windows48.png)    
+![Novo usuário como membro de administradores](img/debian_qemu_kvm_windows48.png)    
 
 
 ---
@@ -84,7 +84,7 @@ Lembre-se de colocar o novo usuário no grupo de **Administradores**, assim não
 ## VIRT-MANAGER - WINDOWS - ATIVANDO O AUTOLOGON
 É muito chato o logon do Windows, especialmente no servidor porque é preciso enviar CTRL+ALT+DEL para então digitar a senha. Uma vez que as VMs só rodam depois que vocÊ faz o login no sistema hospedeiro, é bem provável que você não queira ficar burocratizando digitar a senha na VM Windows também, então para isso temos uma solução, instale o programa de [autologon](https://learn.microsoft.com/pt-br/sysinternals/downloads/autologon).  
 Ele é simples e ao executá-lo pela primeira vez você fornecerá sua autenticação e após o boot, ele entrará sozinho com a conta que foi informada.    
-![Ativando o autologon](../img/debian_qemu_kvm_windows49.png)    
+![Ativando o autologon](img/debian_qemu_kvm_windows49.png)    
 
 
 ---
@@ -124,7 +124,7 @@ O CDROM secundário foi usado para a instalação dos drivers de convidado duran
 Primeiro, desligue a máquina virtual Windows.  
 Depois vá na configuração de hardware da VM, selecione o **CDROM SATA 2**, ejete o `.iso` e enfim, escolha **Remover**.
 Aproveite o momento e ejete o `.iso` de instalação do Windows do **CDROM SATA 1**, cuidado, neste você apenas irá ejetar, não remova  dispositivo de hardware dele.   
-![Removendo CDROM secundario](../img/debian_qemu_kvm_windows50.png)    
+![Removendo CDROM secundario](img/debian_qemu_kvm_windows50.png)    
 
 
 ---
