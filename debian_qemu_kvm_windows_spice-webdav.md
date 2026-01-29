@@ -70,9 +70,9 @@ O compartilhamento efetivo da pasta do hospedeiro é configurado através do `vi
 2.  No `virt-viewer` (a janela que mostra o desktop do Windows):
       * Vá em **Arquivo** (*File*) \> **Preferências** (*Preferences*).
       * Marque a opção **Compartilhar Pasta** (*Share Folder*) e escolha a pasta consolidada que você criou, como `/home/gsantana/work`:
-        ![Compartilhamento de pasta desabilitado](../img/debian_qemu_kvm_windows_spice-webdav01.png)
+        ![Compartilhamento de pasta desabilitado](img/debian_qemu_kvm_windows_spice-webdav01.png)
         Se a opção de **Compartilhar Pasta** (*Share Folder*) estiver desligada como na imagem abaixo é porque o canal `org.spice-space.webdav.0` não foi adicionado:
-        ![Compartilhamento de pasta desabilitado](../img/debian_qemu_kvm_windows_spice-webdav02.png)
+        ![Compartilhamento de pasta desabilitado](img/debian_qemu_kvm_windows_spice-webdav02.png)
         
         Então volte aos passos anteriores para corrigir e só então prossiga.  
 
@@ -88,7 +88,7 @@ net use * http://localhost:9843/
 REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\MountPoints2\##localhost@9843#DavWWWRoot" /v  "_LabelFromReg" /t REG_SZ /d "Spice client" /f
 ```
 O que ele faz por padrão é mapear a unidade compartilhada com a primeira letra de drive disponivel e dar um nome de "Spice client" para ela:
-![Compartilhamento de pasta desabilitado](../img/debian_qemu_kvm_windows_spice-webdav03.png)  
+![Compartilhamento de pasta desabilitado](img/debian_qemu_kvm_windows_spice-webdav03.png)  
 
 No entanto, você pode personalizá-lo se desejar, o script a seguir é um exemplo disso, onde nós podemos escolher uma letra de drive especifica para trabalharmos.  
 
@@ -128,7 +128,7 @@ Você também pode tentar acessar digitando o caminho na barra de endereços do 
 http://localhost:9843/
 ```
 E poderá nevegar pelas pastas/subpastas:  
-![Compartilhamento de pasta desabilitado](../img/debian_qemu_kvm_windows_spice-webdav04.png)   
+![Compartilhamento de pasta desabilitado](img/debian_qemu_kvm_windows_spice-webdav04.png)   
 
 E daí voce pode inclusive mapear pastas/subpastas com letras separadas se desejar.
 
