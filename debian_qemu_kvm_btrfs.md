@@ -40,7 +40,7 @@ sudo btrfs filesystem defragment -r "/home/libvirt/images"
 ```
 Se for possivel, use o agendador de tarefas do Linux para rodá-lo num horário programado, execute o comando **crontab -e** e adicione a linha:  
 ```
-0 12 * * * /bin/bash -c '/usr/bin/btrfs filesystem defragment -r "/home/gsantana/libvirt/images"'
+0 12 * * * /bin/bash -c '/usr/bin/btrfs filesystem defragment -r "/home/libvirt/images"'
 ```
 O comando acima, no horário 12:00 (almoço) fará a desfragmentação da pasta mencionada.  
 
