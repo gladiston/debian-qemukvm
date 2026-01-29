@@ -30,7 +30,7 @@ Caso seja desenvolvedor, provavelmente não precisa tanto do modo bridge porque 
 
 Uma vez detectado que realmente vocÊ precisa de bridge então siga o restante do tutorial, mas entenda que ativando o modo bridge pode ser que alguns recursos de comunicação entre host e convidado podem não funcionar como diz essa advertência:  
 
-![VM Windows](../img/debian_qemu_kvm_bridge3.png)  
+![VM Windows](img/debian_qemu_kvm_bridge3.png)  
 
 
 ## ENTENDENDO O AMBIENTE DO EXEMPLO
@@ -190,7 +190,7 @@ No virt-manager, ao criar ou editar uma VM:
 3. Selecione **macvtap0** (modo bridge).
 4. Clique em Aplicar e salve.
 
-![Tela de configuração da VM](../img/debian_qemu_kvm_bridge1.png)
+![Tela de configuração da VM](img/debian_qemu_kvm_bridge1.png)
 
 A VM agora receberá IP direto do servidor DHCP da rede local, sem NAT, podendo se comunicar com outras VMs e dispositivos da LAN.
 
@@ -229,7 +229,7 @@ Se quiser testar pingando endereços de internet, também vale, mas antes, verif
 ping 1.1.1.1 # IP do DNS da Cloudfare
 ```
 
-![VM Windows](../img/debian_qemu_kvm_bridge2.png)  
+![VM Windows](img/debian_qemu_kvm_bridge2.png)  
 
 Se sua VM conseguiu um IP de sua rede e consegue dar ping em qualquer outra estação, então parabens! Você conseguiu criar uma conexão bridge satisfatória e pode prosseguir. Criar uma bridge não é uma etapa fácil, eu patinei muitas vezes. Para desenvolvedores, usar uma conexão NAT é bem vantajosa e mais simples, mas administradores de sistemas quase sempre precisam simular que estão dentro da rede corporativa.  
 
