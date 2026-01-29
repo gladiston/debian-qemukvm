@@ -6,13 +6,13 @@ O Windows depois de instalado está carregado de coisas que roubam performance, 
 ## Otimizando o Windows - Removendo o Gerenciador do Servidor do Startp do Windows:
 Se estiver usando uma edição Servidor do Windows, provavelmente você se aborrecerá do Gerenciador do Servidor que é carregado todas as vezes que faz o logon. Para desabilitá-lo vá em **Gerenciar|Propriedades do Gerenciador do Servidor** e então marque a opção **Não iniciar o Gerenciador do Servidor automaticamente no logon**:  
 
-![Ativando o autologon](../img/debian_qemu_kvm_windows51.png)    
+![Ativando o autologon](img/debian_qemu_kvm_windows51.png)    
 
 ---
 
 ## Otimizando o Windows - Menu do Windows
 No painel de menu, remova os recursos que não precisa como caixa de pesquisa e visão de tarefas:   
-![Remova os recursos que não precisa como caixa de pesquisa e visão de tarefas](../img/debian_qemu_kvm_windows52.png)    
+![Remova os recursos que não precisa como caixa de pesquisa e visão de tarefas](img/debian_qemu_kvm_windows52.png)    
 
 Lembre-se de que qualquer coisa que consuma ciclos de CPU e não são úteis, devem ser desativados.  
 
@@ -20,7 +20,7 @@ Lembre-se de que qualquer coisa que consuma ciclos de CPU e não são úteis, de
 
 ## Otimizando o Windows - Papel de parede
 Remova o papel de parede e use uma cor solida como preto. Antes que pergunte, sim, isso faz muito a diferença.  
-![Remova o papel de parede e use uma cor solida como preto](../img/debian_qemu_kvm_windows53.png)    
+![Remova o papel de parede e use uma cor solida como preto](img/debian_qemu_kvm_windows53.png)    
 Lembre-se de que qualquer coisa que consuma ciclos de CPU e não são úteis, devem ser desativados.  
 
 ---
@@ -28,7 +28,7 @@ Lembre-se de que qualquer coisa que consuma ciclos de CPU e não são úteis, de
 ## Otimizando o Windows - Energia
 Você esta usando uma VM e por isso, você não tem compromisso de economia de energia.  
 No Windows vá em **Configurações**, procure por **Energia**, e desative qualquer medida ou tentativa para economizar energia:  
-![Remova a economia de energia](../img/debian_qemu_kvm_windows54.png)    
+![Remova a economia de energia](img/debian_qemu_kvm_windows54.png)    
 
 Em outras palavras, você quer um Windows com **Alto desenpenho**.  
 
@@ -41,10 +41,10 @@ Antes de executar essa ação, saiba que essa ação só é recomendada para os 
 
 Vá no menu iniciar do Windows e procure por **Segurança** e encontrará **Segurança do Windows** então depois vá em **Proteção contra virus e ameaças e desative-o:  
 
-![Desativando Proteção contra vírus e ameaças](../img/debian_qemu_kvm_windows_otimizar01.png)  
+![Desativando Proteção contra vírus e ameaças](img/debian_qemu_kvm_windows_otimizar01.png)  
 
 Caso ache isso imprudente porque no seu contexto irá expor a VM a coisas críticas, então pelo menos indique pastas que sejam seguras o antivírus não ficar varrendo-as em horários programados, mas tenha certeza de eleger uma pasta que tenham contato com o mundo exterior para ser sempre várrida, por exemplo a pasta **Usuários(Users)** onde são manipulados arquivos dos usuários, inclusive os arquivos advindos da Internet:   
-![Otimizando o Windows - Recursos Visuais](../img/debian_qemu_kvm_windows_otimizar04.png)   
+![Otimizando o Windows - Recursos Visuais](img/debian_qemu_kvm_windows_otimizar04.png)   
 
 **ATENÇÃO**: É quase certo que após alguma atualização, este serviço seja religado. Isso acontece com alguma frequencia no Windows 11, então, periodicamente reveja esta configuração.   
 
@@ -60,7 +60,7 @@ A configuração de vídeo é um aspecto muito importante porque não importa o 
 Se você tiver um notebook que tem uma placa de vídeo Intel e outra NVIDIA, parabens você pode configurar sua máquina virtual para passthrough, isto é, deixar o sistema hospedeiro ficar 100% com uma placa de vídeo(Intel) enquanto a VM fica 100% com a outra placa de vídeo(NVIDIA) por meio de passthrough e poderá inclusive jogar nessa VM com desempenho similar sem virtualização.  
 Mas voltando ao assunto, este guia passo a passo foi feito para mortais que usufruem apenas de uma placa de vídeo e como ela fica com o hospedeiro, as VMs "emulam" uma placa de vídeo que usa um driver QXL que é apenas um quebra-galho aceitando apenas a parte 2D, por isso dentro do Windows vocÊ precisa urgentemente desligar todos os efeitos visuais que puder, vá em **Configurações\>ConfiguraçõesaAvançadas do sistema\>Desempenho** e clique em **Configurações** e deixe selecionado apenas a opção **Usar fontes de tela com cantos arredondados** porque nossos olhos não precisam sangrar também:  
 
-![Otimizando o Windows - Recursos Visuais](../img/debian_qemu_kvm_windows_otimizar02.png)  
+![Otimizando o Windows - Recursos Visuais](img/debian_qemu_kvm_windows_otimizar02.png)  
 
 ---
 
@@ -79,7 +79,7 @@ bcdedit /set useplatformclock No
 ## Otimizando o Windows - Apps no iniciar do Windows
 Vá em **Configurações** e procure por **Aplicativos** e então aparecerá um **Aplicativos na inicialização**, execute ele.  
 A seguir serão listados programas que são carregados juntos com o Windows:  
-![Remova a economia de energia](../img/debian_qemu_kvm_windows55.png)    
+![Remova a economia de energia](img/debian_qemu_kvm_windows55.png)    
 
 Desabiltie o máximo de programas que puder.
 
