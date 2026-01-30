@@ -89,6 +89,7 @@ iface br0 inet dhcp
     bridge_maxwait 0
 
 ```
+A vantagem em usar IP fixo é que é mais rápido do que por DHCP, mas se for usá-la então avise seu administrador para que ele faça a reserva senão poderá existir dois IPs iguais na rede e você será identificado como o causador.  
 
 ## 4. Aplicando e Reiniciando
 
