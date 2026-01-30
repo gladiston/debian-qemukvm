@@ -51,7 +51,6 @@ A propósito, sinta-se à vontade para **adaptar os scripts ao seu cenário** pu
 Um sistema previsível e repetível, com configurações documentadas, pronto para trabalho diário, testes e virtualização.
 
 ---
-
 ## Os padrões usados neste guia
 Para o correto entendimento deste guia, usarei alguns padrões:  
 **Nome do host**: ti-01  
@@ -61,46 +60,6 @@ Para o correto entendimento deste guia, usarei alguns padrões:
 **Ubuntu-Like**: É o termo que uso para distro Linux baseadas em Ubuntu que pode se referir aos vários sabores do Ubuntu e também Linux Mint, Zorin OS,...   
 **HowTo**: É o termo que designamos para este guia passo-a-passo.    
 
-As vezes, comandos que precisam ser executados no terminal são mesclados com o texto da saída do comando, quando isso acontecer, para que você diferencie, qual que é o comando e qual é a saída de texto dele, os comandos serão precedidos de "$", por exemplo:  
-```
-$ sudo apt update -y
-Obter:1 https://dl.google.com/linux/chrome/deb stable InRelease [1.825 B]
-Obter:2 https://dl.google.com/linux/chrome/deb stable/main amd64 Packages [1.210 B]                                           
-Atingido:3 http://archive.ubuntu.com/ubuntu questing InRelease                                             
-Atingido:4 http://security.ubuntu.com/ubuntu questing-security InRelease
-Atingido:5 http://archive.ubuntu.com/ubuntu questing-updates InRelease
-Atingido:6 http://archive.ubuntu.com/ubuntu questing-backports InRelease
-Obter:7 http://archive.ubuntu.com/ubuntu questing/main Translation-pt_BR [349 kB]
-Obter:8 http://archive.ubuntu.com/ubuntu questing/main Translation-pt [161 kB]
-Obter:9 http://archive.ubuntu.com/ubuntu questing/universe Translation-pt [823 kB]
-Obter:10 http://archive.ubuntu.com/ubuntu questing/universe Translation-pt_BR [1.668 kB]
-Obter:11 http://archive.ubuntu.com/ubuntu questing/restricted Translation-pt_BR [584 B]
-Obter:12 http://archive.ubuntu.com/ubuntu questing/restricted Translation-pt [588 B]
-Obter:13 http://archive.ubuntu.com/ubuntu questing/multiverse Translation-pt [7.720 B]
-Obter:14 http://archive.ubuntu.com/ubuntu questing/multiverse Translation-pt_BR [18,3 kB]
-Obtidos 3.031 kB em 4s (848 kB/s)                                              
-Todos os pacotes estão atualizados.         
-Nota: Algumas fontes podem ser modernizadas. Execute 'apt modernize-sources' para fazer isso.
-```
-
----
-## UBUNTU vs DEBIAN: QUAL ESCOLHER PARA SUA PRODUTIVIDADE
-As duas distribuições mais influentes no ecossistema Linux são **Debian** e **Ubuntu**, sendo o Ubuntu uma derivação direta do Debian otimizada para usuários domésticos e corporativos.  Você conhece as diferenças? Qual escolher para sua produtividade?  No link abaixo, respondo esta pergunta.  
-
-
-[UBUNTU vs DEBIAN: Qual Escolher para Sua Produtividade?](https://github.com/gladiston/debianlinux/blob/main/docs/debian_ubuntu.md)  
-
----
-
-## GNOME ou KDE PLASMA: QUAL O MELHOR DESKTOP?
-Em sistemas Linux, o **ambiente de trabalho** (ou **Desktop Environment - DE**) é a camada gráfica que interage diretamente com o usuário. Diferentemente do Windows ou macOS, que possuem uma interface fixa, **Linux oferece múltiplas opções de ambientes gráficos**, cada um com filosofia, funcionalidade e estética próprias. As mais populares no Linux são: KDE e GNOME, mas qual as diferenças?
-
-Curioso para saber minha opinião? Clique  no link abaixo:  
-[GNOME ou KDE PLASMA: Qual o melhor desktop?](https://github.com/gladiston/debianlinux/blob/main/docs/debian_kde_gnome.md)  
-
-
----
-
 ## PARTICIONAMENTO DURANTE A INSTALAÇÃO DO DEBIAN/UBUNTU
 A instalação do Debian/Ubuntu não tem grandes mistérios — o ponto mais delicado é mesmo o **particionamento do disco**.  
 No link abaixo explico melhor essa questão, é bom que leia antes de fazer a instalação. Segue:  
@@ -109,7 +68,6 @@ No link abaixo explico melhor essa questão, é bom que leia antes de fazer a in
 
 
 ---
-
 ## SERÁ QUE MEU COMPUTADOR É ELEGIVEL PARA VIRTUALIZAÇÃO NATIVA QEMU+KVM
 Agora, verifique se os módulos do KVM estão carregados no kernel:
 ```bash
@@ -137,7 +95,6 @@ Agora que verificamos que seu computador é elegível para virtualização QEMU+
 [Fazendo um backup das configurações de rede](debian_backup_restore_network.md)  
 
 ---
-
 ## VIRTUALIZAÇÃO NATIVA QEMU+KVM
 O Linux é capaz de criar máquinas virtuais e ele mesmo ser o hypervisor. Será um servidor de virtualização nivel 1, o mais rápido possivel, no entanto com algumas ausencia de recursos que facilitam a configuração que existem no VirtualBox e VMWare, por exemplo, criar redes virtuais com vários tipos de topologias,  clipboard e transferencia de arquivos entre host e anfitrião e outras coisas.  
 Siga os tópicos e saiba que eles estão na ordem que deveriam ser seguidos, e fica a vontade para pular os que não precisa, de maneira geral não há dependencias aqui, ou seja, para um tópico funcionar precisa ter feito o tópico anterior. O único ponto fixo é realmente é a **INSTALAÇÃO**, sem ela, nada funcionará, obviamente.  
