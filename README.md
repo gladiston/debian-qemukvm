@@ -124,7 +124,12 @@ Instale os [programas básicos](debian_qemu_kvm_windows_apps.md).
 ## VIRTUALIZAÇÃO NATIVA QEMU+KVM - CRIANDO UMA INTERFACE BRIDGE
 Para trabalhos extensos e mais profissionais com VMs é impossivel viver apenas com NAT porque na maioria dos ambientes de desenvolvimento ou corporativos uma VM precisa enxergar o anfitrião e também as outras VMs, então siga o tutorial a seguir para criar uma conexão do tipo bridge em seu sistema:  
 
-[Criando conexões bridge pelo terminal](debian_qemu_kvm_bridge.md)   
+[Criando conexões bridge do tipo macvtap](debian_qemu_kvm_bridge_macvtap.md)   
+
+O bridge do tipo **macvtap** é muito interessante, mas se você irá compartilhar arquivos entre host e VM etão temos um problema, ela isola o Host da VM por design. Para resolver isso, precisamos usar um bridge que chamamos de **ponte**. E é sobre este outro link a seguir iremos falar:
+[Criando conexões bridge do tipo macvtap](debian_qemu_kvm_bridge_ponte.md)   
+Este segundo é menos performática - porém nem tanto -, porém o comportamento é como uma segunda placa de rede conectada ao seu computador.
+
 
 É claro que se você está lendo este tutorial e apenas quer usar o Windows com o NAT, não precisará de uma conexão de bridge.  
 
