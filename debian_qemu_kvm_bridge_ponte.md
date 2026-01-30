@@ -8,32 +8,30 @@ Este método é o recomendado para versões Desktop (Debian, Ubuntu, Mint), pois
 
 ## 1. Identificação e Limpeza (Importante)
 
-Antes de criar a nova ponte, precisamos garantir que não existam conexões antigas com o mesmo nome e identificar sua placa física.
+Antes de criar a nova ponte, precisamos garantir que o ambiente esteja limpo para evitar conflitos de IP e UUID.
 
-### Passo A: Identificar a interface física
+### Passo A: Identificar a interface física e a conexão ativa
 ```bash
 nmcli device
 
 ```
 
-Procure a interface do tipo `ethernet` que está `conectada` (ex: `enp5s0`). Chamaremos ela de **SUA_INTERFACE**.
+Procure a interface `ethernet` que está `conectada` (ex: `enp5s0`). Chamaremos ela de **SUA_INTERFACE**.
+Anote também o nome da conexão listada na coluna `CONNECTION` (geralmente `Wired connection 1`).
 
-### Passo B: Limpar conexões antigas
+### Passo B: Limpar conexões de bridge antigas
 
-Para evitar erros de UUID duplicado, verifique se já existe uma conexão chamada `br0` ou escravos antigos e remova-os:
+Verifique se já existe uma conexão chamada `br0` e remova-a para evitar duplicidade de UUID:
 
 ```bash
-# Lista as conexões
-nmcli connection show
-
-# Se houver algo chamado 'br0', remova:
+# Se houver algo chamado 'br0' no comando 'nmcli connection show', remova:
 sudo nmcli connection delete br0
 
 ```
 
 ### Passo C: Preparar o arquivo interfaces
 
-Certifique-se de que o arquivo `/etc/network/interfaces` não possui configurações para a sua placa física ou para a bridge. Deixe-o apenas com o básico:
+Certifique-se de que o arquivo `/etc/network/interfaces` não possui configurações para a sua placa física. Deixe-o apenas com o básico:
 
 ```text
 auto lo
@@ -57,8 +55,6 @@ sudo apt update && sudo apt install bridge-utils -y
 
 ## 3. Criando a Bridge via Terminal (nmcli)
 
-Siga esta sequência exata de comandos para criar a ponte de forma limpa:
-
 ### Passo A: Criar a interface da Bridge
 
 ```bash
@@ -68,42 +64,54 @@ sudo nmcli connection add type bridge autoconnect yes con-name br0 ifname br0
 
 ### Passo B: Escravizar a placa física à Bridge
 
-Substitua `SUA_INTERFACE` pelo nome que você identificou no Passo 1 (ex: `enp5s0`).
+Substitua `SUA_INTERFACE` pelo nome real (ex: `enp5s0`).
 
 ```bash
 sudo nmcli connection add type bridge-slave autoconnect yes con-name bridge-slave-SUA_INTERFACE ifname SUA_INTERFACE master br0
 
 ```
 
-### Passo C: Configurar a Bridge (Escolha uma opção)
+### Passo C: Desativar a conexão Ethernet antiga (Crucial)
 
-**Opção 1: Configuração via DHCP (Recomendado)**
-O NetworkManager cuidará do IP, Gateway e DNS automaticamente.
+O NetworkManager não consegue subir a Bridge se a placa física estiver "presa" à conexão Ethernet comum. Substitua o nome entre aspas pelo que você encontrou no Passo 1A:
+
+```bash
+sudo nmcli connection down "Wired connection 1"
+
+```
+
+### Passo D: Configurar e Ativar a Bridge
+
+**Opção 1: DHCP (Recomendado)**
 
 ```bash
 sudo nmcli connection modify br0 ipv4.method auto
-
-```
-
-**Opção 2: Configuração com IP Fixo (Estático)**
-
-```bash
-sudo nmcli connection modify br0 ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns "192.168.1.5, 8.8.8.8" ipv4.method manual
-
-```
-
-### Passo D: Ativar a conexão
-
-```bash
 sudo nmcli connection up br0
 
 ```
 
-*Sua conexão cairá por um instante e voltará operando através da ponte.*
+**Opção 2: IP Fixo (Estático)**
+
+```bash
+sudo nmcli connection modify br0 ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns "192.168.1.5, 8.8.8.8" ipv4.method manual
+sudo nmcli connection up br0
+
+```
 
 ---
 
-## 4. Configuração no Virtual Machine Manager (Virt-Manager)
+## 4. Testando a Conectividade do Host
+
+Antes de abrir o Virt-Manager, verifique se o seu Debian está navegando corretamente:
+
+1. **Verificar IP:** O comando `ip addr show br0` deve mostrar o IP recebido.
+2. **Testar Rota (Ping IP):** `ping -c 4 8.8.8.8` (Se funcionar, o gateway está ok).
+3. **Testar DNS (Ping Nome):** `ping -c 4 google.com` (Se funcionar, o DNS está ok).
+4. **Verificar Bridge:** O comando `brctl show` deve listar `SUA_INTERFACE` dentro de `br0`.
+
+---
+
+## 5. Configuração no Virtual Machine Manager (Virt-Manager)
 
 Agora, configure sua VM para entrar neste switch virtual:
 
@@ -115,9 +123,9 @@ Agora, configure sua VM para entrar neste switch virtual:
 
 ---
 
-## 5. Solução de Problemas: Host não responde à VM?
+## 6. Solução de Problemas: Host não responde à VM?
 
-Se a VM navegar mas não acessar o Samba do Host, execute estes comandos para desativar o filtro de firewall interno da ponte:
+Se a VM navegar mas não acessar o Samba ou serviços do Host (Debian), o Kernel pode estar filtrando o tráfego interno da ponte. Execute:
 
 ```bash
 echo "net.bridge.bridge-nf-call-iptables = 0" | sudo tee /etc/sysctl.d/bridge.conf
@@ -128,20 +136,7 @@ sudo sysctl -p /etc/sysctl.d/bridge.conf
 
 ---
 
-## 6. Verificação Final
-
-Verifique se a interface física foi corretamente acoplada à ponte:
-
-```bash
-brctl show
-
-```
-
-A saída deve mostrar a `SUA_INTERFACE` (e as interfaces `vnet` das VMs ligadas) listadas sob a ponte `br0`.
-
----
-
-### Dica para o Samba
+## 7. Dica para o Samba
 
 Garanta que o Samba responda na interface correta editando o `/etc/samba/smb.conf`:
 
@@ -153,9 +148,8 @@ bind interfaces only = yes
 
 ## Conclusão
 
-Gerenciar a Bridge pelo **NetworkManager** garante que o sistema lide corretamente com a troca de rotas e DNS, algo que costuma falhar em ambientes Desktop quando configurado manualmente por arquivos de texto.
+Gerenciar a Bridge pelo **NetworkManager** garante que o sistema lide corretamente com a troca de rotas e DNS, mantendo a estabilidade tanto do Host quanto das Máquinas Virtuais.
 
 ---
 
 [Retornar](https://github.com/gladiston/debian-qemukvm)
-
