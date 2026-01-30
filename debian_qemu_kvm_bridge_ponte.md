@@ -52,17 +52,24 @@ sudo cp /etc/network/interfaces /etc/network/interfaces.bak
 
 ```bash
 sudo editor /etc/network/interfaces
-
 ```
+Seu arquivo `/etc/network/interfaces` deve estar assim:
+```
+source /etc/network/interfaces.d/*
 
-3. **Opção A: Configuração via DHCP (Recomendado para iniciantes)**
-
-```text
-# Interface Loopback
+# The loopback network interface
 auto lo
 iface lo inet loopback
+```
+Abaixo dessas linhas voce deve incluir uma das opções a seguir:  
 
-# Interface Física (Sem IP)
+
+**Opção A: Configuração via DHCP (Recomendado para iniciantes)**
+
+```text
+# ( mantenha as linhas anteriores )
+
+# Interface Física 
 allow-hotplug SUA_INTERFACE
 iface SUA_INTERFACE inet manual
 
@@ -76,16 +83,14 @@ iface br0 inet dhcp
 
 ```
 
-4. **Opção B: Configuração com IP Fixo (Estático)**
+**Opção B: Configuração com IP Fixo (Estático)**
 Use esta opção se o seu servidor precisar manter sempre o mesmo endereço IP.
 *Nota: Se usar esta opção, certifique-se de que o IP escolhido não está em uso para evitar conflitos de rede.*
 
 ```text
-# Interface Loopback
-auto lo
-iface lo inet loopback
+# ( mantenha as linhas anteriores )
 
-# Interface Física (Sem IP)
+# Interface Física 
 allow-hotplug SUA_INTERFACE
 iface SUA_INTERFACE inet manual
 
@@ -103,7 +108,7 @@ iface br0 inet static
 
 ```
 
-## 4. Aplicando e Reiniciando
+## 3. Aplicando e Reiniciando
 
 Diferente de redes simples, a Bridge altera rotas profundas do Kernel. Para limpar caches de ARP e garantir que as novas rotas sejam assumidas corretamente, reinicie o computador:
 
@@ -112,7 +117,7 @@ sudo reboot
 
 ```
 
-## 5. Configuração no Virtual Machine Manager (Virt-Manager)
+## 4. Configuração no Virtual Machine Manager (Virt-Manager)
 
 Para que a sua VM utilize esse novo switch virtual:
 
@@ -125,7 +130,7 @@ Para que a sua VM utilize esse novo switch virtual:
 
 
 
-## 6. Solução de Problemas: O Host não responde à VM?
+## 5. Solução de Problemas: O Host não responde à VM?
 
 Se a VM navega na internet mas não consegue acessar o Samba ou dar Ping no Host, o Kernel pode estar filtrando o tráfego interno da ponte. Execute os comandos abaixo para desativar esse filtro:
 
@@ -139,7 +144,7 @@ sudo sysctl -p /etc/sysctl.d/bridge.conf
 
 ```
 
-## 7. Verificação Final
+## 6. Verificação Final
 
 No terminal do Debian-Like, o comando `brctl show` deve exibir a interface física e a interface virtual da VM (vnet) conectadas à `br0`:
 
@@ -176,8 +181,3 @@ Ao configurar uma **Linux Bridge**, você elimina a barreira invisível entre Ho
 
 [Retornar](https://github.com/gladiston/debian-qemukvm)
 
-
-
-Posso te ajudar com mais alguma coisa para o seu repositório? Seria útil criar um script `.sh` que automatiza a criação dessa bridge?
-
-```
