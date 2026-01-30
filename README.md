@@ -138,13 +138,29 @@ Agora que verificamos que seu computador é elegível para virtualização QEMU+
 
 ---
 
-# VIRTUALIZAÇÃO NATIVA QEMU+KVM
+## VIRTUALIZAÇÃO NATIVA QEMU+KVM
 O Linux é capaz de criar máquinas virtuais e ele mesmo ser o hypervisor. Será um servidor de virtualização nivel 1, o mais rápido possivel, no entanto com algumas ausencia de recursos que facilitam a configuração que existem no VirtualBox e VMWare, por exemplo, criar redes virtuais com vários tipos de topologias,  clipboard e transferencia de arquivos entre host e anfitrião e outras coisas.  
-Vamos agora executar a instalação do QEMU+KVM, siga o link:
+Siga os tópicos e saiba que eles estão na ordem que deveriam ser seguidos, e fica a vontade para pular os que não precisa, de maneira geral não há dependencias aqui, ou seja, para um tópico funcionar precisa ter feito o tópico anterior. O único ponto fixo é realmente é a **INSTALAÇÃO**, sem ela, nada funcionará, obviamente.  
+Vamos agora executar a instalação do QEMU+KVM, siga o link:  
+
 [Instalando o QEMU+KVM](debian_qemu_kvm.md)
 
 ---
 
+## Compartilhamento de arquivos entre hospedeiro e anfitrião  
+Você precisa do suporte ao VirtioFS, siga as instruções [aqui](debian_qemu_kvm_windows_virtiofs.md).  
+
+---
+
+## Programas Básicos
+Instale os [programas básicos](debian_qemu_kvm_windows_apps.md).  
+
+---
+
+## Compactar o Arquivo QCOW2
+Arquivos que representam o disco da VM usam o formato qcow2, que vai inxando com o tempo.
+Então vez ou outra voce precisa compactá-las, mas não é uma compactação do estilo zip, essa é uma compactação que envolve a desfragmentação eliberando os espaços de setores vazios do disco.  
+Para saber como fazer isso, siga o [link](debian_qemu_kvm_compact_qcow2.md).    
 
 ### VIRTUALIZAÇÃO NATIVA QEMU+KVM - CRIANDO UMA INTERFACE BRIDGE
 Para trabalhos extensos e mais profissionais com VMs é impossivel viver apenas com NAT porque na maioria dos ambientes de desenvolvimento ou corporativos uma VM precisa enxergar o anfitrião e também as outras VMs, então siga o tutorial a seguir para criar uma conexão do tipo bridge em seu sistema:  
