@@ -4,13 +4,7 @@ Este guia descreve como configurar uma ponte de rede (Bridge) real no Debian. Di
 
 Falamos em artigo anterior sobre uma bridge do tipo **macvtap**, mas ela tem o seguinte problema,e ela isola o Host da VM por design. Para resolver isso, precisamos usar o **Linux Bridge (`br0`)**. E é sobre este outro tipo de bridge que iremos falar.
 
-
-# Configuração de Rede Bridge no Debian (QEMU/KVM)
-
-Este guia ensina como configurar uma **Linux Bridge** real. Ao contrário do `macvtap`, que isola o Host da Máquina Virtual, a Bridge cria um switch virtual onde o Debian (Host) e as VMs Windows/Linux podem trocar arquivos (Samba), compartilhar impressoras e se comunicar livremente.
-
 ---
-
 ## 1. Identificação da Interface Física
 
 Os nomes das interfaces variam conforme o hardware (ex: `eth0`, `enp5s0`, `eno1`). Antes de configurar, identifique a sua:
@@ -52,7 +46,7 @@ sudo cp /etc/network/interfaces /etc/network/interfaces.bak
 ```bash
 sudo editor /etc/network/interfaces`
 ```
-5. Configure conforme o exemplo abaixo:
+5. Configure conforme o exemplo abaixo se quiser um IP estaticopara sua bridge:
 
 ```text
 # Interface Loopback
@@ -73,6 +67,25 @@ iface br0 inet static
     dns-nameservers 8.8.8.8 1.1.1.1
     bridge_stp off       # Spanning Tree Protocol (off para uso doméstico/small office)
     bridge_fd 0          # Forward Delay
+    bridge_maxwait 0
+
+```
+ou se Preferir que essas informações sejam obtidas via DHCP:
+```text
+# Interface Loopback
+auto lo
+iface lo inet loopback
+
+# Interface Física (Sem IP)
+allow-hotplug SUA_INTERFACE
+iface SUA_INTERFACE inet manual
+
+# Interface Bridge (Configurada via DHCP)
+auto br0
+iface br0 inet dhcp
+    bridge_ports SUA_INTERFACE
+    bridge_stp off
+    bridge_fd 0
     bridge_maxwait 0
 
 ```
