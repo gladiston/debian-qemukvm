@@ -16,7 +16,7 @@ nmcli device
 
 ```
 
-Procure a interface `ethernet` que está `conectada` (ex: `enp5s0`). Chamaremos ela de **SUA_INTERFACE**.
+Procure a interface `ethernet` que está `conectada` (ex: `enp5s0`). Chamaremos ela de `SUA_INTERFACE`.
 Anote o nome da conexão na coluna `CONNECTION` (geralmente `Wired connection 1`).
 
 ### Passo B: Remover Bridge e Escravos preexistentes
@@ -26,7 +26,7 @@ Para evitar erros de UUIDs conflitantes, execute a limpeza abaixo:
 ```bash
 # Remove a conexão br0 e seus escravos se existirem
 sudo nmcli connection delete br0
-sudo nmcli connection delete bridge-slave-SUA_INTERFACE 2>/dev/null
+sudo nmcli connection delete bridge-slave-`SUA_INTERFACE` 2>/dev/null
 
 ```
 
@@ -65,10 +65,10 @@ sudo nmcli connection add type bridge autoconnect yes con-name br0 ifname br0
 
 ### Passo B: Escravizar a placa física à Bridge
 
-Substitua `SUA_INTERFACE` pelo nome real (ex: `enp5s0`).
+Substitua ``SUA_INTERFACE`` pelo nome real (ex: `enp5s0`).
 
 ```bash
-sudo nmcli connection add type bridge-slave autoconnect yes con-name bridge-slave-SUA_INTERFACE ifname SUA_INTERFACE master br0
+sudo nmcli connection add type bridge-slave autoconnect yes con-name bridge-slave-`SUA_INTERFACE` ifname `SUA_INTERFACE` master br0
 
 ```
 
@@ -91,22 +91,33 @@ Sempre ative o "escravo" antes da interface principal para garantir que o canal 
 
 ```bash
 sudo nmcli connection modify br0 ipv4.method auto
-sudo nmcli connection up bridge-slave-SUA_INTERFACE
+```
+Se deu certo, então prosseguimos:  
+```bash
+sudo nmcli connection up bridge-slave-`SUA_INTERFACE`
+```bash
+Se também deu certo, agora ativamos `br0`:
+```bash
 sudo nmcli connection up br0
-
 ```
 
 **Opção 2: IP Fixo (Estático)**
 
 ```bash
 sudo nmcli connection modify br0 ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns "192.168.1.5, 8.8.8.8" ipv4.method manual
-sudo nmcli connection up bridge-slave-SUA_INTERFACE
-sudo nmcli connection up br0
-
 ```
+Se deu certo, então prosseguimos:  
+```bash
+sudo nmcli connection up bridge-slave-`SUA_INTERFACE`
+```
+Se também deu certo, agora ativamos `br0`:
+```bash
+sudo nmcli connection up br0
+```
+Importante: Quando a `br0` subir, a interface fisica `enp5s0` vai se desconectar e reconectar novamente e isso é normal.  
+
 
 ---
-
 ## 4. Testando a Conectividade do Host
 
 Verifique se o seu Debian está navegando corretamente antes de configurar a VM:
@@ -114,7 +125,7 @@ Verifique se o seu Debian está navegando corretamente antes de configurar a VM:
 1. **Verificar IP:** O comando `ip addr show br0` deve exibir o IP.
 2. **Testar Gateway:** `ping -c 4 8.8.8.8` (Se funcionar, a ponte física está ok).
 3. **Testar DNS:** `ping -c 4 google.com` (Se funcionar, a internet está 100%).
-4. **Verificar Bridge:** O comando `brctl show` deve listar `SUA_INTERFACE` dentro de `br0`.
+4. **Verificar Bridge:** O comando `brctl show` deve listar ``SUA_INTERFACE`` dentro de `br0`.
 
 ---
 
