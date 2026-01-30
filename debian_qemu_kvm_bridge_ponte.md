@@ -46,8 +46,26 @@ sudo cp /etc/network/interfaces /etc/network/interfaces.bak
 ```bash
 sudo editor /etc/network/interfaces
 ```
-5. Configure conforme o exemplo abaixo se quiser um IP estaticopara sua bridge:
+5. Configure conforme o exemplo abaixo se quiser um IP estaticopara sua bridge do tipo 'ponte':
+```text
+# Interface Loopback
+auto lo
+iface lo inet loopback
 
+# Interface Física (Sem IP)
+allow-hotplug SUA_INTERFACE
+iface SUA_INTERFACE inet manual
+
+# Interface Bridge (Configurada via DHCP)
+auto br0
+iface br0 inet dhcp
+    bridge_ports SUA_INTERFACE
+    bridge_stp off
+    bridge_fd 0
+    bridge_maxwait 0
+
+```
+Mas se por alguma razão, você precisar de IP fixo para essa ponte, então o arquivo de configuração ficaria assim:  
 ```text
 # Interface Loopback
 auto lo
@@ -70,26 +88,7 @@ iface br0 inet static
     bridge_maxwait 0
 
 ```
-ou se Preferir que essas informações sejam obtidas via DHCP:
-```text
-# Interface Loopback
-auto lo
-iface lo inet loopback
-
-# Interface Física (Sem IP)
-allow-hotplug SUA_INTERFACE
-iface SUA_INTERFACE inet manual
-
-# Interface Bridge (Configurada via DHCP)
-auto br0
-iface br0 inet dhcp
-    bridge_ports SUA_INTERFACE
-    bridge_stp off
-    bridge_fd 0
-    bridge_maxwait 0
-
-```
-A vantagem em usar IP fixo é que é mais rápido do que por DHCP, mas se for usá-la então avise seu administrador para que ele faça a reserva senão poderá existir dois IPs iguais na rede e você será identificado como o causador.  
+A vantagem em usar IP fixo é que ele é mais rápido do que por DHCP, mas se for usá-la então avise seu administrador para que ele faça a reserva no pool de IPs, senão poderá existir dois IPs iguais na rede e isso dá um problemão e então **você** será identificado como o causador e sofrerá as penalidades.  
 
 ## 4. Aplicando e Reiniciando
 
