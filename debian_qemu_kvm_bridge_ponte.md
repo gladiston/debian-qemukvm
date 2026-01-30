@@ -44,7 +44,7 @@ sudo cp /etc/network/interfaces /etc/network/interfaces.bak
 ```
 3. Edite o arquivo:
 ```bash
-sudo editor /etc/network/interfaces`
+sudo editor /etc/network/interfaces
 ```
 5. Configure conforme o exemplo abaixo se quiser um IP estaticopara sua bridge:
 
