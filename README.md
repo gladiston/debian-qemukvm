@@ -146,31 +146,7 @@ Vamos agora executar a instalação do QEMU+KVM, siga o link:
 [Instalando o QEMU+KVM](debian_qemu_kvm.md)
 
 ---
-
-## Compartilhamento de arquivos entre hospedeiro e anfitrião  
-Você precisa do suporte ao VirtioFS, siga as instruções [aqui](debian_qemu_kvm_windows_virtiofs.md).  
-
----
-
-## Programas Básicos
-Instale os [programas básicos](debian_qemu_kvm_windows_apps.md).  
-
----
-
-## Compactar o Arquivo QCOW2
-Arquivos que representam o disco da VM usam o formato qcow2, que vai inxando com o tempo.
-Então vez ou outra voce precisa compactá-las, mas não é uma compactação do estilo zip, essa é uma compactação que envolve a desfragmentação eliberando os espaços de setores vazios do disco.  
-Para saber como fazer isso, siga o [link](debian_qemu_kvm_compact_qcow2.md).    
-
-### VIRTUALIZAÇÃO NATIVA QEMU+KVM - CRIANDO UMA INTERFACE BRIDGE
-Para trabalhos extensos e mais profissionais com VMs é impossivel viver apenas com NAT porque na maioria dos ambientes de desenvolvimento ou corporativos uma VM precisa enxergar o anfitrião e também as outras VMs, então siga o tutorial a seguir para criar uma conexão do tipo bridge em seu sistema:  
-
-[Criando conexões bridge pelo terminal](debian_qemu_kvm_bridge.md)   
-
-É claro que se você está lendo este tutorial e apenas quer usar o Windows com o NAT, não precisará de uma conexão de bridge.  
-  
-
-### VIRTUALIZAÇÃO NATIVA QEMU+KVM - Windows
+## VIRTUALIZAÇÃO NATIVA QEMU+KVM - WINDOWS
 A virtualização com QEMU+KVM oferece desempenho quase nativo, aproveitando recursos do processador e integração direta com o kernel Linux. É uma opção poderosa e leve para executar Windows dentro do Linux, especialmente quando usada com o Virt-Manager, que simplifica a criação e o gerenciamento de VMs.  
 
 Neste guia, você verá como criar uma máquina virtual Windows otimizada, usando o pacote de drivers virtio-win para melhor desempenho de disco, rede e vídeo, além de boas práticas sobre discos dinâmicos, rede bridge e configurações essenciais.  
@@ -179,33 +155,51 @@ Agora que você entende o contexto, vamos começar preparando o ambiente com o p
 
 [Criando e ajustando VM Windows](debian_qemu_kvm_windows.md)
 
-
-### VIRTUALIZAÇÃO NATIVA QEMU+KVM - Criando máquinas virtuais pelo Virt-Manager
+## VIRTUALIZAÇÃO NATIVA QEMU+KVM - Criando máquinas virtuais pelo Virt-Manager
 Instruções de como usar o virt-manager encontra-se na página:  
 [Criando máquinas virtuais pelo Virt-Manager](https://sempreupdate.com.br/como-configurar-e-usar-o-virt-manager-para-kvm-no-fedora-ubuntu-debian-e-derivados/#google_vignette)   
 
+---
+## INSTALANDO PROGRAMAS BÁSICOS NA VM WINDOWS
+Instale os [programas básicos](debian_qemu_kvm_windows_apps.md).  
 
-### EXECUTANDO MAQUINAS VIRTUAIS VIA VIRT-VIEWER
+---
+## VIRTUALIZAÇÃO NATIVA QEMU+KVM - CRIANDO UMA INTERFACE BRIDGE
+Para trabalhos extensos e mais profissionais com VMs é impossivel viver apenas com NAT porque na maioria dos ambientes de desenvolvimento ou corporativos uma VM precisa enxergar o anfitrião e também as outras VMs, então siga o tutorial a seguir para criar uma conexão do tipo bridge em seu sistema:  
+
+[Criando conexões bridge pelo terminal](debian_qemu_kvm_bridge.md)   
+
+É claro que se você está lendo este tutorial e apenas quer usar o Windows com o NAT, não precisará de uma conexão de bridge.  
+
+---
+## COMPARTILHAMENTO DE ARQUIVOS ENTRE HOSPEDERIRO E ANFITRIÃO
+
+Você precisa do suporte ao VirtioFS, siga as instruções no link a seguir:  
+[Compartilhamento de arquivos entre hospedeiro e anfitrião](debian_qemu_kvm_windows_virtiofs.md).  
+
+---
+## EXECUTANDO MAQUINAS VIRTUAIS VIA VIRT-VIEWER
 Você provavelmente está usando o `virt-manager` para iniciar e encerrar suas VMs e não tem nada de errado com isso, no entanto, há um aplicativo mais otimizado para isso, ele se chama `virt-viewer`.  
 Alguns serviços, especialmente para VM Windows, esperam que você use o `virt-viewer` sem o `virt-manager` acionado.  
 Veja no link abaixo como usufruir do `virt-viewer` ao invés do virt-manager:
 
 [Executando VM usando virt-viewer](debian_qemu_kvm_virtviewer.md)  
 
-
+---
 ### OTIMIZANDO O DISCO QCOW2
 O QCOW2 é um formato copy-on-write com recursos como snapshots, compressão e alocação sob demanda. Esses recursos trazem overhead e, com o tempo, geram fragmentação interna. Mas máquinas Windows são muito mais afetadas do que as demais porque o Windows gera memória virtual, arquivos temporários a todo instante. Então o link a seguir descreve como podemos otimizar e compactar o disco virtual para que o desempenho - especialmente para VMs Windows - fique sempre máximizado.  
 
 [Instruções para melhorar o desempenho](debian_qemu_kvm_otimizar_disco.md)
 
-### Backup de Máquinas Virtuais em QEMU+KVM
+---
+## Backup de Máquinas Virtuais em QEMU+KVM
 **Backup de máquina virtual** é a replicação sistemática dos arquivos de disco (imagens QCOW2, RAW, VDI, etc.) e metadados de configuração (arquivos XML do libvirt) para um local independente, garantindo recuperação em caso de corrupção, falha de hardware, exclusão acidental ou desastre. Diferencia-se de snapshots, que são pontos de restauração locais; backups são cópias isoladas em mídia ou storage separado.  
 
 Para entender melhor e aprender como fazer siga o link:  
 [Realizando backups de maquinas virtuais](debian_qemu_kvm_backup.md)  
 
-
-### Convertendo máquinas virtuais do VirtualBox para QEMU+KVM
+---
+## Convertendo máquinas virtuais do VirtualBox para QEMU+KVM
 O VirtualBox é um hipervisor do tipo 2 amplamente utilizado para virtualização em desktops. As vezes é preciso migrar máquinas virtuais desta plataforma para o QEMU+KVM. A conversão funciona, mas levamos junto o lixo da instalação anterior e nem sempre temos os melhores resultados, no entanto, é melhor do que criar tudo do zero. Siga o link abaixo se precisar migrar máquinas virtuais do VirtualBox:  
 
 [Convertendo máquinas virtuais do VirtualBox para QEMU/KVM](debian_qemu_kvm_vbox.md)  
