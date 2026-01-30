@@ -17,10 +17,19 @@ Os nomes das interfaces variam conforme o hardware (ex: `eth0`, `enp5s0`, `eno1`
 
 ```bash
 ip link show
-
+```
+Haverá um resultado como:  
+```
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp5s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 10:ff:e0:05:81:ad brd ff:ff:ff:ff:ff:ff
+    altname enx10ffe00581ad
+4: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:3d:67:a4 brd ff:ff:ff:ff:ff:ff
 ```
 
-> **NOTA:** Procure a interface que está no estado `UP`. Neste guia, chamaremos essa interface de **SUA_INTERFACE**. Substitua este termo pelo nome real que você encontrou.
+> **NOTA:** Procure a interface que está no estado `UP`, em nosso exemplo `enp5s0`, então daqui em diante chamaremos essa interface de **SUA_INTERFACE**. Substitua este termo pelo nome real que você encontrou.
 
 ## 2. Instalação das Ferramentas
 
@@ -36,10 +45,14 @@ sudo apt update && sudo apt install bridge-utils -y
 É aqui que a mágica acontece. Vamos "escravizar" sua placa física à ponte `br0`. O IP passará a pertencer à ponte, e não mais à placa física.
 
 1. Faça um backup da configuração atual:
-`sudo cp /etc/network/interfaces /etc/network/interfaces.bak`
-2. Edite o arquivo:
-`sudo nano /etc/network/interfaces`
-3. Configure conforme o exemplo abaixo:
+```bash
+sudo cp /etc/network/interfaces /etc/network/interfaces.bak
+```
+3. Edite o arquivo:
+```bash
+sudo editor /etc/network/interfaces`
+```
+5. Configure conforme o exemplo abaixo:
 
 ```text
 # Interface Loopback
