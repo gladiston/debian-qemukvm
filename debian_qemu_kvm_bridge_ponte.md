@@ -138,7 +138,9 @@ br0             8000.10ffe00581ad       no              SUA_INTERFACE
 
 ---
 
-**Dica para Samba:** No seu `smb.conf`, garanta que o Samba está ouvindo na interface `br0`:
-`interfaces = lo br0`
-`bind interfaces only = yes`
-
+### Dica para Samba
+No seu `smb.conf`, garanta que o Samba está ouvindo na interface `br0`:  
+```
+interfaces = lo br0
+bind interfaces only = yes
+```
