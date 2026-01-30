@@ -23,7 +23,7 @@ Haverá um resultado como:
     link/ether 52:54:00:3d:67:a4 brd ff:ff:ff:ff:ff:ff
 ```
 
-> **NOTA:** Procure a interface que está no estado `UP`, em nosso exemplo `enp5s0`, então daqui em diante chamaremos essa interface de **SUA_INTERFACE**. Substitua este termo pelo nome real que você encontrou.
+Procure a interface que está no estado `UP`, em nosso exemplo foi identificado como `enp5s0`, então daqui em diante chamaremos essa interface de **SUA_INTERFACE**. Substitua este termo pelo nome real que você encontrou.
 
 ## 2. Instalação das Ferramentas
 
