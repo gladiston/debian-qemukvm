@@ -1,6 +1,6 @@
-# Configuração de Rede Bridge no Debian (QEMU/KVM)
+# Configuração de Rede Bridge no Debian-Like (QEMU/KVM)
 
-Este guia descreve como configurar uma ponte de rede (Bridge) real no Debian. Diferente do `macvtap`, a Bridge permite que o Host e a Máquina Virtual (VM) se comuniquem entre si, além de permitir que a VM seja vista como um dispositivo físico na rede local.
+Este guia descreve como configurar uma ponte de rede (Bridge) real no Debian-Like. Diferente do `macvtap`, a Bridge permite que o Host e a Máquina Virtual (VM) se comuniquem entre si, além de permitir que a VM seja vista como um dispositivo físico na rede local.
 
 Falamos em artigo anterior sobre uma bridge do tipo **macvtap**, mas ela tem o seguinte problema,e ela isola o Host da VM por design. Para resolver isso, precisamos usar o **Linux Bridge (`br0`)**. E é sobre este outro tipo de bridge que iremos falar.
 
@@ -75,7 +75,7 @@ iface lo inet loopback
 allow-hotplug SUA_INTERFACE
 iface SUA_INTERFACE inet manual
 
-# Interface Bridge (O Servidor Debian usará este IP)
+# Interface Bridge (O Servidor Debian-Like usará este IP)
 auto br0
 iface br0 inet static
     bridge_ports SUA_INTERFACE
@@ -127,7 +127,7 @@ sudo sysctl -p /etc/sysctl.d/bridge.conf
 
 ## 7. Verificação Final
 
-No terminal do Debian, o comando `brctl show` deve exibir algo parecido com isto:
+No terminal do Debian-Like, o comando `brctl show` deve exibir algo parecido com isto:
 
 ```text
 bridge name     bridge id               STP enabled     interfaces
@@ -144,3 +144,15 @@ No seu `smb.conf`, garanta que o Samba está ouvindo na interface `br0`:
 interfaces = lo br0
 bind interfaces only = yes
 ```
+
+## Conclusão
+
+Ao configurar uma **Linux Bridge** em vez de utilizar o isolamento do `macvtap`, você transforma seu servidor Debian-Like em um nó de rede muito mais versátil. Essa configuração elimina a barreira invisível entre o Host e o Guest, permitindo que serviços críticos como **Samba, SSH e bancos de dados** funcionem de forma transparente, como se fossem máquinas físicas distintas conectadas ao mesmo switch.
+
+### Dicas Finais:
+* **IP Fixo no Roteador:** Se você optou por DHCP na Bridge, lembre-se de reservar o IP no seu roteador através do endereço MAC para evitar que o IP do servidor mude e "quebre" o mapeamento de rede no Windows.
+* **Performance:** Para servidores de arquivos, prefira sempre o driver de rede `virtio`. Ele reduz o overhead da CPU e entrega velocidades próximas ao cabo gigabit real.
+* **Backup:** Mantenha sempre uma cópia do seu `/etc/network/interfaces`. Em atualizações de versão do Debian-Like, o sistema pode perguntar se você deseja manter sua versão modificada — escolha sempre "Manter a versão atual".
+
+---
+[Retornar](https://github.com/gladiston/debian-qemukvm)
