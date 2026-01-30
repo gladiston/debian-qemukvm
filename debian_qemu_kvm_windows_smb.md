@@ -141,7 +141,8 @@ sudo chmod -R 755 /home/gsantana/work
     smbclient //localhost/work -U gsantana
     ```
 
-    Digite a senha do Samba. O prompt `smb: \>` confirma a conexão bem-sucedida.
+    Digite a senha do Samba e se estiver correta, o prompt `smb: \>` confirma a conexão bem-sucedida e se quiser usar alguns comandos, tente o `ls` e depois o `quit`.  
+    
 
 -----
 
