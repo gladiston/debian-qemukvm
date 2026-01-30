@@ -8,7 +8,7 @@ Este método é o recomendado para versões Desktop (Debian, Ubuntu, Mint), pois
 
 ## 1. Identificação e Limpeza (Importante)
 
-Antes de criar a nova ponte, precisamos garantir que o ambiente esteja limpo para evitar conflitos de IP e UUID.
+Antes de criar a nova ponte, precisamos garantir que o ambiente esteja limpo e identificar os nomes corretos das interfaces.
 
 ### Passo A: Identificar a interface física e a conexão ativa
 ```bash
@@ -17,15 +17,18 @@ nmcli device
 ```
 
 Procure a interface `ethernet` que está `conectada` (ex: `enp5s0`). Chamaremos ela de **SUA_INTERFACE**.
-Anote também o nome da conexão listada na coluna `CONNECTION` (geralmente `Wired connection 1`).
+Anote também o nome da conexão listada na coluna `CONNECTION` (ex: `Wired connection 1`).
 
-### Passo B: Limpar conexões de bridge antigas
+### Passo B: Checar e remover Bridge preexistente
 
-Verifique se já existe uma conexão chamada `br0` e remova-a para evitar duplicidade de UUID:
+Para evitar erros de duplicidade ou UUIDs conflitantes, execute a limpeza abaixo:
 
 ```bash
-# Se houver algo chamado 'br0' no comando 'nmcli connection show', remova:
-sudo nmcli connection delete br0
+# Verifica se já existe uma conexão br0
+if nmcli connection show br0 >/dev/null 2>&1; then
+    echo "Removendo conexão br0 existente..."
+    sudo nmcli connection delete br0
+fi
 
 ```
 
@@ -73,7 +76,7 @@ sudo nmcli connection add type bridge-slave autoconnect yes con-name bridge-slav
 
 ### Passo C: Desativar a conexão Ethernet antiga (Crucial)
 
-O NetworkManager não consegue subir a Bridge se a placa física estiver "presa" à conexão Ethernet comum. Substitua o nome entre aspas pelo que você encontrou no Passo 1A:
+O NetworkManager não consegue subir a Bridge se a placa física estiver "presa" à conexão Ethernet comum. Substitua o nome pelo que você encontrou no Passo 1A:
 
 ```bash
 sudo nmcli connection down "Wired connection 1"
