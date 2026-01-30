@@ -45,8 +45,7 @@ sudo nmcli connection delete bridge-slave-$my_iface 2>/dev/null
 
 ### Passo B: Preparar o arquivo interfaces
 
-O arquivo `/etc/network/interfaces` deve conter apenas o loopback para não conflitar com o NetworkManager:
-
+O arquivo `/etc/network/interfaces` deve conter apenas o loopback para não conflitar com o NetworkManager, exemplo de como deve estar:   
 ```text
 auto lo
 iface lo inet loopback
@@ -58,15 +57,13 @@ source /etc/network/interfaces.d/*
 
 ## 3. Criando a Bridge via Terminal (nmcli)
 
-### Passo A: Criar a interface da Bridge e o Escravo
-
+Vamos criar a interface mestre
 ```bash
-# Criar a interface mestre
 sudo nmcli connection add type bridge autoconnect yes con-name br0 ifname br0
-
-# Criar a interface escrava vinculada à sua placa física
+```
+Agora vamos criar a interface escrava vinculada à sua placa física:  
+```bash
 sudo nmcli connection add type bridge-slave autoconnect yes con-name bridge-slave-$my_iface ifname $my_iface master br0
-
 ```
 
 ### Passo B: Neutralizar a conexão antiga
