@@ -344,20 +344,10 @@ Clique em **Aplicar** para salvar as alterações. É possivel que ao salvar, o 
 Depois inicie a VM.  
 Se não funcionar, reverta as alterações, a causa mais provavel foram os ajustes em **DISCO SATA 1**.
 
----
-
-## Compartilhamento de arquivos entre hospedeiro e anfitrião  
-Você precisa do suporte ao VirtioFS, siga as instruções [aqui](debian_qemu_kvm_windows_virtiofs.md).  
-
----
-
-## Programas Básicos
-Instale os [programas básicos](debian_qemu_kvm_windows_apps.md).  
-
----
-
 ## Compactar o Arquivo QCOW2
-Desligue a VM.  
+Arquivos que representam o disco da VM usam o formato qcow2, que vai inxando com o tempo.
+Então vez ou outra voce precisa compactá-las, mas não é uma compactação do estilo zip, essa é uma compactação que envolve a desfragmentação eliberando os espaços de setores vazios do disco.  
+Para começar o processo, desligue a VM.  
 Para reduzir o tamanho do disco, eliminando blocos vazios, use:
 
 ```bash
