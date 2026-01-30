@@ -140,6 +140,10 @@ Agora que verificamos que seu computador é elegível para virtualização QEMU+
 
 # VIRTUALIZAÇÃO NATIVA QEMU+KVM
 O Linux é capaz de criar máquinas virtuais e ele mesmo ser o hypervisor. Será um servidor de virtualização nivel 1, o mais rápido possivel, no entanto com algumas ausencia de recursos que facilitam a configuração que existem no VirtualBox e VMWare, por exemplo, criar redes virtuais com vários tipos de topologias,  clipboard e transferencia de arquivos entre host e anfitrião e outras coisas.  
+Vamos agora executar a instalação do QEMU+KVM, siga o link:
+[Instalando o QEMU+KVM](debian_qemu_kvm.md)
+
+---
 
 
 ### VIRTUALIZAÇÃO NATIVA QEMU+KVM - CRIANDO UMA INTERFACE BRIDGE
