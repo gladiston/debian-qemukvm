@@ -8,7 +8,7 @@ Este método é o recomendado para versões Desktop (Debian, Ubuntu, Mint), pois
 
 ## 1. Identificação e Limpeza (Importante)
 
-Antes de criar a nova ponte, precisamos garantir que o ambiente esteja limpo e identificar os nomes corretos das interfaces.
+Antes de criar a nova ponte, precisamos identificar os nomes corretos e garantir que não haja duplicidade de configurações.
 
 ### Passo A: Identificar a interface física e a conexão ativa
 ```bash
@@ -17,18 +17,16 @@ nmcli device
 ```
 
 Procure a interface `ethernet` que está `conectada` (ex: `enp5s0`). Chamaremos ela de **SUA_INTERFACE**.
-Anote também o nome da conexão listada na coluna `CONNECTION` (ex: `Wired connection 1`).
+Anote o nome da conexão na coluna `CONNECTION` (geralmente `Wired connection 1`).
 
-### Passo B: Checar e remover Bridge preexistente
+### Passo B: Remover Bridge e Escravos preexistentes
 
-Para evitar erros de duplicidade ou UUIDs conflitantes, execute a limpeza abaixo:
+Para evitar erros de UUIDs conflitantes, execute a limpeza abaixo:
 
 ```bash
-# Verifica se já existe uma conexão br0
-if nmcli connection show br0 >/dev/null 2>&1; then
-    echo "Removendo conexão br0 existente..."
-    sudo nmcli connection delete br0
-fi
+# Remove a conexão br0 e seus escravos se existirem
+sudo nmcli connection delete br0
+sudo nmcli connection delete bridge-slave-SUA_INTERFACE 2>/dev/null
 
 ```
 
@@ -74,21 +72,26 @@ sudo nmcli connection add type bridge-slave autoconnect yes con-name bridge-slav
 
 ```
 
-### Passo C: Desativar a conexão Ethernet antiga (Crucial)
+### Passo C: Neutralizar a conexão Ethernet antiga (Crucial)
 
-O NetworkManager não consegue subir a Bridge se a placa física estiver "presa" à conexão Ethernet comum. Substitua o nome pelo que você encontrou no Passo 1A:
+Para evitar que a Bridge ative e desative sozinha, precisamos impedir que a conexão antiga tente retomar o controle da placa física:
 
 ```bash
+# Substitua pelo nome encontrado no Passo 1A
+sudo nmcli connection modify "Wired connection 1" connection.autoconnect no
 sudo nmcli connection down "Wired connection 1"
 
 ```
 
 ### Passo D: Configurar e Ativar a Bridge
 
+Sempre ative o "escravo" antes da interface principal para garantir que o canal físico esteja aberto.
+
 **Opção 1: DHCP (Recomendado)**
 
 ```bash
 sudo nmcli connection modify br0 ipv4.method auto
+sudo nmcli connection up bridge-slave-SUA_INTERFACE
 sudo nmcli connection up br0
 
 ```
@@ -97,6 +100,7 @@ sudo nmcli connection up br0
 
 ```bash
 sudo nmcli connection modify br0 ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns "192.168.1.5, 8.8.8.8" ipv4.method manual
+sudo nmcli connection up bridge-slave-SUA_INTERFACE
 sudo nmcli connection up br0
 
 ```
@@ -105,18 +109,18 @@ sudo nmcli connection up br0
 
 ## 4. Testando a Conectividade do Host
 
-Antes de abrir o Virt-Manager, verifique se o seu Debian está navegando corretamente:
+Verifique se o seu Debian está navegando corretamente antes de configurar a VM:
 
-1. **Verificar IP:** O comando `ip addr show br0` deve mostrar o IP recebido.
-2. **Testar Rota (Ping IP):** `ping -c 4 8.8.8.8` (Se funcionar, o gateway está ok).
-3. **Testar DNS (Ping Nome):** `ping -c 4 google.com` (Se funcionar, o DNS está ok).
+1. **Verificar IP:** O comando `ip addr show br0` deve exibir o IP.
+2. **Testar Gateway:** `ping -c 4 8.8.8.8` (Se funcionar, a ponte física está ok).
+3. **Testar DNS:** `ping -c 4 google.com` (Se funcionar, a internet está 100%).
 4. **Verificar Bridge:** O comando `brctl show` deve listar `SUA_INTERFACE` dentro de `br0`.
 
 ---
 
 ## 5. Configuração no Virtual Machine Manager (Virt-Manager)
 
-Agora, configure sua VM para entrar neste switch virtual:
+Agora, configure sua VM:
 
 1. Abra o **Virt-Manager** e acesse os detalhes da sua VM.
 2. Vá em **NIC** (Placa de Rede).
@@ -128,7 +132,7 @@ Agora, configure sua VM para entrar neste switch virtual:
 
 ## 6. Solução de Problemas: Host não responde à VM?
 
-Se a VM navegar mas não acessar o Samba ou serviços do Host (Debian), o Kernel pode estar filtrando o tráfego interno da ponte. Execute:
+Se a VM navegar mas não acessar o Samba ou serviços do Host (Debian), execute estes comandos para desativar o filtro de firewall interno da ponte:
 
 ```bash
 echo "net.bridge.bridge-nf-call-iptables = 0" | sudo tee /etc/sysctl.d/bridge.conf
@@ -149,10 +153,7 @@ bind interfaces only = yes
 
 ```
 
-## Conclusão
-
-Gerenciar a Bridge pelo **NetworkManager** garante que o sistema lide corretamente com a troca de rotas e DNS, mantendo a estabilidade tanto do Host quanto das Máquinas Virtuais.
-
 ---
 
 [Retornar](https://github.com/gladiston/debian-qemukvm)
+
