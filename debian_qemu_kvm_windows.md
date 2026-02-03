@@ -21,7 +21,10 @@ O sistema hospedeiro precisa ter os serviços abaixo rodando, eles são importan
 ### Serviço `spice-vdagentd`
 Este é um serviço que lhe permitirá compartilhar a área de clipboard entre hospedeiro e convidado, veja se o serviço está habilitado e rodando, execute:  
 ```bash
-$ sudo systemctl status spice-vdagentd
+sudo systemctl status spice-vdagentd
+```
+E o resultado:  
+```
 ○ spice-vdagentd.service - Agent daemon for Spice guests
      Loaded: loaded (/usr/lib/systemd/system/spice-vdagentd.service; indirect; preset: enabled)
      Active: inactive (dead)
@@ -32,7 +35,10 @@ TriggeredBy: ○ spice-vdagentd.socket
 ### Serviço `spice-webdavd`
 Este é um serviço que lhe permitirá compartilhar arquivos entre hospedeiro e convidado, veja se o serviço está habilitado e rodando, execute:  
 ```bash
-$ sudo systemctl status spice-webdavd
+sudo systemctl status spice-webdavd
+```
+E o resultado:  
+```
 ○ spice-vdagentd.service - Agent daemon for Spice guests
      Loaded: loaded (/usr/lib/systemd/system/spice-vdagentd.service; indirect; preset: enabled)
      Active: inactive (dead)
