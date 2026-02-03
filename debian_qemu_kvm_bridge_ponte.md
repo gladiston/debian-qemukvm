@@ -41,24 +41,14 @@ Isso será importante porque nos passos anteriores não queremos um copiar/colar
 
 Antes de criar a nova ponte, vamos garantir que o ambiente esteja limpo.
 
-### Passo A: Remover configurações preexistentes
-
+### Remover configurações preexistentes intituladas como "br0"
+Vamos criar uma conexão chamada **br0**, mas se ela existir por causa de tentativas frustadas anteriores então irá falhar, para impedir isso, testamos a sua existencia e a removemos:  
 ```bash
 # Remove a conexão br0 e o escravo anterior, se existirem
 sudo nmcli connection delete br0 2>/dev/null
 sudo nmcli connection delete bridge-slave-$my_iface 2>/dev/null
-
 ```
-
-### Passo B: Preparar o arquivo interfaces
-
-O arquivo `/etc/network/interfaces` deve conter apenas o loopback para não conflitar com o NetworkManager, exemplo de como deve estar:   
-```text
-auto lo
-iface lo inet loopback
-source /etc/network/interfaces.d/*
-
-```
+Não tem problema se der erro porque a conexão "br0" não existir quando executar pela primeira vez.  
 
 ---
 
@@ -68,22 +58,27 @@ Vamos criar a interface mestre
 ```bash
 sudo nmcli connection add type bridge autoconnect yes con-name br0 ifname br0
 ```
-Agora vamos criar a interface escrava vinculada à sua placa física:  
+Então será gerada a mensagem:  
+> A conexão “br0” (612432f8-5386-4e18-b12c-1922ca82ddf6) foi adicionada com sucesso.  
+
+A mensagem acima é indicação de sucesso, então agora vamos criar a interface escrava vinculada à sua placa física:  
 ```bash
 sudo nmcli connection add type bridge-slave autoconnect yes con-name bridge-slave-$my_iface ifname $my_iface master br0
 ```
 
-### Passo B: Neutralizar a conexão antiga
+### Neutralizar a conexão antiga
 
 Precisamos impedir que a conexão padrão "roube" a placa física da Bridge:
 
 ```bash
 sudo nmcli connection modify "$my_con_name" connection.autoconnect no
+```
+E depois, execute:  
+```bash
 sudo nmcli connection down "$my_con_name"
-
 ```
 
-### Passo C: Ativar a Bridge
+### Ativar a Bridge
 
 **Opção 1: Via DHCP (Recomendado)**
 
