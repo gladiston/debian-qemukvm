@@ -242,7 +242,7 @@ O padrão de rede da VM é usar **NAT**, se você deseja colocar essa VM como cl
 
 Para trabalhos extensos e mais profissionais com VMs é impossivel viver apenas com NAT, então siga o tutorial a seguir para criar uma conexão do tipo bridge em seu sistema:  
 
-[Criando conexões bridge pelo terminal](debian_qemu_kvm_bridge.md)  
+[Criando conexões bridge pelo terminal](debian_qemu_kvm_bridge_ponte.md)  
 
 ---
 
