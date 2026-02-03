@@ -79,6 +79,10 @@ E depois, execute:
 ```bash
 sudo nmcli connection down "$my_con_name"
 ```
+Uma mensagem de confirmação será exibida, muito parecida com essa:  
+> Conexão “Wired connection 1” desativada com sucesso (caminho D-Bus ativo: /org/freedesktop/NetworkManager/ActiveConnection/3)
+
+
 
 ### Ativar a Bridge
 
@@ -86,34 +90,76 @@ sudo nmcli connection down "$my_con_name"
 
 ```bash
 sudo nmcli connection modify br0 ipv4.method auto
+```
+Se quiser definir um Mac Address antes de subir a bridge, execute também:  
+```bash
+sudo nmcli connection modify br0 bridge.mac-address be:ba:c0:ca:00:50
+```
+Agora vamos subir a interface bridge, execute:  
+```bash
 sudo nmcli connection up bridge-slave-$my_iface
+```
+```bash
 sudo nmcli connection up br0
-
 ```
 
 **Opção 2: Via IP Fixo (Estático)**
 *(Ajuste o IP e o DNS conforme sua necessidade antes de colar)*
 
 ```bash
-sudo nmcli connection modify br0 ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns "192.168.1.5, 8.8.8.8" ipv4.method manual
+sudo nmcli connection modify br0 ipv4.addresses 192.168.1.100/24 ipv4.gateway 192.168.1.1 ipv4.dns "192.168.1.1, 8.8.8.8" ipv4.method manual
+```
+```bash
 sudo nmcli connection up bridge-slave-$my_iface
+```
+```bash
 sudo nmcli connection up br0
-
 ```
 
 ---
 
-## 4. Testando a Conectividade do Host
+### Testando a Conectividade com a rede local
+Execute:  
+```bash
+ip route
+```
+E lhe será exibido algo como:  
+```
+default via 192.168.1.1 dev br0 proto dhcp src 192.168.1.178 metric 425 
+192.168.1.0/24 dev br0 proto kernel scope link src 192.168.1.178 metric 425 
+```
+Se aparecer os parametros **default via** e **src** então parece tudo certo porque descobrimos neste comando que sua conexão tem o ip `192.168.1.178` (parametro src) e o seu gateway é `192.168.1.1` e agora que sabemos disso, vamos pingar o seu gateway(default via), executamos o ping:  
+```bash
+ping -c 3 192.168.1.1
+```
+E aguardamos a resposta, depois de 3 respostas, os pings serão interrompidos:  
+```
+PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
+64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.381 ms
+64 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=0.554 ms
+64 bytes from 192.168.1.1: icmp_seq=3 ttl=64 time=0.314 ms
 
-Verifique se o Host está online antes de prosseguir para a VM:
+--- 192.168.1.1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2026ms
+rtt min/avg/max/mdev = 0.314/0.416/0.554/0.101 ms
+```
+O sucesso no ping indica que nossa bridge do tipo ponte está preparada para máquinas virtuais.  
+Se falhar, não adianta prosseguir, reveja os passos anteriores.
+
+---
+
+### Testando a conectividade com o mundo exterior
+Uma vez que tenha passado no teste de rede local, verifique se o mundo exterior(a internet) está acessível, execute:
 
 1. **Ping IP:** `ping -c 4 8.8.8.8`
 2. **Ping DNS:** `ping -c 4 google.com`
 3. **Verificar Bridge:** `brctl show` (A `$my_iface` deve aparecer dentro de `br0`).
 
+Se o comando `ping` falhar, veja sua configuração de rede, é bem provavel que o firewall, gateway ou proxy tenha bloqueio para o novo IP que a `br0` tenha recebido.   
+
 ---
 
-## 5. Configuração no Virtual Machine Manager (Virt-Manager)
+## 4. Configuração no Virtual Machine Manager (Virt-Manager)
 
 Agora, configure sua VM:
 
@@ -122,30 +168,7 @@ Agora, configure sua VM:
 3. **Device name**: Digite manualmente `br0`.
 4. **Device model**: Escolha `virtio`.
 
----
-
-## 6. Solução de Problemas: Host não responde à VM?
-
-Se a VM tiver internet, mas não acessar o Samba do Host, desative o filtro da ponte:
-
-```bash
-echo "net.bridge.bridge-nf-call-iptables = 0" | sudo tee /etc/sysctl.d/bridge.conf
-echo "net.bridge.bridge-nf-call-arptables = 0" | sudo tee -a /etc/sysctl.d/bridge.conf
-sudo sysctl -p /etc/sysctl.d/bridge.conf
-
-```
-
----
-
-## 7. Configuração do Samba
-
-Certifique-se de que o Samba ouça na interface `br0` em `/etc/samba/smb.conf`:
-
-```ini
-interfaces = lo br0
-bind interfaces only = yes
-
-```
+Pronto, agora poderá iniciar a VM e estará usando a conexão do tipo bridge.
 
 ---
 
