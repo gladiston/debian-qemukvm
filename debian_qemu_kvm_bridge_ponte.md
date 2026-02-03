@@ -93,7 +93,7 @@ sudo nmcli connection modify br0 ipv4.method auto
 ```
 Se quiser definir um Mac Address antes de subir a bridge, execute também:  
 ```bash
-sudo nmcli connection modify br0 bridge.mac-address be:ba:c0:ca:00:50
+sudo nmcli connection modify br0 802-3-ethernet.cloned-mac-address be:ba:c0:ca:00:51
 ```
 Agora vamos subir a interface bridge, execute:  
 ```bash
