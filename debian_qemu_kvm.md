@@ -182,6 +182,9 @@ sudo rsync -aX /var/lib/libvirt/ /home/libvirt/
 Renomeie o diretório antigo (como backup temporário) e crie um ponto de montagem vazio:
 ```bash
 sudo mv /var/lib/libvirt /var/lib/libvirt.bak
+```
+E depois criamos a pasta vazia:  
+```bash
 sudo mkdir /var/lib/libvirt
 ```
 
@@ -239,7 +242,7 @@ Esse será nosso padrão, mas pode-se ter outros lugares adicionados com o coman
 ```bash
 mkdir -p /outro/lugar/images
 sudo chmod g+s /outro/lugar/images
-sudo chown -R /outro/lugar/images
+sudo chown libvirt-qemu:libvirt-qemu -R /outro/lugar/images
 ```
 Depois formalizar com:  
 ```bash
@@ -285,8 +288,11 @@ Nos passos anteriores, assumimos que nossas ISOs serão gravadas em:
 /home/libvirt/isos
 ```
 Então criamos o pool 'isos', execute:
-```
+```bash
 mkdir -p /home/libvirt/isos
+```
+Depois, vamos defini-la como um pool(repositório) do virtualizador:  
+```bash
 sudo virsh pool-define-as isos dir - - - - "/home/libvirt/isos"
 ```
 
