@@ -151,10 +151,14 @@ Se falhar, não adianta prosseguir, reveja os passos anteriores.
 ### Testando a conectividade com o mundo exterior
 Uma vez que tenha passado no teste de rede local, verifique se o mundo exterior(a internet) está acessível, execute:
 
-1. **Ping IP:** `ping -c 4 8.8.8.8`
-2. **Ping DNS:** `ping -c 4 google.com`
-3. **Verificar Bridge:** `brctl show` (A `$my_iface` deve aparecer dentro de `br0`).
-
+1. **Ping IP:**
+   ```bash
+   ping -c 4 8.8.8.8
+   ```
+2. **Ping DNS:**
+   ```bash
+   ping -c 4 google.com
+   ```
 Se o comando `ping` falhar, veja sua configuração de rede, é bem provavel que o firewall, gateway ou proxy tenha bloqueio para o novo IP que a `br0` tenha recebido.   
 
 ---
