@@ -192,6 +192,7 @@ sudo editor /etc/fstab
 ```
 E então acrescente a linha:  
 ```
+# bind para a pasta libvir em /home
 /home/libvirt  /var/lib/libvirt  none  bind  0  0
 ```
 Salve o arquivo e saia do editor.  
