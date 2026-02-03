@@ -67,6 +67,8 @@ sudo nmcli connection add type bridge-slave autoconnect yes con-name bridge-slav
 ```
 
 ### Neutralizar a conexão antiga
+Atente-se aqui que você desligou uma placa de rede - $my_con_name - e esta prestes a iniciar a bridge recém criada `br0` então, ela irá pegar um IP novo e se este IP não tiver navegação com a Internet, você não navegará.  
+Então se tiver que salvar alguma coisa, salve-a antes dos próximos passos.  
 
 Precisamos impedir que a conexão padrão "roube" a placa física da Bridge:
 
