@@ -12,21 +12,28 @@ Para evitar erros de digitação, vamos identificar os nomes e exportá-los como
 Execute o comando:
 ```bash
 nmcli device
-
 ```
-
-1. Na coluna **DEVICE**, identifique sua placa (ex: `enp5s0`).
-2. Na coluna **CONNECTION**, identifique o nome da conexão ativa (ex: `Wired connection 1`).
+O resultado será algo similar a este resultado:
+```
+DEVICE  TYPE      STATE                   CONNECTION         
+enp5s0  ethernet  conectado               Wired connection 1 
+lo      loopback  connected (externally)  lo  
+```
+Onde a coluna **DEVICE** anotamos a identificação da placa de rede, isto é, `enp5s0`.  
+E na outra coluna **CONNECTION**, anotamos o nome daa conexão ativa, isto é, `Wired connection 1`.  
 
 ### Passo B: Exportar as variáveis
 
 Substitua os valores abaixo pelos que você encontrou no passo anterior. **Estes nomes serão usados em todos os comandos seguintes.**
-
+Exportamos o nome da identificação da placa de rede:  
 ```bash
 export my_iface="enp5s0"
-export my_con_name="Wired connection 1"
-
 ```
+E depois exportamos o nome da conexão:  
+```bash
+export my_con_name="Wired connection 1"
+```
+Isso será importante porque nos passos anteriores não queremos um copiar/colar para dentro do seu terminal que seja literal.  
 
 ---
 
