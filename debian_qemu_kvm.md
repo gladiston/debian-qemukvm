@@ -135,8 +135,7 @@ Vamos executar o frontend para gerenciamento de nossas maquinas virtuais, o virt
 
 Ao fazer isso pela primeira vez, serão criadas as pastas e arquivos necessários para seu funcionamento em /var/lib/libvirt, veja:
 ```bash
-cd /var/lib/libvirt
-sudo  sudo tree -ug --dirsfirst
+sudo tree -ug --dirsfirst /var/lib/libvirt
 ```
 E serão exibidas as pastas criadas e notem os donos:  
 ```
