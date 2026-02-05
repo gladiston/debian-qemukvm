@@ -139,18 +139,24 @@ sudo tree -ug --dirsfirst /var/lib/libvirt
 ```
 E serão exibidas as pastas criadas e notem os donos:  
 ```
-[root     root    ]  .
+[root     root    ]  /var/lib/libvirt
 ├── [root     root    ]  boot
+├── [root     root    ]  dnsmasq
+│   ├── [root     root    ]  default.addnhosts
+│   ├── [root     root    ]  default.conf
+│   ├── [root     root    ]  default.hostsfile
+│   └── [root     root    ]  virbr0.status
 ├── [root     root    ]  images
-└── [libvirt-qemu libvirt-qemu]  qemu
-    ├── [libvirt-qemu libvirt-qemu]  checkpoint
-    ├── [libvirt-qemu libvirt-qemu]  dump
-    ├── [libvirt-qemu libvirt-qemu]  nvram
-    ├── [libvirt-qemu libvirt-qemu]  ram
-    ├── [libvirt-qemu libvirt-qemu]  save
-    └── [libvirt-qemu libvirt-qemu]  snapshot
+├── [libvirt-qemu kvm     ]  qemu
+│   ├── [libvirt-qemu kvm     ]  checkpoint
+│   ├── [libvirt-qemu kvm     ]  dump
+│   ├── [libvirt-qemu kvm     ]  nvram
+│   ├── [libvirt-qemu kvm     ]  ram
+│   ├── [libvirt-qemu kvm     ]  save
+│   └── [libvirt-qemu kvm     ]  snapshot
+└── [root     root    ]  sanlock
 
-10 directories, 0 files
+12 directories, 4 files
 ```
 Porque é importante você conhecer isso? Porque num passo mais adiante precisaremos mudar esta pasta de lugar e precisaremos copiar as pastas e permissões originais.  
 
