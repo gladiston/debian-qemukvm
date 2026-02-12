@@ -42,6 +42,14 @@ O Samba gerencia sua própria base de dados de senhas para acesso à rede. O usu
     ```bash
     sudo smbpasswd -e gsantana
     ```
+3.  **Criando um grupo:**
+Não é muito fácil gerenciar permissões por usuário, é mais prático gerenciar permissões por grupo, então vamos criar um grupo chamado `smbwork` e colocar nosso usuário `gsantana` neste grupo:
+    ```bash
+    sudo groupadd smbwork
+    sudo usermod -aG smbwork gsantana
+    ```
+Esse é apenas um exemplo, você pode mudar o nome do gruppo ou acrescentar outros à vontade.  
+
 
 ### 1.3. Configuração do Compartilhamento (`/etc/samba/smb.conf`)
 
@@ -69,7 +77,7 @@ Edite o arquivo principal de configuração para definir o novo recurso de compa
     [global]
         (...)
         workgroup = WORKGROUP
-        unix extensions = no    ; <<< Adicionar esta linha
+        unix extensions = no
         (...)
 ```  
 Se você tiver um dominio em sua rede, troque **WORKGROUP** pelo nome do seu dominio, ex **LOCALDOMAIN**. Isso acelera nosso trabalho porque ao mapear unidades não precisamos informar o usuário desse jeito **localdomain\gsantana**, apenas **gsantana** será suficiente.      
@@ -79,23 +87,17 @@ Se você tiver um dominio em sua rede, troque **WORKGROUP** pelo nome do seu dom
 
 ```ini
 [work]
-    comment = Pasta de Trabalho do gsantana
-    path = /home/gsantana/work
-    browseable = yes
-    read only = no
-    valid users = gsantana
-    public = no
-    writable = yes
-    follow symlinks = yes
-    wide links = yes
+   comment = Pasta de Trabalho
+   path = /home/gsantana/work
+   browseable = yes
+   read only = no
+   writable = yes
 
-    # Máscaras de permissão
-    create mask = 0644
-    directory mask = 0755
+   create mask = 0660
+   directory mask = 2770
 
-    # Configurações de segurança para mapeamento de usuário
-    force user = gsantana
-    force group = gsantana
+   force group = smbwork
+   inherit permissions = yes
 ```
 
 5.  **Salvar e Sair** do editor.
@@ -105,13 +107,20 @@ Se você tiver um dominio em sua rede, troque **WORKGROUP** pelo nome do seu dom
 Confirme se o usuário `gsantana` possui as permissões corretas no sistema de arquivos para a pasta a ser compartilhada.
 Define gsantana como dono (se necessário):  
 ```bash
-sudo chown -R gsantana:gsantana /home/gsantana/work
+sudo chown -R gsantana:smbwork /home/gsantana/work
+sudo chmod -R 2770 /home/gsantana/work
 ```
 
-Garante permissões rwx (7) ao proprietário:  
+Agora vamos usar uma ACL para que novas pastas e/ou arquivos herdem as permissões e donos da pasta raiz:
 ```
-sudo chmod -R 755 /home/gsantana/work
+sudo setfacl -R -m g:smbwork:rwx /home/gsantana/work
+sudo setfacl -R -m d:g:smbwork:rwx /home/gsantana/work
 ```
+Não é uma boa ideia dar permissões `outros`, apenas `dono` e `grupo`, mas se estiver lidando com uma situação onde isso seja necessário, então poderá executar:  
+```
+sudo chmod -R 1777 /home/gsantana/work
+```
+E isso farpa que `outros` além do dono e grupo também tenham acesso.  
 
 ### 1.5. Reinício e Teste do Serviço
 
