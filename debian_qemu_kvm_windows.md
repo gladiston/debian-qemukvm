@@ -166,7 +166,7 @@ Se desejar prosseguir com esse método de compartilhamento de arquivos entre hos
 Embora o `Virtio-FS` seja o método de compartilhamento de arquivos mais rápido e performático, ele possui limitações notáveis em ambientes Windows devido à diferença na arquitetura dos sistemas de arquivos, o `Virtio-FS` tentará transliterar as permissões Posix dos arquivos Linux para as ACLs do Windows, mas tem coisas que o Windows não sabe lidar direito e cria alguns embaraços, mas você pode contornar este problema usando o `spice-webdav` que cria uma camada de rede e cria uma ponte entre hospedeiro e VM com o protocolo de rede chamado webdav que é basicamente mapear uma letra de drive para um endreço como http://localhost/pastacompartilhada e assim, o acesso a arquivos é mais compativel com o mundo Windows.   
 
 Se desejar usar o acesso webdav, siga as instruções abaixo:  
-[COMPARTILHANDO ARQUIVOS VIA SHARED FOLDERS+WinSFP](debian_qemu_kvm_windows_spice-webdav.md)
+[COMPARTILHANDO ARQUIVOS VIA SPICE-WEBDAV](debian_qemu_kvm_windows_spice-webdav.md)
 
 ---
 ## VIRT-MANAGER - COMPARTILHANDO ARQUIVOS VIA SAMBA

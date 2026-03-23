@@ -18,7 +18,7 @@ Prepare-se para não apenas configurar o seu sistema, mas **aprender o Linux de 
 ## Sobre o particionamento (Btrfs vs ext4)
 Se o seu foco for virtualização e você pretende usar snapshots (recurso em que o Btrfs brilha), o Btrfs pode ser excelente — mas há nuances para VMs (desempenho, CoW, layout de subvolumes) que exigem atenção.
 Se você não precisa de snapshots ou prefere o caminho mais simples, ext4 é uma escolha direta e estável. No tópico específico de Btrfs explico quando e por que usá-lo (e como ajustar para uso de VMs).  
-Se possivel, todas as partições que contêm dados importantes devem ter um *label* como #dados1, #dados2, #disco1, #home e assim por diante, sempre sendo fáceis de serem identificados quando executarmos o comando **lsblk -f**. Colocar labels em disco é vida!  
+Se possível, todas as partições que contêm dados importantes devem ter um *label* como #dados1, #dados2, #disco1, #home e assim por diante, sempre fáceis de identificar com **lsblk -f**. Colocar labels em disco é vida!  
 
 ---
 
@@ -49,6 +49,34 @@ A propósito, sinta-se à vontade para **adaptar os scripts ao seu cenário** pu
 
 ## Resultado esperado
 Um sistema previsível e repetível, com configurações documentadas, pronto para trabalho diário, testes e virtualização.
+
+---
+## Índice dos ficheiros `.md` deste repositório
+Todos os artigos abaixo fazem parte do mesmo guia. Os que não aparecem como secção própria mais abaixo são **extensões** ligadas a partir de [Instalando o QEMU+KVM](debian_qemu_kvm.md) ou de [Criando e ajustando VM Windows](debian_qemu_kvm_windows.md).
+
+| Ficheiro | Conteúdo |
+|:--|:--|
+| [README.md](README.md) | Índice principal (este ficheiro) |
+| [debian_backup_restore_network.md](debian_backup_restore_network.md) | Backup da configuração de rede antes do libvirt |
+| [debian_qemu_kvm.md](debian_qemu_kvm.md) | Instalação do QEMU/KVM, libvirt, virt-manager |
+| [debian_qemu_kvm_btrfs.md](debian_qemu_kvm_btrfs.md) | Btrfs e pools para VMs (opcional; ligado a partir do artigo anterior) |
+| [debian_qemu_kvm_windows.md](debian_qemu_kvm_windows.md) | Hub Windows: VirtIO, serviços SPICE, fluxo geral |
+| [debian_qemu_kvm_windows_inst.md](debian_qemu_kvm_windows_inst.md) | Instalação do Windows no assistente do virt-manager |
+| [debian_qemu_kvm_windows_lang.md](debian_qemu_kvm_windows_lang.md) | Idioma e região no Windows convidado |
+| [debian_qemu_kvm_windows_apps.md](debian_qemu_kvm_windows_apps.md) | Programas básicos na VM Windows |
+| [debian_qemu_kvm_windows_otimizar.md](debian_qemu_kvm_windows_otimizar.md) | Otimizações leves no Windows convidado |
+| [debian_qemu_kvm_windows_seamless.md](debian_qemu_kvm_windows_seamless.md) | Modo seamless / integração de janelas |
+| [debian_qemu_kvm_bridge_macvtap.md](debian_qemu_kvm_bridge_macvtap.md) | Rede macvtap |
+| [debian_qemu_kvm_bridge_ponte.md](debian_qemu_kvm_bridge_ponte.md) | Bridge tipo ponte |
+| [debian_qemu_kvm_windows_virtiofs.md](debian_qemu_kvm_windows_virtiofs.md) | Partilha Virtio-FS + WinFsp |
+| [debian_qemu_kvm_windows_spice-webdav.md](debian_qemu_kvm_windows_spice-webdav.md) | Partilha via SPICE-WebDAV |
+| [debian_qemu_kvm_windows_smb.md](debian_qemu_kvm_windows_smb.md) | Partilha SMB/CIFS |
+| [debian_qemu_kvm_virtviewer.md](debian_qemu_kvm_virtviewer.md) | Uso do virt-viewer |
+| [debian_qemu_kvm_otimizar_disco.md](debian_qemu_kvm_otimizar_disco.md) | Otimizar/compactar QCOW2 |
+| [debian_qemu_kvm_backup.md](debian_qemu_kvm_backup.md) | Backup de VMs |
+| [debian_qemu_kvm_vbox.md](debian_qemu_kvm_vbox.md) | Migração VirtualBox → QEMU/KVM |
+
+Particionamento na instalação do SO (documento externo): [debian_part.md](https://github.com/gladiston/debianlinux/blob/main/docs/debian_part.md).
 
 ---
 ## Os padrões usados neste guia
@@ -156,7 +184,7 @@ Se desejar prosseguir com esse método de compartilhamento de arquivos entre hos
 Embora o `Virtio-FS` seja o método de compartilhamento de arquivos mais rápido e performático, ele possui limitações notáveis em ambientes Windows devido à diferença na arquitetura dos sistemas de arquivos, o `Virtio-FS` tentará transliterar as permissões Posix dos arquivos Linux para as ACLs do Windows, mas tem coisas que o Windows não sabe lidar direito e cria alguns embaraços, mas você pode contornar este problema usando o `spice-webdav` que cria uma camada de rede e cria uma ponte entre hospedeiro e VM com o protocolo de rede chamado webdav que é basicamente mapear uma letra de drive para um endreço como http://localhost/pastacompartilhada e assim, o acesso a arquivos é mais compativel com o mundo Windows.   
 
 Se desejar usar o acesso webdav, siga as instruções abaixo:  
-[COMPARTILHANDO ARQUIVOS VIA SHARED FOLDERS+WinSFP](debian_qemu_kvm_windows_spice-webdav.md)
+[COMPARTILHANDO ARQUIVOS VIA SPICE-WEBDAV](debian_qemu_kvm_windows_spice-webdav.md)
 
 ---
 ## VIRT-MANAGER - COMPARTILHANDO ARQUIVOS VIA SAMBA
