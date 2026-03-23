@@ -196,10 +196,6 @@ Agora vamos em nossa placa de rede e vamos fazer um pequeno ajuste:
 **Modelo de dispositivo**: troque para **virtio**.  
 ![Habilitar dispositivo de rede VirtIO](img/debian_qemu_kvm_windows18.png)   
 
-#### Tela 5 de 5 - REMOVENDO TABLET
-Há um item em nossa lista de hardware intitulado como **Tablet**, ele é desnecessário, remova-o:  
-![Remover Tablet](img/debian_qemu_kvm_windows19.png)  
-
 #### Tela 5 de 5 - ADICIONAL CANAL SPICE
 Nosso virtualizador usa de um de hardware chamado de **canal(Channel spice)** que é usado para a interação entre hospedeiro e convidado, por exemplo, troca de arquivos e funcionamento de copiar/colar da área de clipboard entre eles. Vamos adicionar um **canal**, vá em **Adicionar hardware** e escolha **Channel** e ajuste os detalhes para:
   
