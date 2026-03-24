@@ -6,24 +6,24 @@ Um sistema Windows básico em minha opinião, não sobrevive sem estes programas
 
 ## Autologon
 
-**Autologon** é uma ferramenta utilitária Microsoft Sysinternals que automatiza o login no Windows, permitindo que uma máquina inicie e efetue autenticação sem intervenção manual. Funciona armazenando credenciais de forma cifrada no registro do Windows, ideal para cenários de servidor, VM de laboratorio e automação de infraestrutura.  
+**Autologon** é uma ferramenta utilitária Microsoft Sysinternals que automatiza o login no Windows, permitindo que uma máquina inicie e efetue autenticação sem intervenção manual. Funciona armazenando credenciais de forma cifrada no registro do Windows, ideal para cenários de servidor, VM de laboratório e automação de infraestrutura.  
 
-Vale instalar em ambientes onde é necessário **boot desatendido** (unattended deployment), automação de testes em VMs de desenvolvimento, inicialização de serviços críticos que dependem de autenticação prévia, ou recuperação de ambientes após reinicializações não planejadas. Particularmente relevante em sua stack de **QEMU+KVM com Windows Server**, facilitando deployments ágeis, automação de laboratorios de teste, e gerenciamento centralizado de máquinas virtuais sem necessidade de interação via console gráfico.  
+Vale instalar em ambientes onde é necessário **boot desatendido** (unattended deployment), automação de testes em VMs de desenvolvimento, inicialização de serviços críticos que dependem de autenticação prévia, ou recuperação de ambientes após reinicializações não planejadas. Particularmente relevante em sua stack de **QEMU+KVM com Windows Server**, facilitando deployments ágeis, automação de laboratórios de teste, e gerenciamento centralizado de máquinas virtuais sem necessidade de interação via console gráfico.  
 
 A ferramenta oferece interface CLI simples, criptografia segura das senhas no registro, e integração nativa com Group Policy, tornando-a solução prática para ambientes corporativos e de infraestrutura virtualizada. Durante o processo de criação da VM, já tínhamos sugerido sua instalação, mas caso ainda não tenha feito, é bastante recomendável.  
 
 Download:  
 [https://learn.microsoft.com/pt-br/sysinternals/downloads/autologon](https://learn.microsoft.com/pt-br/sysinternals/downloads/autologon)  
 
-**Instalação:** você **precisa descompactar** o arquivo baixado (é um `.zip`). Dentro haverá, entre outros, **Autologon.exe** (32 bits) e **Autologon64.exe** (64 bits). Em **Windows de 64 bits** (o caso mais comum), copie **Autologon64.exe** para **`C:\Windows\System32`** — é o local usual para ferramentas de 64 bits e a pasta já está no `PATH`. O **Autologon.exe** de 32 bits, se for o que você usar num sistema 64 bits, deve ir para **`C:\Windows\SysWOW64`** (é onde o Windows coloca executáveis 32 bits; o nome da pasta parece “invertido”, mas é assim mesmo). Na prática você só precisa **de um** dos dois, conforme a arquitetura do Windows; não é necessário copiar os dois para os dois sítios.
+**Instalação:** você **precisa descompactar** o arquivo baixado (é um `.zip`). Dentro haverá, entre outros, **Autologon.exe** (32 bits) e **Autologon64.exe** (64 bits). Em **Windows de 64 bits** (o caso mais comum), copie **Autologon64.exe** para **`C:\Windows\System32`** — é o local usual para ferramentas de 64 bits e a pasta já está no `PATH`. O **Autologon.exe** de 32 bits, se for o que você usar num sistema 64 bits, deve ir para **`C:\Windows\SysWOW64`** (é onde o Windows coloca executáveis 32 bits; o nome da pasta parece “invertido”, mas é assim mesmo). Na prática você só precisa **de um** dos dois, conforme a arquitetura do Windows; não é necessário copiar os dois para dois lugares diferentes.
 
-![Ficheiros do Autologon após descompactar o pacote](img/debian_qemu_kvm_windows_apps01.png)
+![Arquivos do Autologon após descompactar o pacote](img/debian_qemu_kvm_windows_apps01.png)
 
-Execute **Autologon64.exe** (64 bits) ou **Autologon.exe** (32 bits) conforme a arquitetura do seu Windows. Na janela do utilitário, introduza as **credenciais** para o autologon (utilizador, domínio se aplicável, senha), como na figura abaixo.
+Execute **Autologon64.exe** (64 bits) ou **Autologon.exe** (32 bits) conforme a arquitetura do seu Windows. Na janela do utilitário, preencha as **credenciais** para o autologon (usuário, domínio se aplicável, senha), como na figura abaixo.
 
 ![Janela do Autologon — preenchimento das credenciais](img/debian_qemu_kvm_windows_apps02.png)
 
-Confirme (por exemplo **Enable**). No próximo arranque, o Windows iniciará sessão automaticamente com essas credenciais.
+Confirme (por exemplo **Enable**). Na próxima inicialização, o Windows entrará automaticamente com essas credenciais.
 
 ---
 
@@ -32,9 +32,20 @@ Confirme (por exemplo **Enable**). No próximo arranque, o Windows iniciará ses
 Vale instalar por ser leve, versátil, disponível nos repositórios (ex: apt install p7zip-full) e essencial em workflows de backup e distribuição de artefatos—particularmente em cenários onde margem de espaço é crítica.  
 
 Download:  
-[http://www.7-zip.org/download.html](http://www.7-zip.org/download.html)    
+[http://www.7-zip.org/download.html](http://www.7-zip.org/download.html)  
 
-Não tem instalação, basta descompactar e executá-lo e então ele perguntará os dados para o logon e se tudo estiver correto, no próximo boot, o Windows se logará sozinho com as credenciais fornecidas.  
+Na página de download há pacotes **`.exe`** (instalador clássico) e **`.msi`** (Windows Installer). **Prefira o `.msi`**: integra-se ao serviço de instalação do Windows (registro em *Aplicativos e recursos* / *Aplicativos e funcionalidades*, reparação e desinstalação mais previsíveis, menos surpresas de “instalador empacotado”) e costuma ser a opção indicada em ambientes com políticas ou quando se quer um fluxo de instalação alinhado ao padrão Microsoft. O `.exe` continua válido, mas o `.msi` é em geral mais limpo para administração do sistema.
+
+![Download do 7-Zip — escolha do instalador](img/debian_qemu_kvm_windows_apps03.png)
+
+A **instalação** é bastante simples: execute o arquivo baixado, aceite a licença se solicitado, confirme o caminho (o padrão costuma servir) e conclua com **Instalar** / **Install**.
+
+**Definir o 7-Zip como aplicativo padrão** para arquivos compactados (opcional, mas útil):
+
+- **Pelo próprio 7-Zip:** abra o **7-Zip File Manager** (`7zFM.exe`) → menu **Ferramentas** → **Opções** (em inglês: **Tools** → **Options**) → separador **Sistema** / **System** (ou **7-Zip** nas versões recentes) → marque as extensões que deseja associar (por exemplo `.zip`, `.7z`, `.rar`, `.tar`, `.gz`) → **Aplicar** / **Apply** → **OK**. Isso grava as associações no perfil do usuário.
+- **Pelas configurações do Windows:** **Configurações** → **Aplicativos** → **Aplicativos padrão** → **Escolher padrões por tipo de arquivo** (no Windows 11 o caminho pode ser o mesmo ou **Aplicativos padrão** → **Escolher padrões por tipo de arquivo**) → localize extensões como `.zip` ou `.7z` e selecione **7-Zip**.
+
+Assim, ao dar duplo clique em um arquivo, o Windows abre no 7-Zip em vez do Explorador ou de outro descompactador.
 
 ---
 
@@ -45,21 +56,52 @@ Vale instalar por garantir **compatibilidade total com PDFs proprietários**, es
 Download:  
 [http://get.adobe.com/br/reader/enterprise/](http://get.adobe.com/br/reader/enterprise/)  
 
-**ALERTA**:  O link acima é para baixar a versão offline, não tente usar o instalador online (websetup) porque este instalará junto outros programas que você não pediu. A versão online é uma das versões mais traiçoeiras que existe, ela pode incluir quantos outros programas a Oracle desejar em teu computador.    
+**ALERTA (instalador):** o link acima é para baixar a versão offline; não use o instalador online (websetup), pois ele pode instalar junto outros programas que você não pediu. A versão online é uma das mais traiçoeiras: pode incluir software adicional que a Adobe empacotar no fluxo. Use sua conta e o pacote offline corporativo quando possível.
+
+**ALERTA (privacidade e sistema limpo):** os softwares da Adobe **não são** a melhor escolha para quem prioriza **privacidade** e um **sistema enxuto**. Depois de instalado, o Reader costuma **manter comunicação de rede** com servidores da Adobe; não há transparência total sobre **o que envia** ou quando. Além disso, costuma ser criada uma **tarefa no Agendador de tarefas** para, em períodos de **ociosidade**, verificar atualizações. Em algumas versões a Adobe também inclui **programas ou serviços** que passam a carregar com o Windows.
+
+Se mesmo assim você precisar do Reader, vale **endurecer** o ambiente. **Não** incluímos aqui passos de firewall bloqueando um `.exe` específico: o tráfego pode vir de **outros** processos ou serviços da Adobe (atualizadores, helpers, etc.), e não há como garantir que bloquear só o executável principal cubra tudo.
+
+![Adobe Reader — exemplo (Agendador de tarefas, inicialização ou instalador, conforme a captura)](img/debian_qemu_kvm_windows_apps04.png)
+
+1. **Agendador de tarefas (remover ou desativar atualização automática)**  
+   - Abra o **Agendador de tarefas** (`taskschd.msc` ou pesquise pelo nome).  
+   - No painel esquerdo, em **Biblioteca do Agendador de tarefas**, expanda e procure pastas ou tarefas com **Adobe** no nome.  
+   - Clique com o botão direito nas tarefas relacionadas a **atualização**, **Adobe Acrobat Update** ou similares → **Desabilitar** (mais seguro que apagar, se quiser reverter) ou **Excluir**, se tiver certeza.
+
+2. **Programas na inicialização do Windows**  
+   - Pressione **Ctrl+Shift+Esc** para abrir o **Gerenciador de Tarefas** → aba **Inicialização** (no Windows 11: **Mais detalhes** primeiro, se aparecer compacto).  
+   - Ou: **Configurações** → **Aplicativos** → **Inicialização**.  
+   - Desative itens **Adobe** (Reader, updater, etc.) que não forem necessários.  
+   - Opcional: em **Gerenciador de Tarefas** → **Inicialização**, verifique o impacto na inicialização e desative o que for “Alto” e não essencial.
+
+3. **Conferência após instalar**  
+   - Repita os passos acima **depois de cada atualização** do Reader, pois instaladores às vezes recriam tarefas e entradas de inicialização.
 
 ---
 
 ## Visual Studio Code
 **Visual Studio Code** (VS Code) é um **editor de código-fonte leve e extensível** desenvolvido pela Microsoft, baseado em Electron. Oferece suporte nativo a múltiplas linguagens de programação, debugging integrado, controle Git embutido e um ecossistema massivo de extensões que adaptam a ferramenta a qualquer workflow técnico.  
-Vale instalar por ser **gratuito, multiplataforma** (Windows, Linux, macOS) e extremamente performático mesmo em máquinas com recursos limitados. Sua curva de aprendizado reduzida, comunidade ativa e integração com ferramentas DevOps (Docker, Kubernetes, SSH remoto) o tornaram **padrão de facto** entre desenvolvedores e SysAdmins. É ideal para codificação em PHP, JavaScript, Python, C/C++ e scripting—essencial em ambientes de infraestrutura e desenvolvimento.  
+Vale instalar por ser **gratuito, multiplataforma** (Windows, Linux, macOS) e extremamente performático mesmo em máquinas com recursos limitados. Sua curva de aprendizado reduzida, comunidade ativa e integração com ferramentas DevOps (Docker, Kubernetes, SSH remoto) o tornaram **padrão na prática** entre desenvolvedores e administradores de sistemas. É ideal para codificação em PHP, JavaScript, Python, C/C++ e scripting—essencial em ambientes de infraestrutura e desenvolvimento.  
+
+Hoje o VS Code **já não é unanimidade** para quem quer **IA nativa e forte** no fluxo de edição (completar, refatorar, explicar o repositório inteiro). Se quiser **opcionalmente** experimentar outras bases no lugar dele ou em paralelo, duas opções em destaque são **Cursor** e **Google Antigravity** (em conversas informais o nome costuma aparecer abreviado como **Antigravity** ou até **“Gravity”** — o produto oficial é o [Google Antigravity](https://antigravity.google/download)):
+
+**Cursor** — editor derivado do ecossistema VS Code, pensado para **IA em primeiro plano**: chat com contexto do projeto, edições em vários arquivos de uma vez, integração com modelos para gerar e ajustar código sem ficar só no autocompletar linha a linha. Para muitos times, isso é mais **conveniente** do que montar manualmente extensões de IA no VS Code tradicional.  
+Download: [https://cursor.com/downloads](https://cursor.com/downloads)
+
+**Google Antigravity** — plataforma **centrada em agentes**: além da visão de editor com IA, há uma área para **orquestrar agentes** que planejam e executam tarefas através de **editor, terminal e navegador**; os agentes podem entregar **artefatos** (planos, capturas, registros) para você revisar em vez de só despejar log bruto. Há suporte a **vários modelos** (por exemplo Gemini e outros, conforme a versão e política da Google).  
+Download: [https://antigravity.google/download](https://antigravity.google/download)
+
+Nada impede manter **VS Code** instalado e usar um desses editores só em projetos onde a IA agregue mais — são escolhas **opcionais**, não obrigatórias.
+
 Durante a instalação, não esqueça de marcar as opções:  
-* Adicione a ação "Abir com Code" ao menu de contexto de arquivos do Windows Explorer.
-* Adicione a ação "Abir com Code" ao menu de contexto de diretório do Windows Explorer.
+* Adicione a ação "Abrir com o Code" ao menu de contexto de arquivos do Windows Explorer.
+* Adicione a ação "Abrir com o Code" ao menu de contexto de pastas do Windows Explorer.
 
 Download:  
 [https://code.visualstudio.com/](https://code.visualstudio.com/)    
 
-**ALERTA**:  Muito cuidado com o download, a maioria das pessoas vai institivamente na primeira opção que é **User Installer** que se autoinstala no perfil do usuário, no entanto, é melhor baixar a versão **System Installer** que beneficia todos os perfís existentes:  
+**ALERTA**: muito cuidado com o download — a maioria das pessoas vai intuitivamente na primeira opção, **User Installer**, que se instala só no perfil do usuário. É melhor baixar a versão **System Installer**, que fica disponível para todos os perfis da máquina:  
 ![Instale o VSCode System Installer](img/debian_qemu_kvm_windows_vscode1.png)   
 
 ---
@@ -72,8 +114,8 @@ Vale instalar apesar de ser **inferior ao VS Code em praticamente todos os aspec
 Download:  
 [https://notepad-plus-plus.org/downloads/](https://notepad-plus-plus.org/downloads/)   
 
-Ao instalar o programa, escolha o idioma em português logo no inicio de sua instalação.  
-Depois de instalá-lo, vá em tipos conhecidos de arquivos como .txt e .ini e em suas propriedades escolha "abrir com" e indique o notepad++.   
+Ao instalar o programa, escolha o idioma em português logo no início do assistente.  
+Depois de instalá-lo, em tipos de arquivo como `.txt` e `.ini`, use **Propriedades** → **Alterar** (ou **Abrir com**) e defina o Notepad++.   
 
 ---
 
@@ -81,13 +123,13 @@ Depois de instalá-lo, vá em tipos conhecidos de arquivos como .txt e .ini e em
 
 **LinkShell Extension** é uma extensão de contexto do Windows Explorer que facilita a criação de **hard links, symbolic links (junctions) e copy-on-write** diretamente via menu de clique direito. Oferece interface gráfica intuitiva para operações de linking que normalmente exigiriam comandos de linha de comando complexos.  
 Vale instalar por permitir **gerenciamento eficiente de espaço em disco** através de hard links (múltiplas referências ao mesmo arquivo físico), essencial em cenários de backup deduplicated, repositórios de desenvolvimento e arquivamento. É particularmente útil para administradores que trabalham com armazenamento otimizado ou ambientes onde a economia de espaço é crítica—oferecendo alternativa visual robusta à manipulação manual via CMD ou PowerShell.  
-Depois de sua instalação é recomendado reiniciar sua sessão do Windows.  
+Depois da instalação, recomenda-se encerrar a sessão e entrar de novo no Windows (ou reiniciar).  
 
 Download:  
 [http://schinagl.priv.at/nt/hardlinkshellext/linkshellextension.html](http://schinagl.priv.at/nt/hardlinkshellext/linkshellextension.html)   
 
 Serão dois downloads, o runtime [vc_redist.x64.exe](https://aka.ms/vs/15/release/vc_redist.x64.exe) e o programa principal.  
-Ao instalar o programa principal, escolha o idioma em português logo no inicio de sua instalação.  
+Ao instalar o programa principal, escolha o idioma em português no início do assistente.  
 
 ---
 
@@ -98,31 +140,31 @@ Vale instalar por ser **multiplataforma** (Windows, Linux, macOS), leve, sem pub
 Download:  
 [https://www.videolan.org/vlc/](https://www.videolan.org/vlc/)   
 
-Ao instalar o programa, escolha o idioma em português logo no inicio de sua instalação.  
+Ao instalar o programa, escolha o idioma em português no início do assistente.  
 
 ---
 
 ## RAMMap
 **RAMMap** é uma ferramenta de diagnóstico desenvolvida pela Microsoft (Sysinternals) que oferece **visualização detalhada e em tempo real da alocação de memória RAM** no Windows. Mapeia como a memória física é distribuída entre processos, cache, kernel e outros componentes do sistema operacional.  
-Vale instalar por ser **essencial para troubleshooting de performance** e identificação de vazamentos de memória, processos consumidores excessivos e comportamento anômalo de cache. Para um **gerente de TI e administrador de sistemas**, RAMMap é ferramenta indispensável em análise de gargalos, planejamento de capacidade e diagnóstico de instabilidades—oferecendo granularidade que Task Manager não fornece. Permite decisões baseadas em dados concretos sobre alocação de recursos e identificação de problemas antes de impactarem produção.  
+Vale instalar por ser **essencial para troubleshooting de performance** e identificação de vazamentos de memória, processos consumidores excessivos e comportamento anômalo de cache. Para **gestores de TI e administradores de sistemas**, o RAMMap é uma ferramenta indispensável em análise de gargalos, planejamento de capacidade e diagnóstico de instabilidades—oferecendo granularidade que Task Manager não fornece. Permite decisões baseadas em dados concretos sobre alocação de recursos e identificação de problemas antes de impactarem produção.  
 
 Download:  
 [https://learn.microsoft.com/en-us/sysinternals/downloads/rammap](https://learn.microsoft.com/en-us/sysinternals/downloads/rammap)
 
-A instalação dele não é óbvia, é um arquivo .zip contendo 3 arquivos:
-* RAMMap.exe: Você copia para **C:\Windows\SysWOW64**, mas apenas que você for debugar uma aplicação 32bits, você não usará.     
-* RAMMap64.exe: Você copia para **C:\Windows\System32**, será a versão mais usada.  
-* RAMMap64a.exe: Para processadores diferentes de Intel/AMD, ignore-o.
+A “instalação” não é óbvia: vem um `.zip` com três executáveis:
+* **RAMMap.exe** — copie para **`C:\Windows\SysWOW64`** só se for depurar um **aplicativo de 32 bits**; na maioria dos casos você não usará.  
+* **RAMMap64.exe** — copie para **`C:\Windows\System32`**; é o que você vai usar no dia a dia em Windows de 64 bits.  
+* **RAMMap64a.exe** — para hardware que não seja Intel/AMD típico; ignore na dúvida.
 
-Estou considerando que voce esteja usando um Windows 64 bits.  
-Quando precisar executar o `RAMMap`, simplesmente Win+R e digite `RAMMap64`.  
+Consideramos aqui um **Windows de 64 bits**.  
+Para abrir, pressione **Win+R**, digite **`RAMMap64`** e confirme.  
 
 ---
 
 ## PuTTY
 **PuTTY** é um cliente SSH/Telnet leve e multiplataforma que oferece acesso seguro a servidores remotos via protocolo SSH, além de suporte legado a Telnet, Rlogin e serial connections. Funciona como ferramenta essencial para administração remota de infraestrutura Unix/Linux e dispositivos de rede.  
 
-Vale instalar por ser **gratuito, portável e extremamente leve**, sem dependências complexas—ideal para acesso rápido a servidores Debian, RedHat e outras distribuições Linux. Oferece autenticação por chave pública/privada, port forwarding local/remoto, suporte a SOCKS proxy e gerenciamento de sessões salvas, tornando-o **padrão de facto** para SysAdmins em ambientes Windows que precisam administrar infraestrutura Linux/Unix. Embora mais recente que alternatives como Windows Terminal + OpenSSH, PuTTY permanece relevante por sua compatibilidade e ausência de overhead.  
+Vale instalar por ser **gratuito, portável e extremamente leve**, sem dependências complexas—ideal para acesso rápido a servidores Debian, RedHat e outras distribuições Linux. Oferece autenticação por chave pública/privada, port forwarding local/remoto, suporte a SOCKS proxy e gerenciamento de sessões salvas, tornando-o **padrão na prática** para administradores em ambientes Windows que precisam administrar infraestrutura Linux/Unix. Embora existam alternativas mais novas, como o Windows Terminal com OpenSSH integrado, o PuTTY segue útil pela compatibilidade e pelo consumo baixo de recursos.  
 
 Download:  
 [https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
@@ -135,7 +177,7 @@ Download:
 
 Vale instalar por ser **gratuito, intuitivo e suportar múltiplos protocolos** (FTP, SFTP com chaves SSH, FTPS com TLS/SSL), essencial para administradores que precisam transferir arquivos entre ambientes Windows e servidores Linux/Unix. Oferece gerenciamento de sites salvos, sincronização bidirecional, fila de transferências paralelas e suporte a proxy, tornando-o ferramenta indispensável em cenários de manutenção de servidores, deployment de aplicações e gerenciamento de conteúdo. Particularmente útil em workflows que não justificam overhead de ferramentas mais complexas como rsync ou git.  
 
-**ADVERTÊNCIA**:  O Link principal do FileZilla há uma advertência dizendo que o **instalador pode conter programas promocionais**, por essa razão, estou te passando um link alternativo na mesma página, que geralmente é livre de **programas promocionais**, mesmo assim, seja cauteloso, durante a instalação observe se há opções marcadas para instalação de programas adicionais, se houverem, desmarque-os.  
+**ADVERTÊNCIA:** no site do FileZilla costuma haver aviso de que o **instalador pode incluir software promocional**. Por isso o link abaixo aponta para a página com **todas as opções de download**; prefira o pacote **sem** ofertas, se disponível. Mesmo assim, durante a instalação, desmarque qualquer caixa de programa extra que não queira.  
 
 Download: 
 [https://filezilla-project.org/download.php?show_all=1](https://filezilla-project.org/download.php?show_all=1)   
@@ -146,9 +188,9 @@ Download:
 **Git** é um **sistema de controle de versão distribuído** que rastreia alterações em arquivos e projetos, permitindo histórico completo de modificações, ramificações paralelas (branches) e colaboração entre múltiplos desenvolvedores. Cada repositório Git funciona como uma cópia independente e auditável do projeto.  
 
 Vale instalar por ser o **padrão da indústria** em versionamento de código, integrar-se com plataformas como GitHub e GitLab, facilitar **reversão de mudanças** e **merge de branches**, além de ser essencial em pipelines CI/CD modernos. É indispensável para qualquer desenvolvedor ou administrador que trabalhe com infraestrutura como código (IaC).  
-O instalador sugere instalar em **C:\Program Files\Git**, no entanto, para configurar outras ferramentas de programação e ajustar o PATH nestas ferramentas, eu sugiro instalar e **C:\Git** e não criar atalho no menu ou área de trabalho.  
+O instalador sugere instalar em **C:\Program Files\Git**, no entanto, para configurar outras ferramentas de programação e ajustar o PATH nestas ferramentas, eu sugiro instalar em **C:\Git** e não criar atalho no menu Iniciar nem na área de trabalho.  
 
-Durante a instalação do git, ele faz uma pergunta sobre qual editor de texto usar em casos especiais, por exemplo para `commit`, `diff` entre outras, as opções geralmente são: **vim**, **notepad+++**, **vscode** ou até mesmo o tradicional bloco de noas do Windows, se você não faz idéia qual deles usará, então escolha o **notepad++**. Também durante a instalação, o **git** pergunta sobre qual é o terminador de linha, essa questão é relevante porque no mundo da Web, Linux, Mac e outros sistemas, o terminador de linha é simplesmente o ENTER(LF), porém no Windows são dois caracteres e por isso chamado de CRLF. Se voce lida com os dois tipos e geralmente é, responda **Checkout as-is, commit as-is** para que o git nunca faça nenhuma conversão. Muito novato já bagunçou arquivos de outros por cauda de uma péssima decisão aqui.
+Durante a instalação do git, ele faz uma pergunta sobre qual editor de texto usar em casos especiais, por exemplo para `commit`, `diff` entre outras, as opções geralmente são: **vim**, **notepad++**, **VS Code** ou até o Bloco de notas do Windows; se não souber qual usar, escolha **Notepad++**. Na mesma instalação, o Git pergunta o **terminador de linha**: na Web, Linux e macOS costuma ser só LF; no Windows, CRLF. Se você trabalha com os dois mundos (como é comum), responda **Checkout as-is, commit as-is** para o Git não converter linha à toa. Muita gente já estragou projeto de time por escolher errado aqui.
 
 Download:  
 [https://git-scm.com/downloads/win](https://git-scm.com/downloads/win)  
@@ -166,7 +208,7 @@ Aproveite este momento para fazer todas as atualizações do Windows, faça-o at
 
 Vale instalar por ser uma **ferramenta oficial da Microsoft** com integração nativa ao Windows 11 e Windows Server, otimizar o desempenho da máquina removendo bloatwares e processos desnecessários, facilitar o **monitoramento em tempo real** de CPU, memória e disco, oferecer limpeza de startup para acelerar boot, além de incluir proteção contra malware e PUPs (Potentially Unwanted Programs). É especialmente relevante para administradores de TI que gerenciam múltiplas estações e precisam manter a integridade e desempenho da frota de máquinas.
 
-Durante a instalação do PC Manager, ele se integra automaticamente à Configurações do Windows e cria atalhos no menu Iniciar. Diferentemente de ferramentas legacy, a Microsoft o mantém atualizado via Microsoft Store, garantindo que você sempre tenha a versão mais recente com correções de segurança. Recomenda-se **fixar a aplicação na barra de tarefas** para acesso rápido durante rotinas de manutenção, especialmente em cenários de troubleshooting de performance.
+Durante a instalação do PC Manager, ele se integra automaticamente à Configurações do Windows e cria atalhos no menu Iniciar. Diferentemente de ferramentas legacy, a Microsoft o mantém atualizado via Microsoft Store, garantindo que você sempre tenha a versão mais recente com correções de segurança. Recomenda-se **fixar o aplicativo na barra de tarefas** para acesso rápido durante rotinas de manutenção, especialmente em cenários de troubleshooting de performance.
 
 Ao executar pela primeira vez, o PC Manager oferece uma **varredura completa do sistema** recomendando ações prioritárias. Preste atenção às categorias: **Limpeza** (arquivos temporários, cache, downloads antigos), **Startup** (processos de inicialização desnecessários), **Apps** (desinstalação de software redundante) e **Segurança** (verificação de malware e PUPs). Para ambientes corporativos ou máquinas críticas, execute um **diagnóstico prévio** antes de aplicar limpezas agressivas, documentando o estado inicial para auditoria.
 
@@ -183,4 +225,4 @@ Aproveite este momento para fazer uma **Limpeza profunda** usando o PC Manager:
 
 ---
 
-[Retornar à página de Virtualização nativa com QAEMU+KVM Usando VM/Windows](debian_qemu_kvm_windows.md)   
+[Retornar à página de virtualização nativa com QEMU+KVM usando VM Windows](debian_qemu_kvm_windows.md)   
