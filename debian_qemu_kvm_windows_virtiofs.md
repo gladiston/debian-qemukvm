@@ -77,9 +77,9 @@ Quando você termina o assistente, o **Caminho de origem** aparece como **`/home
 2. **O assistente existe para registrar esse vínculo.** Você cria o pool (no exemplo, ligado ao seu `$HOME`) e **só então** escolhe `~/work` **dentro** dele. Assim o XML da VM fica consistente: origem válida para o hypervisor, não um texto digitado à mão que o libvirt não validou.
 3. **Se você pular o pool e apontar para qualquer pasta**, pode até “passar” em versões novas do virt-manager, mas é exatamente aí que costumam aparecer **VM que não sobe**, **compartilhamento que some** ou **caminho que o QEMU não resolve** — porque a configuração foge do modelo que o libvirt espera.
 
-**Regra prática:** sempre que o virt-manager oferecer o fluxo **pool → pasta dentro do pool**, use esse fluxo. É o caminho suportado e previsível.
+**Regra prática:** sempre que o virt-manager oferecer o fluxo **pool → pasta dentro do pool**, use esse fluxo. É o caminho suportado e previsível.  
 
-Na janela final, fica assim:
+Na janela final, fica assim:  
 ![Criando um novo volume](img/debian_qemu_kvm_windows_virtiofs05.png)   
 
 | Campo | Valor | Observação |
