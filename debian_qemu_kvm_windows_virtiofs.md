@@ -115,53 +115,83 @@ Se quiser que isso ocorra na inicialização, **neste** caso você precisará co
 E se não aparecer nenhuma unidade? Revise o processo de configuração. A causa mais comum é o `Source Path` **não estar** associado a um **pool** no libvirt. Outra causa frequente é o **WinFsp** não estar instalado: abra `services.msc` e confira se o serviço Virtio-FS sobe; sem o WinFsp, ele costuma falhar.
 
 ### CONSOLIDE TUDO NUM ÚNICO PONTO DE ENTRADA
-Consolide todas as pastas necessárias numa **única** pasta maior. Para isso, use **`bind mount`** (não confunda com atalho de link simbólico no Explorer). No exemplo a seguir, vamos agregar a pasta `Downloads` ao volume **work**. Primeiro, crie uma pasta vazia `~/work/downloads`:  
+
+**Ideia:** em vez de exportar vários `Source Path` no virt-manager, você mantém **só** `~/work` visível para a VM e, **no Linux**, “encaixa” outras pastas reais dentro de `~/work` com **`bind mount`**. O Windows continua vendo **uma** letra; por baixo, no hospedeiro, várias pastas aparecem como subpastas.
+
+**Não é** o mesmo que um atalho de link simbólico no Explorer: o kernel trata o conteúdo do bind como se estivesse mesmo naquele caminho.
+
+**Exemplo — juntar `Downloads` ao volume `work`**
+
+**Passo 1 — no hospedeiro (Linux)**  
+Crie uma pasta vazia que será o “gancho” do bind (o Virtio-FS já enxerga `~/work`; você só prepara a subpasta):
 
 ```bash
-mkdir -p ~/work/downloads  # pasta vazia
+mkdir -p ~/work/downloads
 ```
-Se você olhar de dentro da VM Windows, verá uma pasta `downloads` vazia:  
-![Volume com a pasta downloads vazia](img/debian_qemu_kvm_windows_virtiofs07.png)    
 
-Agora monte a pasta `~/Downloads` em `~/work/downloads` com `bind mount`:
+**Passo 2 — na VM (Windows)**  
+Abra a unidade Virtio-FS (ex.: `Z:`) e confira: deve existir uma pasta `downloads` **vazia**.
+
+![Volume com a pasta downloads vazia](img/debian_qemu_kvm_windows_virtiofs07.png)
+
+**Passo 3 — de volta ao hospedeiro**  
+Monte o conteúdo real de `~/Downloads` **em cima** dessa pasta vazia:
+
 ```bash
 sudo mount --bind /home/gsantana/Downloads /home/gsantana/work/downloads
 ```
-Dentro da VM, abra de novo `Z:\downloads` e confira:  
-![Volume com a pasta downloads vazia](img/debian_qemu_kvm_windows_virtiofs08.png)    
 
-Se quiser tornar esse `bind mount` **permanente** (ou seja, mantê-lo após reiniciar o computador), edite o `/etc/fstab` e inclua a linha de montagem. Por exemplo:  
+Depois disso, `~/work/downloads` mostra os mesmos arquivos que `~/Downloads`.
+
+**Passo 4 — na VM de novo**  
+Atualize `Z:\downloads` (F5) ou abra a pasta outra vez: os arquivos devem aparecer.
+
+![Volume com a pasta downloads vazia](img/debian_qemu_kvm_windows_virtiofs08.png)
+
+---
+
+**Tornar o bind permanente (sobrevive ao reinício do Linux)**
+
+1. **Por quê?** O comando `mount --bind` manual some se você reiniciar o **hospedeiro**. Para recriar a montagem automaticamente, use o arquivo **`/etc/fstab`** (lista de montagens do sistema).
+2. **Edite o fstab** (use o editor que preferir, por exemplo `sudo nano /etc/fstab` ou `sudo editor /etc/fstab`):
 ```bash
 sudo editor /etc/fstab
 ```
-Inclua a seguinte linha ao final do arquivo:  
+3. **Adicione uma linha** no final (ajuste usuário/caminhos se não for `gsantana`):
 ```text
-# bind mounts importantes: 
+# bind mounts importantes:
 /home/gsantana/Downloads  /home/gsantana/work/downloads  none  bind,defaults  0  0
 ```
-Salve o arquivo e saia do editor.  
-Para testar o `/etc/fstab` sem reiniciar, na VM a pasta `Z:\downloads` não pode estar em uso; caso contrário, o `umount` falha. Às vezes o Windows mantém o diretório aberto — nesses casos, só desligando a VM. Certifique-se de que `~/work/downloads` não está em uso no hospedeiro e desmonte assim:
+4. **Salve** e saia do editor.
+
+**Testar sem reiniciar o hospedeiro**
+
+- **No Windows (VM):** feche o Explorer e qualquer programa que use `Z:\downloads\...`. Se ainda travar, **desligue a VM** — o Windows às vezes mantém o diretório aberto e o `umount` no Linux falha.
+- **No hospedeiro:** com `~/work/downloads` livre para desmontar, rode:
 ```bash
-sudo systemctl daemon-reload  # isso atualiza /etc/fstab
-sudo umount /home/gsantana/work/downloads  # desmonta
+sudo systemctl daemon-reload   # recarrega unidades do systemd (útil após mudar fstab)
+sudo umount /home/gsantana/work/downloads
+sudo mount -a                    # monta tudo o que está no /etc/fstab
 ```
-Em seguida, monte tudo de novo usando o `/etc/fstab` como referência:
-```bash
-sudo mount -a
-```
-Se não houver mensagem de erro, provavelmente funcionou; para confirmar, liste o conteúdo de `~/work/downloads` ou execute:
+- Se **não** aparecer erro, o `fstab` provavelmente está certo. Confira no hospedeiro:
 ```bash
 ls -lh ~/work/downloads
 ```
-Então você verá os mesmos arquivos que estão em `~/Downloads`.  
-Por fim, acrescente outras pastas do mesmo modo e vá **agregando-as** em **`/home/gsantana/work`**.   
+Os arquivos devem ser os mesmos de `~/Downloads`.
+
+**Outras pastas:** repita o mesmo padrão — pasta vazia dentro de `~/work`, `mount --bind` da origem real para essa pasta, linha correspondente no `fstab` — até tudo o que precisar estiver sob **`/home/gsantana/work`**.
 
 ## SEGURANÇA
-Para a segurança do seu sistema hospedeiro e do convidado:  
-1. Você pode criar **um** pool para o seu `$HOME`, mas não deve exportar o `$HOME` inteiro para dentro de uma VM.  
-2. Exporte como `Source Path` apenas as pastas de que aquela VM precisar. Além de **ser** mais seguro, isso limita programas que fazem **telemetria** — no fundo, **spywares** que ficam **bisbilhotando** o seu sistema.   
-3. Minha preferência: crie uma pasta no estilo **work** e use *bind mounts* para reunir só o que essa VM precisa dentro desse `Source Path`.
-4. Se você usa Delphi, trabalhe direto na unidade **work** (seja qual for a letra que o Windows der), mas evite que o projeto dependa de **links simbólicos** apontando para essa unidade — o Delphi costuma falhar ao resolver arquivos por symlink nesse caso, mesmo com os dados presentes. **Por outro lado**, links simbólicos para **compartilhamento de rede** costumam funcionar bem com o Delphi.  
+
+**Objetivo:** a VM enxergar só o que precisa; o hospedeiro não expor pastas sensíveis à toa.
+
+| Princípio | Em prática |
+|-----------|------------|
+| **Menos é mais** | Crie um pool no `$HOME` se precisar, mas **não** exporte o `$HOME` inteiro. Uma VM comprometida ou um app bisbilhotando teria escopo enorme. |
+| **Só o necessário** | Use como `Source Path` apenas pastas que essa VM realmente usa. Reduz risco e também limita **telemetria** de programas que, no fundo, se comportam como **spyware** no seu sistema. |
+| **Padrão “pasta work”** | Uma pasta estilo **`work`**, com *bind mounts* só do que essa VM precisa, costuma ser o melhor equilíbrio entre praticidade e controle. |
+
+**Nota para quem usa Delphi:** trabalhe na unidade **work** (qualquer letra que o Windows der), mas evite que o **projeto** dependa de **links simbólicos** apontando **para** essa unidade Virtio-FS — o Delphi costuma falhar ao resolver arquivos nesse caso, mesmo com os dados lá. **Por outro lado**, links simbólicos para **compartilhamento de rede** costumam funcionar bem com o Delphi.  
 
 
 ## Dicas do YouTube
