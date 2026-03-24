@@ -54,10 +54,10 @@ Você precisará criar um **pool**, para isso adicione um novo hardware e escolh
 Na tela acima, perceba que **Driver** é **virtiofs**.  
 
 Em **Caminho de origem** você precisará clicar em **Navegar** e então selecionar um **pool**. Um **pool**, neste exemplo, é o “recipiente” no libvirt que aponta para onde estão os arquivos que você quer ver na VM — em geral uma pasta no seu sistema. Como `~/work` fica dentro do seu `$HOME` (ex.: `/home/gsantana`), é esse o **pool** a criar:  
-![Criando um novo volume](img/debian_qemu_kvm_windows_virtiofs04.png)   
+![Criando um novo volume](img/debian_qemu_kvm_windows_virtiofs03.png)   
 
 Uma vez criado o volume, a parte seguinte é apenas selecionar a pasta `~/work`:   
-![Criando um novo volume](img/debian_qemu_kvm_windows_virtiofs03.png)   
+![Criando um novo volume](img/debian_qemu_kvm_windows_virtiofs04.png)   
 
 Agora que os parâmetros corretos apareceram, confira se estão assim:  
 
@@ -69,7 +69,15 @@ Agora que os parâmetros corretos apareceram, confira se estão assim:
 
 Depois clique em **Concluir**.  
 
-Você volta à tela anterior e o **Caminho de origem** aparece como **/home/gsantana/work**. Aí costuma surgir a dúvida: **por que** não digitar esse caminho direto e **por que** criar um **volume** antes? Resposta curta: **porque é o jeito certo no libvirt/virt-manager**. Não escolha uma pasta que não tenha um volume (pool) criado para ela. Em versões antigas, o virt-manager nem aceita pastas fora de um pool; nas novas às vezes aceita, mas pode não funcionar direito.  
+**Por que não dá para só digitar `/home/gsantana/work` e pronto?**
+
+Quando você termina o assistente, o **Caminho de origem** aparece como **`/home/gsantana/work`** — e parece redundante ter passado por “criar pool” e “escolher pasta”. O ponto é este:
+
+1. **O libvirt não pensa só em “caminho solto”.** Ele organiza armazenamento em **pools** (pastas de armazenamento, LVM, etc.). O Virtio-FS precisa de um **caminho que o libvirt já conheça** como parte de um desses pools.
+2. **O assistente existe para registrar esse vínculo.** Você cria o pool (no exemplo, ligado ao seu `$HOME`) e **só então** escolhe `~/work` **dentro** dele. Assim o XML da VM fica consistente: origem válida para o hypervisor, não um texto digitado à mão que o libvirt não validou.
+3. **Se você pular o pool e apontar para qualquer pasta**, pode até “passar” em versões novas do virt-manager, mas é exatamente aí que costumam aparecer **VM que não sobe**, **compartilhamento que some** ou **caminho que o QEMU não resolve** — porque a configuração foge do modelo que o libvirt espera.
+
+**Regra prática:** sempre que o virt-manager oferecer o fluxo **pool → pasta dentro do pool**, use esse fluxo. É o caminho suportado e previsível.
 
 Na janela final, fica assim:
 ![Criando um novo volume](img/debian_qemu_kvm_windows_virtiofs05.png)   
