@@ -8,7 +8,7 @@ Este guia mostra como **otimizar e compactar** discos QCOW2, mantendo desempenho
 
 ---
 
-> ⚠️ **Nota sobre o termo “compactar”**
+> **Nota sobre o termo “compactar”**
 >
 > Neste artigo, as palavras **“compactar”** ou **“comprimir”** não se referem à compressão de dados como `zip`, `gzip` ou `bzip2`.
 > Aqui, elas indicam o **processo de redução do tamanho físico ocupado por uma imagem QCOW2** após a remoção de blocos não utilizados e reorganização dos dados no disco virtual.
@@ -46,10 +46,10 @@ Este guia mostra como **otimizar e compactar** discos QCOW2, mantendo desempenho
 
 Os ajustes mencionados a seguir foram feitos nos passos anteriores deste guia, no entanto, caso tenha caído nesta página por qualquer outra razão, o que iremos fazer é conferir se o nosso disco virtual foi ajustado para ter máxima performance com o Windows, esses ajustes garantem que operações de “descartar blocos” (TRIM/UNMAP) do convidado cheguem até o hospedeiro, permitindo que futuras exclusões dentro da VM liberem espaço real.
 
-### 🔧 Pelo virt-manager (GUI)
+### Pelo virt-manager (GUI)
 
 1. **Abra o virt-manager** e selecione a VM desejada.
-2. Clique no ícone **⚙️ “i” (Mostrar detalhes da máquina virtual)**.
+2. Clique no ícone de informações **“i” (Mostrar detalhes da máquina virtual)**.
 3. No painel esquerdo, clique em **Disco VirtIO 1(VirtIO Disk)** — ou o nome do disco principal.
 4. Na aba Detalhes, expanda **Opções avançadas** (Advanced options).
 5. Ele mostrará:

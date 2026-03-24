@@ -524,9 +524,9 @@ for backup in /media/backup-vm/libvirt-bak/*/*.qcow2.backup-*; do
     echo "Verificando: ${backup}"
     
     if qemu-img check "${backup}" > /dev/null 2>&1; then
-        echo "✓ OK"
+        echo "OK"
     else
-        echo "✗ ERRO: Backup corrompido"
+        echo "ERRO: Backup corrompido"
     fi
 done
 ```

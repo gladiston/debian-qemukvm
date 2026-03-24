@@ -11,7 +11,7 @@ Ele cria uma **interface virtual ligada à NIC física (`enp8s0`)**, compartilha
 - Permitir que as VMs obtenham IPs da rede local (via DHCP ou IP fixo);  
 - Evitar a queda temporária de conexão causada pela criação de bridges tradicionais.  
 
-> 💡 Este procedimento é compatível tanto com ambientes **gráficos (virt-manager)** quanto **servidores headless (libvirt/QEMU puro)**.
+> **Dica:** este procedimento é compatível tanto com ambientes **gráficos (virt-manager)** quanto **servidores headless (libvirt/QEMU puro)**.
 
 Durante o processo:
 - A interface física (`enp8s0`) será **transferida para a bridge**;
@@ -19,7 +19,7 @@ Durante o processo:
 - Você poderá **usar DHCP ou IP fixo** (exemplo incluso);
 - Um **método de reversão** completo é apresentado ao final, com opção de restauração total do backup.
 
-⚠️ **Importante:**  
+**Importante:**  
 Execute este guia **diretamente no terminal local** (não via SSH), pois a conexão pode cair temporariamente enquanto a nova bridge é criada.
 
 ## VOCÊ PRECISA DE BRIDGE?

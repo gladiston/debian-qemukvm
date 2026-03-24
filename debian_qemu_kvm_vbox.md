@@ -362,7 +362,7 @@ O comando realiza uma desfragmentação lógica da imagem QCOW2, consolidando os
 
 ---
 
-## 🧩 Conclusão
+## Conclusão
 
 A conversão de discos **VDI>QCOW2** é o caminho mais prático para migrar VMs do VirtualBox para o QEMU/KVM.
 Com essa abordagem:

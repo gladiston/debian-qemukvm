@@ -119,23 +119,23 @@ Alguns serviços o Windows sao dispensáveis, execute `services.msc` e desative 
 
 | Nome exibido no `services.msc` | Nome interno (`sc config ...`) | Função | Pode desativar? |
 |--------------------------------|-------------------------------|---------|------------------|
-| **Windows Search** | `WSearch` | Indexação de arquivos e e-mails | ✅ |
-| **SysMain** *(antigo Superfetch)* | `SysMain` | Otimiza inicialização e cache de aplicativos | ✅ |
-| **Optimize Drives (Desfragmentador)** | `defragsvc` | Desfragmenta discos mecânicos | ✅ |
-| **Windows Error Reporting Service** | `WerSvc` | Envia relatórios de erro para a Microsoft | ✅ |
-| **Diagnostic Policy Service** | `DPS` | Detecta e tenta corrigir problemas de rede e hardware | ✅ |
-| **Connected User Experiences and Telemetry** | `DiagTrack` | Coleta telemetria e estatísticas de uso | ✅ |
-| **Windows Update Medic Service** | `WaaSMedicSvc` | Reativa o Windows Update automaticamente | ✅ |
-| **Remote Registry** | `RemoteRegistry` | Permite editar o registro remotamente | ✅ |
-| **Fax** | `Fax` | Suporte a envio de fax | ✅ |
-| **Print Spooler** | `Spooler` | Gera fila de impressão | ✅ *(a não ser que use impressoras)* |
-| **Bluetooth Support Service** | `bthserv` | Gerencia dispositivos Bluetooth | ✅ |
-| **Smart Card** | `SCardSvr` | Gerencia cartões inteligentes | ✅ |
-| **Secondary Logon** | `seclogon` | Permite “Executar como outro usuário” | ⚠️ *Opcional* |
-| **Windows Defender Antivirus Service** | `WinDefend` | Proteção antivírus | ⚠️ *Somente se VM isolada* |
-| **Offline Files** | `CscService` | Sincroniza arquivos offline | ✅ |
-| **Program Compatibility Assistant Service** | `PcaSvc` | Detecta compatibilidade de programas antigos | ✅ |
-| **Security Center** | `wscsvc` | Central de segurança (alertas) | ✅ |
+| **Windows Search** | `WSearch` | Indexação de arquivos e e-mails | Sim |
+| **SysMain** *(antigo Superfetch)* | `SysMain` | Otimiza inicialização e cache de aplicativos | Sim |
+| **Optimize Drives (Desfragmentador)** | `defragsvc` | Desfragmenta discos mecânicos | Sim |
+| **Windows Error Reporting Service** | `WerSvc` | Envia relatórios de erro para a Microsoft | Sim |
+| **Diagnostic Policy Service** | `DPS` | Detecta e tenta corrigir problemas de rede e hardware | Sim |
+| **Connected User Experiences and Telemetry** | `DiagTrack` | Coleta telemetria e estatísticas de uso | Sim |
+| **Windows Update Medic Service** | `WaaSMedicSvc` | Reativa o Windows Update automaticamente | Sim |
+| **Remote Registry** | `RemoteRegistry` | Permite editar o registro remotamente | Sim |
+| **Fax** | `Fax` | Suporte a envio de fax | Sim |
+| **Print Spooler** | `Spooler` | Gera fila de impressão | Sim *(a não ser que use impressoras)* |
+| **Bluetooth Support Service** | `bthserv` | Gerencia dispositivos Bluetooth | Sim |
+| **Smart Card** | `SCardSvr` | Gerencia cartões inteligentes | Sim |
+| **Secondary Logon** | `seclogon` | Permite “Executar como outro usuário” | *Opcional — avalie antes* |
+| **Windows Defender Antivirus Service** | `WinDefend` | Proteção antivírus | *Somente se VM isolada — avalie risco* |
+| **Offline Files** | `CscService` | Sincroniza arquivos offline | Sim |
+| **Program Compatibility Assistant Service** | `PcaSvc` | Detecta compatibilidade de programas antigos | Sim |
+| **Security Center** | `wscsvc` | Central de segurança (alertas) | Sim |
 
 A lista acima, foi tirada do Windows Server, o Windows 11 tem muito mais serviços que estes e levará algum tempo para você complementar a lista.  
 Desativar um serviço de cada vez levará muito tempo, então para agilizar, criei um script `agilizar_vm.bat` que ao rodar uma única vez como administrador, ele desativará vários de uma única vez. Se estiver interessado crie um script `agilizar_vm.bat` com o seguinte cnteúdo:  
