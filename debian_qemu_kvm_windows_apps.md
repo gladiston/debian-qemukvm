@@ -56,6 +56,8 @@ Vale instalar por garantir **compatibilidade total com PDFs proprietários**, es
 Download:  
 [http://get.adobe.com/br/reader/enterprise/](http://get.adobe.com/br/reader/enterprise/)  
 
+**Observação:** até o momento **não há** distribuição oficial do **Adobe Acrobat Reader** em executável **somente 64 bits** para Windows — o produto continua, na prática, no modelo **32 bits** (pastas como `Program Files (x86)`), mesmo em sistemas operacionais de 64 bits. Confira no site da Adobe se isso mudou depois da publicação deste guia.
+
 **ALERTA (instalador):** o link acima é para baixar a versão offline; não use o instalador online (websetup), pois ele pode instalar junto outros programas que você não pediu. A versão online é uma das mais traiçoeiras: pode incluir software adicional que a Adobe empacotar no fluxo. Use sua conta e o pacote offline corporativo quando possível.
 
 **ALERTA (privacidade e sistema limpo):** os softwares da Adobe **não são** a melhor escolha para quem prioriza **privacidade** e um **sistema enxuto**. Depois de instalado, o Reader costuma **manter comunicação de rede** com servidores da Adobe; não há transparência total sobre **o que envia** ou quando. Além disso, costuma ser criada uma **tarefa no Agendador de tarefas** para, em períodos de **ociosidade**, verificar atualizações. Em algumas versões a Adobe também inclui **programas ou serviços** que passam a carregar com o Windows.
@@ -64,8 +66,10 @@ Se mesmo assim você precisar do Reader, vale **endurecer** o ambiente. **Não**
 
 ![Adobe Reader — exemplo (Agendador de tarefas, inicialização ou instalador, conforme a captura)](img/debian_qemu_kvm_windows_apps04.png)
 
+
+
 1. **Agendador de tarefas (remover ou desativar atualização automática)**  
-   - Abra o **Agendador de tarefas** (`taskschd.msc` ou pesquise pelo nome).  
+   - Abra o **Agendador de tarefas** (`r` ou pesquise pelo nome).  
    - No painel esquerdo, em **Biblioteca do Agendador de tarefas**, expanda e procure pastas ou tarefas com **Adobe** no nome.  
    - Clique com o botão direito nas tarefas relacionadas a **atualização**, **Adobe Acrobat Update** ou similares → **Desabilitar** (mais seguro que apagar, se quiser reverter) ou **Excluir**, se tiver certeza.
 
@@ -74,6 +78,8 @@ Se mesmo assim você precisar do Reader, vale **endurecer** o ambiente. **Não**
    - Ou: **Configurações** → **Aplicativos** → **Inicialização**.  
    - Desative itens **Adobe** (Reader, updater, etc.) que não forem necessários.  
    - Opcional: em **Gerenciador de Tarefas** → **Inicialização**, verifique o impacto na inicialização e desative o que for “Alto” e não essencial.
+
+   ![Gerenciador de Tarefas — aba Inicialização (itens Adobe, exemplo)](img/debian_qemu_kvm_windows_apps05.png)
 
 3. **Conferência após instalar**  
    - Repita os passos acima **depois de cada atualização** do Reader, pois instaladores às vezes recriam tarefas e entradas de inicialização.
