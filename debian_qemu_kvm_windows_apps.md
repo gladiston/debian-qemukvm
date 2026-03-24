@@ -353,9 +353,14 @@ Mais detalhes, *issues* conhecidos e alternativas de instalação: [repositório
 
 Na primeira vez que o script **Winutil** estiver aberto, vá em **Tweaks**, clique no botão **Standard** e ele marcará automaticamente várias opções. A partir daí, recomendo o seguinte:
 
-- **Desmarque** **Run Disk Cleanup** — essa etapa costuma **demorar muito** e você pode executar a limpeza de disco manualmente no final, fora do Winutil.
-- **Marque também** (acrescente as marcações): **Disable Hibernation** e **Remove Widgets**.
-- Em **Advanced Tweaks**, marque: **Adobe Network Block**, **Block Razer Software Installs** (ou nome parecido, ex.: **VBlock Razer Software Installs**, conforme a versão do Winutil) e **Disable Microsoft Copilot**.
+| Opção (seção) | Ação sugerida |
+|:--|:--|
+| **Run Disk Cleanup** (lista após **Standard**) | **Desmarcar** — essa etapa costuma **demorar muito**; faça a limpeza de disco manualmente no final, **fora** do Winutil. |
+| **Disable Hibernation** | **Marcar** |
+| **Remove Widgets** | **Marcar** |
+| **Adobe Network Block** (*Advanced Tweaks*) | **Marcar** |
+| **Block Razer Software Installs** (*Advanced Tweaks*) | **Marcar** (o nome na interface pode variar, ex.: **VBlock Razer Software Installs**, conforme a versão do Winutil). |
+| **Disable Microsoft Copilot** (*Advanced Tweaks*) | **Marcar** |
 
 Em **Customize preferences**, costumo deixar assim (ajuste se os rótulos mudarem de nome na sua versão):
 
