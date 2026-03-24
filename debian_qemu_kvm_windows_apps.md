@@ -2,6 +2,8 @@
 
 Um sistema Windows básico em minha opinião, não sobrevive sem estes programas:
 
+**Observação (Windows em VM):** dentro do **convidado** (a VM), **não** instale **Subsistema do Windows para Linux (WSL)**, **Hyper-V** nem **Área Restrita do Windows** (*Windows Sandbox*). Esses recursos pressupõem outro papel para o SO (virtualização aninhada, isolamento de kernel ou acesso a hipervisor) e, em VM sobre QEMU/KVM, em geral **não fazem sentido**, podem **falhar na instalação**, gerar **instabilidade** ou **desperdiçar recursos** sem ganho prático. Para Linux, use o **hospedeiro** ou uma **VM Linux separada**; para testes isolados, use outra máquina virtual em vez de Sandbox/Hyper-V dentro do convidado.
+
 ---
 
 ## Autologon
@@ -232,7 +234,7 @@ Aproveite este momento para fazer uma **Limpeza profunda** usando o PC Manager:
 
 ## Instalando recursos opcionais do Windows
 
-Em **Configurações** → **Aplicativos** → **Recursos opcionais** → **Mais recursos do Windows** (ou execute **`optionalfeatures`** no menu Executar), marque para instalação, entre outros que precisar:
+Em **Configurações**, procure por **Recursos opcionais**, depois **Mais recursos do Wndows** e então marque para instalação, entre outros que precisar:
 
 ![Recursos opcionais do Windows — instalação de componentes (exemplo)](img/debian_qemu_kvm_windows_apps07.png)
 
@@ -276,10 +278,29 @@ As **Ferramentas de Administração de Servidor Remoto** (*Remote Server Adminis
 **Quando vale a pena:** se você **lida com redes em domínio Microsoft** (AD DS), precisa **criar usuários**, **resetar senha**, **verificar GPO**, **consultar DNS interno** ou **DHCP** enquanto usa uma **VM Windows** de trabalho, instalar o RSAT nessa VM evita depender de outra máquina só para abrir `dsa.msc`, `gpmc.msc`, `dnsmgmt.msc` e similares.
 
 **Como instalar (Windows 10 / 11 — build recente)**
+1. Abra **Configurações**, procure por **Recursos opcionais**, depois **Exibir ou editar recursos opcionais**, clique no botão **Exibir Recursos**, na janela seguinte, é bem discreto, mas há um link intitulado **Ver os recursos disponíveis**:  
 
-1. Abra **Configurações** → **Aplicativos** → **Recursos opcionais** (ou **Recursos avançados opcionais**, conforme a versão).
-2. Em **Adicionar um recurso** / **Exibir recursos**, use a pesquisa por **RSAT** ou pelo componente desejado (ex.: **RSAT: Ferramentas de Active Directory Domain Services e Lightweight Directory Services**, **RSAT: Gerenciamento de Política de Grupo**, **RSAT: Ferramentas de DNS**, etc.).
-3. Instale só o que for usar — cada módulo ocupa espaço e aparece no menu Ferramentas administrativas do Windows.
+![Ver os recursos disponíveis](img/debian_qemu_kvm_windows_apps09.png)
+2. Em **Adicionar um recurso** / **Exibir recursos**, e então marque apenas o que for instalar, exemplo:
+  * Ferramentas de Administração de Serviços Remoto: Active Directory Domain Services e Lightweight Directory Services Tools
+  * Ferramentas de Administração de Serviços Remoto: Ferramentas de Gerenciamento de Controlador de Rede
+  * Ferramentas de Administração de Serviços Remoto: Ferramenta de servidor DHCP
+  * Ferramentas de Administração de Serviços Remoto: Serviços de arquivo
+  * Ferramentas de Administração de Serviços Remoto: Ferramentas do Servidor DNS
+  * Ferramentas de Administração de Serviços Remoto: Gerenciador do Servidor
+  * Ferramentas de Administração de Serviços Remoto: Ferramentas para Windows Server Update Services
+  * Gerenciamento de Armazenamento do Windows
+  * RSAT: Ferramentas de gerenciamento de Política de Grupo 
+  * RSAT: Ferramentas de Gerenciamento de Serviço de Migração de Armazenamento
+  * RSAT: Ferramentas de Serviço de Área de Trabalho Remota 
+  * RSAT: Módulo de Insights do Sistema para Windows PowerShell 
+  * RSAT: Ferramentas de Serviços de Certificados do Active Directory
+  * WMIC 
+
+![Marque apenas o que for instalar](img/debian_qemu_kvm_windows_apps10.png)  
+**Observação**: Antigamente bastava usar a pesquisa e procurar por "RSAT", porém atualmente nem sempre as opções começam com "RSAT" ou "Ferramentas de Administração de Serviços Remoto" o que nos faz ver a lista inteira ou procurar por DNS, DHCP,...   e ir marcando individualmente.
+
+Parece óbvio, mas **instale só o que for usar** — cada módulo ocupa um espaço razoável e incluirá atualizações pesadas.
 
 **Alternativa (PowerShell como administrador)** — listar o que está disponível e instalar um pacote (exemplo; o nome exato varia com a build):
 
