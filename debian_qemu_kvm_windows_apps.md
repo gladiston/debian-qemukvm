@@ -311,7 +311,11 @@ Por fim, clique em **Run Tweaks** e aguarde a conclusão.
 
 **Plano Ultimate Performance (opcional):** caso **queira maximizar o desempenho**, no Winutil clique também em **Add and Activate Ultimate Performance Profile** (o rótulo pode variar um pouco, mas costuma citar *Ultimate Performance*). Isso instala e ativa o **esquema de energia “Desempenho máximo”** do Windows — um perfil que, em troca de **maior consumo de energia** e **mais calor/ruído de cooler**, reduz **throttling** agressivo da CPU e ajustes que o sistema faria para economizar energia. É pensado para estações **ligadas na tomada** (desktop, notebook em uso contínuo na fonte, VM com carga pesada); em **notebook na bateria** pode drenar a carga rápido e não é ideal.
 
-Se **não gostar** do comportamento (ruído, temperatura ou consumo), use **Remove Ultimate Performance Profile** no Winutil: o plano extra some e o Windows volta a usar o esquema de energia que estava ativo antes (por exemplo **Equilibrado**).
+Se **não gostar** do comportamento (ruído, temperatura ou consumo), use **Remove Ultimate Performance Profile** no Winutil: o plano extra some e o Windows volta a usar o esquema de energia que estava ativo antes (por exemplo **Equilibrado**).  
+
+Aproveite agora para conhecer melhor o script Winutil, nele encontrará outras opções como **instalação de programas**, **ajustes (“tweaks”)**, **configurações** e ajuda com **atualizações** do Windows numa interface única. Por exemplo, acho muito úteis as opções:
+* **NFS - Nwtowrk File Syustem**:  lhe dará uma opção de compartilhar arquivos entre a VM e host Linux sem necessitar do SAMBA ou outros recursos.
+* **Enable OpenSSH Server**: Lhe permitirá usar `ssh` remoto no terminal do Windows.
 
 ---
 
