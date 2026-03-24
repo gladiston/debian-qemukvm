@@ -10,10 +10,20 @@ Um sistema Windows básico em minha opinião, não sobrevive sem estes programas
 
 Vale instalar em ambientes onde é necessário **boot desatendido** (unattended deployment), automação de testes em VMs de desenvolvimento, inicialização de serviços críticos que dependem de autenticação prévia, ou recuperação de ambientes após reinicializações não planejadas. Particularmente relevante em sua stack de **QEMU+KVM com Windows Server**, facilitando deployments ágeis, automação de laboratorios de teste, e gerenciamento centralizado de máquinas virtuais sem necessidade de interação via console gráfico.  
 
-A ferramenta oferece interface CLI simples, criptografia segura das senhas no registro, e integração nativa com Group Policy, tornando-a solução prática para ambientes corporativos e de infraestrutura virtualizada. Durante o processo de ciação, já tinhamos sugerido sua instalação, mas caso ainda não tenha feito, é bastante recomendável.  
+A ferramenta oferece interface CLI simples, criptografia segura das senhas no registro, e integração nativa com Group Policy, tornando-a solução prática para ambientes corporativos e de infraestrutura virtualizada. Durante o processo de criação da VM, já tínhamos sugerido sua instalação, mas caso ainda não tenha feito, é bastante recomendável.  
 
 Download:  
 [https://learn.microsoft.com/pt-br/sysinternals/downloads/autologon](https://learn.microsoft.com/pt-br/sysinternals/downloads/autologon)  
+
+**Instalação:** você **precisa descompactar** o arquivo baixado (é um `.zip`). Dentro haverá, entre outros, **Autologon.exe** (32 bits) e **Autologon64.exe** (64 bits). Em **Windows de 64 bits** (o caso mais comum), copie **Autologon64.exe** para **`C:\Windows\System32`** — é o local usual para ferramentas de 64 bits e a pasta já está no `PATH`. O **Autologon.exe** de 32 bits, se for o que você usar num sistema 64 bits, deve ir para **`C:\Windows\SysWOW64`** (é onde o Windows coloca executáveis 32 bits; o nome da pasta parece “invertido”, mas é assim mesmo). Na prática você só precisa **de um** dos dois, conforme a arquitetura do Windows; não é necessário copiar os dois para os dois sítios.
+
+![Ficheiros do Autologon após descompactar o pacote](img/debian_qemu_kvm_windows_apps01.png)
+
+Execute **Autologon64.exe** (64 bits) ou **Autologon.exe** (32 bits) conforme a arquitetura do seu Windows. Na janela do utilitário, introduza as **credenciais** para o autologon (utilizador, domínio se aplicável, senha), como na figura abaixo.
+
+![Janela do Autologon — preenchimento das credenciais](img/debian_qemu_kvm_windows_apps02.png)
+
+Confirme (por exemplo **Enable**). No próximo arranque, o Windows iniciará sessão automaticamente com essas credenciais.
 
 ---
 
