@@ -71,7 +71,8 @@ Se mesmo assim você precisar do Reader, vale **endurecer** o ambiente. **Não**
 1. **Agendador de tarefas (remover ou desativar atualização automática)**  
    - Abra o **Agendador de tarefas** (`r` ou pesquise pelo nome).  
    - No painel esquerdo, em **Biblioteca do Agendador de tarefas**, expanda e procure pastas ou tarefas com **Adobe** no nome.  
-   - Clique com o botão direito nas tarefas relacionadas a **atualização**, **Adobe Acrobat Update** ou similares → **Desabilitar** (mais seguro que apagar, se quiser reverter) ou **Excluir**, se tiver certeza.
+   - Clique com o botão direito nas tarefas relacionadas a **atualização**, **Adobe Acrobat Update** ou similares → **Desabilitar** (mais seguro que apagar, se quiser reverter) ou **Excluir**, se tiver certeza.  
+   ![Gerenciador de Tarefas — aba Inicialização (itens Adobe, exemplo)](img/debian_qemu_kvm_windows_apps05.png)   
 
 2. **Programas na inicialização do Windows**  
    - Pressione **Ctrl+Shift+Esc** para abrir o **Gerenciador de Tarefas** → aba **Inicialização** (no Windows 11: **Mais detalhes** primeiro, se aparecer compacto).  
@@ -79,7 +80,7 @@ Se mesmo assim você precisar do Reader, vale **endurecer** o ambiente. **Não**
    - Desative itens **Adobe** (Reader, updater, etc.) que não forem necessários.  
    - Opcional: em **Gerenciador de Tarefas** → **Inicialização**, verifique o impacto na inicialização e desative o que for “Alto” e não essencial.
 
-   ![Gerenciador de Tarefas — aba Inicialização (itens Adobe, exemplo)](img/debian_qemu_kvm_windows_apps05.png)
+
 
 3. **Conferência após instalar**  
    - Repita os passos acima **depois de cada atualização** do Reader, pois instaladores às vezes recriam tarefas e entradas de inicialização.
