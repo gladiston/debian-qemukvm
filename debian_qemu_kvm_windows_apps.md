@@ -266,28 +266,52 @@ irm "https://christitus.com/win" | iex
 
 4. Há também uma linha de **desenvolvimento** (`windev`) no repositório — use só se souber o que está fazendo: [documentação no README do Winutil](https://github.com/ChrisTitusTech/winutil).
 
+### Primeira execução — Tweaks (sugestão)
+
+Na primeira vez que o script **Winutil** estiver aberto, vá em **Tweaks**, clique no botão **Standard** e ele marcará automaticamente várias opções. A partir daí, recomendo o seguinte:
+
+- **Desmarque** **Run Disk Cleanup** — essa etapa costuma **demorar muito** e você pode executar a limpeza de disco manualmente no final, fora do Winutil.
+- **Marque também** (acrescente as marcações): **Disable Hibernation** e **Remove Widgets**.
+- Em **Advanced Tweaks**, marque: **Adobe Network Block**, **Block Razer Software Installs** (ou nome parecido, ex.: **VBlock Razer Software Installs**, conforme a versão do Winutil) e **Disable Microsoft Copilot**.
+
+Em **Customize preferences**, costumo deixar assim (ajuste se os rótulos mudarem de nome na sua versão):
+
+| Preferência | Valor sugerido |
+|:--|:--|
+| Bing Search in Start Menu | Desligado |
+| Num Lock on Startup | Ligado |
+| Recommendation in Start Menu (ou “Recomendation”, conforme o rótulo) | Desligado |
+| Show Extensions | Ligado |
+| Show Hidden Files | Ligado |
+| Task View Button in TaskBar | Desligado |
+
+Por fim, clique em **Run Tweaks** e aguarde a conclusão.
+
+![Winutil — Tweaks, Standard e preferências (exemplo)](img/debian_qemu_kvm_windows_apps06.png)
+
+**Plano Ultimate Performance (opcional):** caso **queira maximizar o desempenho**, no Winutil clique também em **Add and Activate Ultimate Performance Profile** (o rótulo pode variar um pouco, mas costuma citar *Ultimate Performance*). Isso instala e ativa o **esquema de energia “Desempenho máximo”** do Windows — um perfil que, em troca de **maior consumo de energia** e **mais calor/ruído de cooler**, reduz **throttling** agressivo da CPU e ajustes que o sistema faria para economizar energia. É pensado para estações **ligadas na tomada** (desktop, notebook em uso contínuo na fonte, VM com carga pesada); em **notebook na bateria** pode drenar a carga rápido e não é ideal.
+
+Se **não gostar** do comportamento (ruído, temperatura ou consumo), use **Remove Ultimate Performance Profile** no Winutil: o plano extra some e o Windows volta a usar o esquema de energia que estava ativo antes (por exemplo **Equilibrado**).
+
 ### Rede com proxy (para o script conseguir baixar e rodar)
 
-O `irm` precisa de **HTTPS** até `christitus.com` (e, dependendo da versão, outros hosts que o próprio script chamar). Em redes com **proxy corporativo**:
-
-1. **Defina o proxy na sessão do PowerShell** (ajuste endereço, porta e, se necessário, usuário/senha):
+O `irm` precisa de **HTTPS** até `christitus.com` (e, dependendo da versão, outros hosts que o próprio script chamar). Com **proxy autenticado**, use o endereço do servidor, a porta e as credenciais diretamente no comando:
 
 ```powershell
-$env:HTTP_PROXY  = "http://proxy.suaempresa.com.br:8080"
-$env:HTTPS_PROXY = "http://proxy.suaempresa.com.br:8080"
+$proxy = "http://ip.do.servidor.proxy:porta"
+$sec   = ConvertTo-SecureString "senhadousuario" -AsPlainText -Force
+$cred  = New-Object System.Management.Automation.PSCredential("logindousuario", $sec)
+
+irm "https://christitus.com/win" -Proxy $proxy -ProxyCredential $cred | iex
 ```
 
-Se o proxy exigir autenticação NTLM ou integrada ao Windows, muitas vezes o caminho é configurar o proxy nas **Opções da Internet** do Windows (**Win+R** → `inetcpl.cpl` → guia **Conexões** → **Configurações da LAN**) e então abrir de novo o PowerShell **como administrador**; o subsistema pode herdar esse proxy.
+Substitua `ip.do.servidor.proxy`, `porta`, `logindousuario` e `senhadousuario` pelos dados da sua rede. **Atenção:** deixar a senha em texto plano no script ou no histórico do console é **arriscado**; em ambiente corporativo, prefira pedir credenciais na hora (`Get-Credential`) ou use o fluxo que a TI indicar, e não compartilhe esse trecho em repositórios públicos.
 
-2. **Lista de exceções (bypass)** para endereços internos, se o proxy quebrar acesso à rede local:
+Os parâmetros `-Proxy` e `-ProxyCredential` em `irm` existem no **PowerShell 7** e em versões recentes. Se o **Windows PowerShell 5.1** reclamar que não conhece `-Proxy`, execute o mesmo bloco no **PowerShell 7** (`pwsh`), [instalável à parte](https://aka.ms/powershell).
 
-```powershell
-$env:NO_PROXY = "localhost,127.0.0.1,.suaempresa.local"
-```
+Se o proxy **não** exigir usuário/senha (apenas endereço:porta), teste só com `-Proxy` (sem `-ProxyCredential`) ou configure o proxy nas **Opções da Internet** (**Win+R** → `inetcpl.cpl` → **Conexões** → **Configurações da LAN**) e execute o `irm` normalmente.
 
-3. Peça à **TI** liberação de saída **HTTPS (443)** para pelo menos **`christitus.com`** e, se o antivírus/proxy inspecionar TLS, que o **certificado raiz** da empresa esteja confiável no Windows (inspeção SSL quebra `irm` se não houver confiança).
-
-4. Se o **SmartScreen** ou o **antivírus** bloquear o download/execução, isso é decisão de segurança local — só desbloqueie se a política da organização permitir.
+Peça à **TI** liberação de saída **HTTPS (443)** para **`christitus.com`**; se houver **inspeção SSL** no proxy, o certificado raiz da empresa precisa ser confiável no Windows. Se o **SmartScreen** ou o **antivírus** bloquear o download, siga a política local da organização.
 
 Mais detalhes, *issues* conhecidos e alternativas de instalação: [repositório winutil no GitHub](https://github.com/ChrisTitusTech/winutil).
 
