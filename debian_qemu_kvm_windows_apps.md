@@ -263,8 +263,28 @@ Isso usa `Invoke-RestMethod` (`irm`) para baixar o script e `Invoke-Expression` 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 irm "https://christitus.com/win" | iex
 ```
+**Rede com proxy (para o script conseguir baixar e rodar)**
 
-4. Há também uma linha de **desenvolvimento** (`windev`) no repositório — use só se souber o que está fazendo: [documentação no README do Winutil](https://github.com/ChrisTitusTech/winutil).
+O `irm` precisa de **HTTPS** até `christitus.com` (e, dependendo da versão, outros hosts que o próprio script chamar). Com **proxy autenticado**, use o endereço do servidor, a porta e as credenciais diretamente no comando:
+
+```powershell
+$proxy = "http://ip.do.servidor.proxy:porta"
+$sec   = ConvertTo-SecureString "senhadousuario" -AsPlainText -Force
+$cred  = New-Object System.Management.Automation.PSCredential("logindousuario", $sec)
+
+irm "https://christitus.com/win" -Proxy $proxy -ProxyCredential $cred | iex
+```
+
+Substitua `ip.do.servidor.proxy`, `porta`, `logindousuario` e `senhadousuario` pelos dados da sua rede.
+
+Os parâmetros `-Proxy` e `-ProxyCredential` em `irm` existem no **PowerShell 7** e em versões recentes. Se o **Windows PowerShell 5.1** reclamar que não conhece `-Proxy`, execute o mesmo bloco no **PowerShell 7** (`pwsh`), [instalável à parte](https://aka.ms/powershell).
+
+Se o proxy **não** exigir usuário/senha (apenas endereço:porta), teste só com `-Proxy` (sem `-ProxyCredential`) ou configure o proxy nas **Opções da Internet** (**Win+R** → `inetcpl.cpl` → **Conexões** → **Configurações da LAN**) e execute o `irm` normalmente.
+
+Peça à **TI** liberação de saída **HTTPS (443)** para **`christitus.com`**; se houver **inspeção SSL** no proxy, o certificado raiz da empresa precisa ser confiável no Windows. Se o **SmartScreen** ou o **antivírus** bloquear o download, siga a política local da organização.
+
+Mais detalhes, *issues* conhecidos e alternativas de instalação: [repositório winutil no GitHub](https://github.com/ChrisTitusTech/winutil).
+
 
 ### Primeira execução — Tweaks (sugestão)
 
@@ -293,27 +313,37 @@ Por fim, clique em **Run Tweaks** e aguarde a conclusão.
 
 Se **não gostar** do comportamento (ruído, temperatura ou consumo), use **Remove Ultimate Performance Profile** no Winutil: o plano extra some e o Windows volta a usar o esquema de energia que estava ativo antes (por exemplo **Equilibrado**).
 
-### Rede com proxy (para o script conseguir baixar e rodar)
+---
 
-O `irm` precisa de **HTTPS** até `christitus.com` (e, dependendo da versão, outros hosts que o próprio script chamar). Com **proxy autenticado**, use o endereço do servidor, a porta e as credenciais diretamente no comando:
+## Limpeza do sistema
 
-```powershell
-$proxy = "http://ip.do.servidor.proxy:porta"
-$sec   = ConvertTo-SecureString "senhadousuario" -AsPlainText -Force
-$cred  = New-Object System.Management.Automation.PSCredential("logindousuario", $sec)
+Depois de instalar atualizações e software, vale uma **limpeza administrativa** para recuperar espaço e arquivos temporários. A ferramenta nativa mais segura para isso continua sendo a **Limpeza de Disco** (*Disk Cleanup*) do Windows.
 
-irm "https://christitus.com/win" -Proxy $proxy -ProxyCredential $cred | iex
-```
+### Limpeza de Disco (`cleanmgr`)
 
-Substitua `ip.do.servidor.proxy`, `porta`, `logindousuario` e `senhadousuario` pelos dados da sua rede. **Atenção:** deixar a senha em texto plano no script ou no histórico do console é **arriscado**; em ambiente corporativo, prefira pedir credenciais na hora (`Get-Credential`) ou use o fluxo que a TI indicar, e não compartilhe esse trecho em repositórios públicos.
+1. Pressione **Win+R**, digite `cleanmgr` e **Enter** (ou pesquise **Limpeza de Disco** no menu Iniciar).
+2. Escolha a unidade **C:** (ou onde está o Windows) e marque o que fizer sentido: **Arquivos temporários da Internet**, **Lixeira**, **Miniaturas**, **Arquivos de log de atualização do Windows**, etc.
+3. Para liberar **atualizações antigas do Windows** e outros itens do sistema, clique em **Limpar arquivos do sistema** (o utilitário será executado de novo com privilégios elevados e mostrará categorias extras, em geral bem maiores).
+4. Confirme e aguarde — pode levar vários minutos.
 
-Os parâmetros `-Proxy` e `-ProxyCredential` em `irm` existem no **PowerShell 7** e em versões recentes. Se o **Windows PowerShell 5.1** reclamar que não conhece `-Proxy`, execute o mesmo bloco no **PowerShell 7** (`pwsh`), [instalável à parte](https://aka.ms/powershell).
+Isso atinge tanto **resíduos de perfil** (cache, lixeira) quanto **lixo de sistema** (instaladores antigos de update), sem precisar de programas de terceiros.
 
-Se o proxy **não** exigir usuário/senha (apenas endereço:porta), teste só com `-Proxy` (sem `-ProxyCredential`) ou configure o proxy nas **Opções da Internet** (**Win+R** → `inetcpl.cpl` → **Conexões** → **Configurações da LAN**) e execute o `irm` normalmente.
+### Pasta `Windows.old` (após atualizar de versão do Windows)
 
-Peça à **TI** liberação de saída **HTTPS (443)** para **`christitus.com`**; se houver **inspeção SSL** no proxy, o certificado raiz da empresa precisa ser confiável no Windows. Se o **SmartScreen** ou o **antivírus** bloquear o download, siga a política local da organização.
+Após uma **atualização in-place** (por exemplo de uma build do Windows 11 para outra), o Windows costuma manter a pasta **`C:\Windows.old`** com a instalação anterior — útil para **reverter** a atualização dentro do prazo que a Microsoft oferece (em geral **cerca de 10 dias**). Essa pasta pode ocupar **dezenas de gigabytes**.
 
-Mais detalhes, *issues* conhecidos e alternativas de instalação: [repositório winutil no GitHub](https://github.com/ChrisTitusTech/winutil).
+**Só apague se tiver certeza** de que não precisa voltar à versão anterior e de que o sistema está estável:
+
+- **Forma recomendada (nativa):** volte ao **Limpeza de Disco** → **Limpar arquivos do sistema** → marque **Instalação(es) anterior(es) do Windows** ou **Arquivos temporários de instalação do Windows** (o nome exato varia) → **OK** → **Excluir arquivos**.
+- **Alternativa:** **Configurações** → **Sistema** → **Armazenamento** → **Dados temporários** / **Limpeza de memória** (nomes podem mudar no Windows 11) e remova entradas relacionadas à instalação anterior, se aparecerem.
+
+**Não** apague manualmente `Windows.old` no Explorador sem seguir o fluxo acima — o Windows protege a pasta e a remoção manual pode falhar ou deixar lixo inconsistente.
+
+### Outras dicas comuns
+
+- **Arquivos temporários do usuário:** pastas como `%TEMP%` e `C:\Users\seu_usuario\AppData\Local\Temp` — feche programas antes e apague o conteúdo (não a pasta em si) se souber o que está fazendo; ou use a própria **Limpeza de Disco** / **Armazenamento** para ser mais seguro.
+- **Lixeira:** esvazie após revisar.
+- Em **notebook**, prefira fazer limpezas longas com o equipamento **na tomada**, para não interromper por falta de bateria.
 
 ---
 
