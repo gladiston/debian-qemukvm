@@ -54,10 +54,10 @@ Você precisará criar um **pool**, para isso adicione um novo hardware e escolh
 Na tela acima, perceba que **Driver** é **virtiofs**.  
 
 Em **Caminho de origem** você precisará clicar em **Navegar** e então selecionar um **pool**. Um **pool**, neste exemplo, é o “recipiente” no libvirt que aponta para onde estão os arquivos que você quer ver na VM — em geral uma pasta no seu sistema. Como `~/work` fica dentro do seu `$HOME` (ex.: `/home/gsantana`), é esse o **pool** a criar:  
-![Criando um novo volume](img/debian_qemu_kvm_windows_virtiofs03.png)   
+![Criando um novo volume](img/debian_qemu_kvm_windows_virtiofs04.png)   
 
 Uma vez criado o volume, a parte seguinte é apenas selecionar a pasta `~/work`:   
-![Criando um novo volume](img/debian_qemu_kvm_windows_virtiofs04.png)   
+![Criando um novo volume](img/debian_qemu_kvm_windows_virtiofs03.png)   
 
 Agora que os parâmetros corretos apareceram, confira se estão assim:  
 
