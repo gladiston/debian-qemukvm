@@ -228,7 +228,68 @@ Aproveite este momento para fazer uma **Limpeza profunda** usando o PC Manager:
 
 ![Realizando a primeira Limpeza Profunda](img/debian_qemu_kvm_windows_pcmanager1.png)  
 
+---
 
+## Winutil (Chris Titus Tech) — script opcional
+
+O projeto **[Winutil](https://github.com/ChrisTitusTech/winutil)** (Chris Titus Tech) é um utilitário em **PowerShell** que reúne **instalação de programas**, **ajustes (“tweaks”)**, **configurações** e ajuda com **atualizações** do Windows numa interface única. A documentação oficial e o código-fonte estão no repositório; o lançamento recomendado usa um script obtido por HTTPS (veja abaixo).
+
+### Vantagens
+- **Um só lugar** para instalar pacotes comuns, aplicar otimizações e correções sem abrir dezenas de sites.
+- **Código aberto** (licença MIT no repositório), com histórico público e comunidade grande — você pode inspecionar o que executa antes de confiar.
+- **Fluxo padronizado** para quem monta várias máquinas (laboratório, VM, desktop de uso pessoal).
+
+### Riscos (leia antes de executar)
+- O script roda com **privilégios de administrador** e pode **alterar o sistema** (serviços, políticas, pacotes). Erro de uso ou combinação ruim de opções pode deixar o Windows instável.
+- Você está **confiando no autor e na cadeia de entrega** (o comando baixa e executa código da internet). Sempre há risco teórico de **supply chain** (site ou DNS comprometido). Em ambientes **corporativos ou com dados sensíveis**, alinhe com a TI antes.
+- **“Tweaks” agressivos** podem conflitar com políticas da empresa, antivírus ou drivers — teste primeiro em **VM** ou backup.
+
+Se, **após** ponderar prós e contras, você **aceitar** esse nível de confiança, siga os passos abaixo. Se não aceitar, **não execute** o comando.
+
+### Execução (Windows — PowerShell como administrador)
+
+1. Abra o **PowerShell** ou o **Terminal do Windows** **como administrador** (botão direito no menu Iniciar → *Terminal (Administrador)* ou *Windows PowerShell (Administrador)*).
+2. O projeto documenta o comando estável (branch recomendada):
+
+```powershell
+irm "https://christitus.com/win" | iex
+```
+
+Isso usa `Invoke-RestMethod` (`irm`) para baixar o script e `Invoke-Expression` (`iex`) para executar. A janela do Winutil deve abrir.
+
+3. Se aparecer erro de **política de execução**, na **mesma** janela elevada, tente antes só nesta sessão:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+irm "https://christitus.com/win" | iex
+```
+
+4. Há também uma linha de **desenvolvimento** (`windev`) no repositório — use só se souber o que está fazendo: [documentação no README do Winutil](https://github.com/ChrisTitusTech/winutil).
+
+### Rede com proxy (para o script conseguir baixar e rodar)
+
+O `irm` precisa de **HTTPS** até `christitus.com` (e, dependendo da versão, outros hosts que o próprio script chamar). Em redes com **proxy corporativo**:
+
+1. **Defina o proxy na sessão do PowerShell** (ajuste endereço, porta e, se necessário, usuário/senha):
+
+```powershell
+$env:HTTP_PROXY  = "http://proxy.suaempresa.com.br:8080"
+$env:HTTPS_PROXY = "http://proxy.suaempresa.com.br:8080"
+```
+
+Se o proxy exigir autenticação NTLM ou integrada ao Windows, muitas vezes o caminho é configurar o proxy nas **Opções da Internet** do Windows (**Win+R** → `inetcpl.cpl` → guia **Conexões** → **Configurações da LAN**) e então abrir de novo o PowerShell **como administrador**; o subsistema pode herdar esse proxy.
+
+2. **Lista de exceções (bypass)** para endereços internos, se o proxy quebrar acesso à rede local:
+
+```powershell
+$env:NO_PROXY = "localhost,127.0.0.1,.suaempresa.local"
+```
+
+3. Peça à **TI** liberação de saída **HTTPS (443)** para pelo menos **`christitus.com`** e, se o antivírus/proxy inspecionar TLS, que o **certificado raiz** da empresa esteja confiável no Windows (inspeção SSL quebra `irm` se não houver confiança).
+
+4. Se o **SmartScreen** ou o **antivírus** bloquear o download/execução, isso é decisão de segurança local — só desbloqueie se a política da organização permitir.
+
+Mais detalhes, *issues* conhecidos e alternativas de instalação: [repositório winutil no GitHub](https://github.com/ChrisTitusTech/winutil).
 
 ---
 
