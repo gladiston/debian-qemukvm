@@ -230,6 +230,69 @@ Aproveite este momento para fazer uma **Limpeza profunda** usando o PC Manager:
 
 ---
 
+## Instalando recursos opcionais do Windows
+
+Em **Configurações** → **Aplicativos** → **Recursos opcionais** → **Mais recursos do Windows** (ou execute **`optionalfeatures`** no menu Executar), marque para instalação, entre outros que precisar:
+
+![Recursos opcionais do Windows — instalação de componentes (exemplo)](img/debian_qemu_kvm_windows_apps07.png)
+
+- **Cliente para NFS** (ou **Serviços para NFS** com o componente de cliente — o nome exato depende da edição do Windows; em algumas builds aparece agrupado em *Serviços para NFS*).
+- **Cliente Telnet** (*Telnet Client*).
+- **Cliente OpenSSH** (*OpenSSH Client*) — ferramentas de linha de comando `ssh`, `scp`, `sftp` para acessar servidores Linux/host sem instalar software de terceiros.
+- **Servidor OpenSSH** (*OpenSSH Server*) — permite que a própria VM Windows aceite **sessões SSH** (útil para automação, cópia de arquivos e acesso remoto a partir do Linux hospedeiro ou de outras máquinas na rede).
+
+Se **alguma dessas opções não aparecer** na lista para marcar, é bem provável que **já tenha sido instalada** antes (atualização do Windows ou imagem corporativa). Nesse caso, em **Configurações** → **Aplicativos** → **Recursos opcionais**, use **Exibir recursos** (ou **Recursos instalados** / lista do que já está no sistema — o rótulo varia um pouco) para **conferir o que já está instalado** e não duplicar.
+
+![Recursos opcionais — Exibir recursos / já instalados (exemplo)](img/debian_qemu_kvm_windows_apps08.png)
+
+**Por que isso ajuda quem desenvolve e usa uma VM**
+
+- **NFS:** em laboratórios com **Linux no host** ou **storage NFS** (NAS, servidor de arquivos), o cliente NFS permite **montar pastas de rede no estilo Unix** sem depender só de SMB. Isso agiliza testes de aplicações, cópia de artefatos e integração com pipelines que já expõem NFS — cenário comum quando a VM Windows precisa consumir o mesmo export que serviços Linux usam.
+- **Telnet:** o cliente **não** é para “login seguro” (Telnet é inseguro por natureza), mas é útil para **testar se uma porta TCP está aberta** e para **diagnóstico rápido** de serviços legados em homologação. Em VM de desenvolvimento, isso evita instalar ferramentas extras só para um teste pontual.
+- **OpenSSH (cliente):** integra-se ao fluxo típico de **Git por SSH**, **deploy** e **administração em servidores Linux** a partir do Windows.
+- **OpenSSH (servidor):** em VM, permite **entrar por SSH** no Windows (com autenticação e firewall bem configurados) para scripts e cópias, **sem depender só de RDP** — prático quando o host é Linux.
+
+**Observação:** alguns recursos (NFS em profundidade) podem não existir em todas as edições (**Home** vs **Pro**/**Enterprise**). Se a opção não aparecer na lista de novos recursos, confira também **Exibir recursos** e a edição do Windows; use alternativas (SMB, virtio-fs, etc.) quando necessário.
+
+**Via PowerShell (como administrador)** — ajuste se o nome do recurso for recusado pelo sistema:
+
+```powershell
+dism /online /enable-feature /featurename:TelnetClient
+# Cliente NFS (quando disponível na edição):
+dism /online /enable-feature /featurename:ServicesForNFS-ClientOnly
+# OpenSSH (capacidades; o sufixo 0.0.1.0 pode variar — use Get-WindowsCapability para confirmar):
+Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
+Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+```
+
+Reinicie se o assistente pedir.
+
+---
+
+## Instalando o RSAT (opcional)
+
+As **Ferramentas de Administração de Servidor Remoto** (*Remote Server Administration Tools*, **RSAT**) são o conjunto de consoles da Microsoft para administrar **Active Directory**, **DNS**, **DHCP**, **Política de Grupo**, **certificados**, etc., **a partir de um Windows cliente** — sem precisar abrir sessão no servidor com área de trabalho.
+
+**Quando vale a pena:** se você **lida com redes em domínio Microsoft** (AD DS), precisa **criar usuários**, **resetar senha**, **verificar GPO**, **consultar DNS interno** ou **DHCP** enquanto usa uma **VM Windows** de trabalho, instalar o RSAT nessa VM evita depender de outra máquina só para abrir `dsa.msc`, `gpmc.msc`, `dnsmgmt.msc` e similares.
+
+**Como instalar (Windows 10 / 11 — build recente)**
+
+1. Abra **Configurações** → **Aplicativos** → **Recursos opcionais** (ou **Recursos avançados opcionais**, conforme a versão).
+2. Em **Adicionar um recurso** / **Exibir recursos**, use a pesquisa por **RSAT** ou pelo componente desejado (ex.: **RSAT: Ferramentas de Active Directory Domain Services e Lightweight Directory Services**, **RSAT: Gerenciamento de Política de Grupo**, **RSAT: Ferramentas de DNS**, etc.).
+3. Instale só o que for usar — cada módulo ocupa espaço e aparece no menu Ferramentas administrativas do Windows.
+
+**Alternativa (PowerShell como administrador)** — listar o que está disponível e instalar um pacote (exemplo; o nome exato varia com a build):
+
+```powershell
+Get-WindowsCapability -Online | Where-Object Name -like 'Rsat*'
+# Exemplo (confira o Name exato na saída acima):
+Add-WindowsCapability -Online -Name "Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0"
+```
+
+Em **edições Home** do Windows, o RSAT costuma **não** estar disponível; aí a solução é usar uma edição **Pro/Enterprise** na VM ou administrar o domínio a partir de outra estação onde o RSAT esteja instalado.
+
+---
+
 ## Winutil (Chris Titus Tech) — script opcional
 
 O projeto **[Winutil](https://github.com/ChrisTitusTech/winutil)** (Chris Titus Tech) é um utilitário em **PowerShell** que reúne **instalação de programas**, **ajustes (“tweaks”)**, **configurações** e ajuda com **atualizações** do Windows numa interface única. A documentação oficial e o código-fonte estão no repositório; o lançamento recomendado usa um script obtido por HTTPS (veja abaixo).
