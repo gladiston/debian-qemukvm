@@ -181,6 +181,30 @@ Os arquivos devem ser os mesmos de `~/Downloads`.
 
 **Outras pastas:** repita o mesmo padrão — pasta vazia dentro de `~/work`, `mount --bind` da origem real para essa pasta, linha correspondente no `fstab` — até tudo o que precisar estiver sob **`/home/gsantana/work`**.
 
+## Permissões: hospedeiro Linux × convidado Windows
+
+**Grupos do login (ex.: `gsantana`):** para usar **virt-manager** / **virsh** sem ser root, o usuário deve estar no grupo **`libvirt`**. Em Debian (e na maioria das instalações com KVM), inclua também o grupo **`kvm`**, que libera acesso a **`/dev/kvm`** (aceleração). Não confunda com **`libvirt-qemu`**: esse é um **usuário de sistema** sob o qual o QEMU costuma rodar; **não** é o grupo em que se coloca a conta pessoal.
+
+```bash
+sudo adduser gsantana libvirt
+sudo adduser gsantana kvm
+newgrp libvirt
+newgrp kvm
+```
+Arquivos criados a partir do Windows costumam aparecer no Linux com dono **`libvirt-qemu`**, não como **`gsantana`**. A **melhor prática** para compartilhar **`~/work`** é ACL para os **dois usuários** (`gsantana` **e** `libvirt-qemu`): você edita no hospedeiro como pessoa física; a VM não perde acesso quando o dono do inode for **`libvirt-qemu`**. As regras **default** (`-d`) cobrem **novos** arquivos e subpastas.
+
+**Uma vez** (preferencialmente com a VM desligada ou sem uso intenso da pasta), alinhe dono e ACL:
+
+```bash
+sudo chown -R gsantana:gsantana ~/work
+sudo setfacl -R  -m u:gsantana:rwx -m u:libvirt-qemu:rwx ~/work
+sudo setfacl -R -d -m u:gsantana:rwx -m u:libvirt-qemu:rwx ~/work
+```
+
+Conferência rápida: `getfacl ~/work | head -25`
+
+Documentação do libvirt sobre Virtio-FS: [Sharing files with Virtiofs](https://libvirt.org/kbase/virtiofs.html).
+
 ## SEGURANÇA
 
 **Objetivo:** a VM enxergar só o que precisa; o hospedeiro não expor pastas sensíveis à toa.
@@ -190,9 +214,6 @@ Os arquivos devem ser os mesmos de `~/Downloads`.
 | **Menos é mais** | Crie um pool no `$HOME` se precisar, mas **não** exporte o `$HOME` inteiro. Uma VM comprometida ou um app bisbilhotando teria escopo enorme. |
 | **Só o necessário** | Use como `Source Path` apenas pastas que essa VM realmente usa. Reduz risco e também limita **telemetria** de programas que, no fundo, se comportam como **spyware** no seu sistema. |
 | **Padrão “pasta work”** | Uma pasta estilo **`work`**, com *bind mounts* só do que essa VM precisa, costuma ser o melhor equilíbrio entre praticidade e controle. |
-
-**Nota para quem usa Delphi:** trabalhe na unidade **work** (qualquer letra que o Windows der), mas evite que o **projeto** dependa de **links simbólicos** apontando **para** essa unidade Virtio-FS — o Delphi costuma falhar ao resolver arquivos nesse caso, mesmo com os dados lá. **Por outro lado**, links simbólicos para **compartilhamento de rede** costumam funcionar bem com o Delphi.  
-
 
 ## Dicas do YouTube
 
