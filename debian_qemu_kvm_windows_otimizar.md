@@ -1,12 +1,17 @@
-# OTIMIZAÇÃO DA VM WINDOWS
-O Windows depois de instalado está carregado de coisas que roubam performance, vamos tentar melhorar. Siga as instruções abaixo para otimizá-lo:  
+# Otimização da VM Windows
+
+Depois da instalação, o Windows traz muitos recursos em segundo plano que consomem CPU, disco e memória. O passo a passo abaixo ajuda a **reduzir esse custo** em VMs — sempre avaliando o que faz sentido no **seu** uso (servidor de testes, desktop isolado, etc.).
 
 ---
 
-## Otimizando o Windows - Removendo o Gerenciador do Servidor do Startp do Windows:
-Se estiver usando uma edição Servidor do Windows, provavelmente você se aborrecerá do Gerenciador do Servidor que é carregado todas as vezes que faz o logon. Para desabilitá-lo vá em **Gerenciar|Propriedades do Gerenciador do Servidor** e então marque a opção **Não iniciar o Gerenciador do Servidor automaticamente no logon**:  
+## Remover o Gerenciador do servidor da inicialização (edições Server)
 
-![Ativando o autologon](img/debian_qemu_kvm_windows51.png)    
+Se você usa **Windows Server**, o **Gerenciador do Servidor** pode abrir a cada logon. Para desativar essa abertura automática:
+
+1. No próprio Gerenciador, vá em **Gerenciar** → **Propriedades do Gerenciador do Servidor**.
+2. Marque **Não iniciar o Gerenciador do Servidor automaticamente no logon**.
+
+![Desativar início automático do Gerenciador do Servidor](img/debian_qemu_kvm_windows51.png)
 
 ---
 
@@ -14,74 +19,87 @@ Se estiver usando uma edição Servidor do Windows, provavelmente você se aborr
 No painel de menu, remova os recursos que não precisa como caixa de pesquisa e visão de tarefas:   
 ![Remova os recursos que não precisa como caixa de pesquisa e visão de tarefas](img/debian_qemu_kvm_windows52.png)    
 
-Lembre-se de que qualquer coisa que consuma ciclos de CPU e não são úteis, devem ser desativados.  
+No menu/barra de tarefas, **desligue** o que não precisar — por exemplo **caixa de pesquisa** na barra e **visão de tarefas**, se não usar.
+
+![Personalizar itens da barra de tarefas](img/debian_qemu_kvm_windows52.png)
+
+**Regra simples:** tudo o que anima, indexa ou fica consultando o sistema sem necessidade real pode ser desligado em VM.
 
 ---
 
-## Otimizando o Windows - Papel de parede
-Remova o papel de parede e use uma cor solida como preto. Antes que pergunte, sim, isso faz muito a diferença.  
-![Remova o papel de parede e use uma cor solida como preto](img/debian_qemu_kvm_windows53.png)    
-Lembre-se de que qualquer coisa que consuma ciclos de CPU e não são úteis, devem ser desativados.  
+## Papel de parede
+
+Use **fundo sólido** (por exemplo preto) em vez de papel de parede. Em ambiente virtualizado isso costuma **aliviar** trabalho de composição do ambiente gráfico.
+
+![Fundo sólido em vez de papel de parede](img/debian_qemu_kvm_windows53.png)
 
 ---
 
-## Otimizando o Windows - Energia
-Você esta usando uma VM e por isso, você não tem compromisso de economia de energia.  
-No Windows vá em **Configurações**, procure por **Energia**, e desative qualquer medida ou tentativa para economizar energia:  
-![Remova a economia de energia](img/debian_qemu_kvm_windows54.png)    
+## Plano de energia
 
-Em outras palavras, você quer um Windows com **Alto desenpenho**.  
+Em **VM** você normalmente **não** precisa economizar energia no sentido de notebook em bateria. Ajuste para **Alto desempenho** ou equivalente:
+
+1. **Configurações** → busque por **Energia** (ou **Energia e bateria**).
+2. Desligue economia agressiva e prefira desempenho máximo, se a opção existir na sua edição.
+
+![Ajuste de energia](img/debian_qemu_kvm_windows54.png)
 
 ---
 
 ## Otimizando o Windows - Proteção contra vírus e ameaças
 O Windows Server e a versao Desktop incluem um sistema integrado de vigilância e proteção chamado de **Proteção contra vírus e ameaças** que fazem muito sentido num desktop, e que tem como compromisso periodicamente varrer todos os seus arquivos, além disso, cada arquivo executado, criado ou copiado também será vasculhado imediatamente. Isso parece bom, mas não faz tanto sentido assim em ambientes controlados como VMs, então é bom você desativá-lo para que o desempenho da VM fique ainda melhor.   
 
-Antes de executar essa ação, saiba que essa ação só é recomendada para os casos onde a VM tem um ambiente controlado onde há baixos riscos, ou seja, troca de troca de arquivos de procedencia duvidosa. Não iremos desligar o Firewall, esse item é imprescindivel.  
+O Windows (Server e desktop) inclui **Proteção contra vírus e ameaças**, que faz varreduras e analisa arquivos — útil em desktop exposto; em **VM isolada** e **controlada**, desligar ou reduzir o escopo pode **melhorar** a responsividade.
 
-Vá no menu iniciar do Windows e procure por **Segurança** e encontrará **Segurança do Windows** então depois vá em **Proteção contra virus e ameaças e desative-o:  
+**Só faça isso** se a VM tiver **baixo risco**: sem downloads dúbios, sem abrir anexos externos, rede limitada, snapshot/backup. **Não** confunda com desligar o **Firewall** — o firewall continua recomendado.
 
-![Desativando Proteção contra vírus e ameaças](img/debian_qemu_kvm_windows_otimizar01.png)  
+No menu Iniciar, abra **Segurança do Windows** → **Proteção contra vírus e ameaças** e ajuste ou desative conforme sua política.
 
-Caso ache isso imprudente porque no seu contexto irá expor a VM a coisas críticas, então pelo menos indique pastas que sejam seguras o antivírus não ficar varrendo-as em horários programados, mas tenha certeza de eleger uma pasta que tenham contato com o mundo exterior para ser sempre várrida, por exemplo a pasta **Usuários(Users)** onde são manipulados arquivos dos usuários, inclusive os arquivos advindos da Internet:   
-![Otimizando o Windows - Recursos Visuais](img/debian_qemu_kvm_windows_otimizar04.png)   
+![Proteção contra vírus e ameaças](img/debian_qemu_kvm_windows_otimizar01.png)
 
-**ATENÇÃO**: É quase certo que após alguma atualização, este serviço seja religado. Isso acontece com alguma frequencia no Windows 11, então, periodicamente reveja esta configuração.   
+**Meio-termo:** mantenha o antivírus, mas **exclua pastas “internas”** de varredura agendada (por exemplo diretórios de build), desde que **mantenha** áreas sensíveis (como **Users**) cobertas.
 
----
+![Exclusões ou escopo de varredura](img/debian_qemu_kvm_windows_otimizar04.png)
 
-## Otimizando o Windows - Programas dispensáveis
-Se você não usa os serviços Microsoft 365 nesta VM, não instale o onedrive e afins, só vão lhe roubar recursos.  
+**Observação:** após **atualizações** do Windows, o Defender e opções relacionadas podem ser **reativados**. Vale **revisar** de tempos em tempos (comum no Windows 11).
 
 ---
 
-## Otimizando o Windows - Recursos Visuais
-A configuração de vídeo é um aspecto muito importante porque não importa o quanto a VM seja rápida para processar, o aspecto mais valorizado é a responsividade. As vezes você pode achar a VM lenta, mas quando roda um processo, o processo roda rápido, mas a impressão que se tem é de lerdeza ao operar a VM, isto é a responsividade.  
-Se você tiver um notebook que tem uma placa de vídeo Intel e outra NVIDIA, parabens você pode configurar sua máquina virtual para passthrough, isto é, deixar o sistema hospedeiro ficar 100% com uma placa de vídeo(Intel) enquanto a VM fica 100% com a outra placa de vídeo(NVIDIA) por meio de passthrough e poderá inclusive jogar nessa VM com desempenho similar sem virtualização.  
-Mas voltando ao assunto, este guia passo a passo foi feito para mortais que usufruem apenas de uma placa de vídeo e como ela fica com o hospedeiro, as VMs "emulam" uma placa de vídeo que usa um driver QXL que é apenas um quebra-galho aceitando apenas a parte 2D, por isso dentro do Windows vocÊ precisa urgentemente desligar todos os efeitos visuais que puder, vá em **Configurações\>ConfiguraçõesaAvançadas do sistema\>Desempenho** e clique em **Configurações** e deixe selecionado apenas a opção **Usar fontes de tela com cantos arredondados** porque nossos olhos não precisam sangrar também:  
+## Programas dispensáveis
 
-![Otimizando o Windows - Recursos Visuais](img/debian_qemu_kvm_windows_otimizar02.png)  
+Se não usa **Microsoft 365** nessa VM, evite instalar **OneDrive** e apps do ecossistema que sincronizam em segundo plano — consomem CPU, disco e rede.
 
 ---
 
-## Otimizando o Windows - Agendador de tarefas
-Depois de instalar dentro da VM todos os programas de que precisa, vá no agendador de tarefas e desative os agendamentos de atualizações que estes programas gostam de deixar lá, por exemplo, o Oracle Java e Adobe Reader deixam no Agendador de tarefas programas para atualização de seus produtos. Normalmente ficam programados para conferir se há atualizações de seu produtos quando o computador esta ocioso e diariamente, e isso é horrivel para a nossa VM.  
+## Efeitos visuais e responsividade
+
+O que mais incomoda em VM muitas vezes não é o processador em si, e sim a **responsividade** da interface (menus, janelas, animações).
+
+Se você usa **GPU passthrough**, o cenário muda; **este guia** assume vídeo “virtual” (por exemplo **QXL** / SPICE), onde **efeitos 3D** e animações pesam.
+
+1. Abra **Propriedades do sistema** (por exemplo: `sysdm.cpl` ou **Configurações** → **Sistema** → **Sobre** → **Configurações avançadas do sistema**).
+2. Aba **Avançado** → **Desempenho** → **Configurações**.
+3. Prefira **Ajustar para melhor desempenho** ou desmarque efeitos que não precisar (sombras, animações, etc.).
+
+![Ajuste de efeitos visuais](img/debian_qemu_kvm_windows_otimizar02.png)
 
 ---
 
-## Otimizando o Windows - Relogio
-Vamos desativar o uso do relógio de hardware HPET (High Precision Event Timer) como fonte principal de tempo do sistema, afinal, isso será fornecido pelo nosso hypervisor. Abra o terminal `cmd` como administrador e execute:  
+## Agendador de Tarefas (apps de terceiros)
+
+Depois de instalar o que precisar, abra o **Agendador de Tarefas** e revise tarefas de **atualização automática** de software (ex.: Java, Adobe). Programar verificação diária “quando ocioso” em VM costuma ser **desnecessário** e consome recursos.
+
+---
+
+## Relógio (HPET)
+
+O tempo da VM em KVM costuma ser tratado pelo **hypervisor**. Para não forçar o **HPET** como base principal no convidado, em **cmd** **como administrador**:
+
 ```cmd
 bcdedit /set useplatformclock No
 ```
-**ALERTA:** Não confunda PowerShell com o `cmd` do Windows.  
 
-## Otimizando o Windows - Apps no iniciar do Windows
-Vá em **Configurações** e procure por **Aplicativos** e então aparecerá um **Aplicativos na inicialização**, execute ele.  
-A seguir serão listados programas que são carregados juntos com o Windows:  
-![Remova a economia de energia](img/debian_qemu_kvm_windows55.png)    
-
-Desabiltie o máximo de programas que puder.
+**Importante:** use o **Prompt de Comando (cmd)** administrativo, não confunda com o **PowerShell** para este comando específico.
 
 ---
 
@@ -90,7 +108,7 @@ Desabiltie o máximo de programas que puder.
 Por padrão, o **Windows Server** exibe uma janela chamada **Shutdown Event Tracker**, que solicita ao usuário o **motivo do desligamento ou reinicialização**.
 Esse recurso foi criado para registrar eventos de parada no **Event Viewer** (ID 1074, origem USER32), sendo útil em ambientes com auditoria, mas desnecessário em VMs de teste ou servidores pessoais.
 
-### 🪟 Desativando via Política de Grupo
+![Aplicativos na inicialização](img/debian_qemu_kvm_windows55.png)
 
 1. Pressione **Win + R** e digite:
 
@@ -114,31 +132,35 @@ Após aplicar essa configuração, o **Shutdown Event Tracker** deixará de ser 
   
 ---
 
-## Otimizando o Windows - Serviçõs dispensáveis
-Alguns serviços o Windows sao dispensáveis, execute `services.msc` e desative alguns desses(ou todos eles):  
+## Serviços dispensáveis
 
-| Nome exibido no `services.msc` | Nome interno (`sc config ...`) | Função | Pode desativar? |
-|--------------------------------|-------------------------------|---------|------------------|
-| **Windows Search** | `WSearch` | Indexação de arquivos e e-mails | Sim |
-| **SysMain** *(antigo Superfetch)* | `SysMain` | Otimiza inicialização e cache de aplicativos | Sim |
-| **Optimize Drives (Desfragmentador)** | `defragsvc` | Desfragmenta discos mecânicos | Sim |
-| **Windows Error Reporting Service** | `WerSvc` | Envia relatórios de erro para a Microsoft | Sim |
-| **Diagnostic Policy Service** | `DPS` | Detecta e tenta corrigir problemas de rede e hardware | Sim |
-| **Connected User Experiences and Telemetry** | `DiagTrack` | Coleta telemetria e estatísticas de uso | Sim |
-| **Windows Update Medic Service** | `WaaSMedicSvc` | Reativa o Windows Update automaticamente | Sim |
-| **Remote Registry** | `RemoteRegistry` | Permite editar o registro remotamente | Sim |
-| **Fax** | `Fax` | Suporte a envio de fax | Sim |
-| **Print Spooler** | `Spooler` | Gera fila de impressão | Sim *(a não ser que use impressoras)* |
-| **Bluetooth Support Service** | `bthserv` | Gerencia dispositivos Bluetooth | Sim |
-| **Smart Card** | `SCardSvr` | Gerencia cartões inteligentes | Sim |
-| **Secondary Logon** | `seclogon` | Permite “Executar como outro usuário” | *Opcional — avalie antes* |
-| **Windows Defender Antivirus Service** | `WinDefend` | Proteção antivírus | *Somente se VM isolada — avalie risco* |
-| **Offline Files** | `CscService` | Sincroniza arquivos offline | Sim |
-| **Program Compatibility Assistant Service** | `PcaSvc` | Detecta compatibilidade de programas antigos | Sim |
+Alguns serviços são **candidatos** a desativar em VM de laboratório. Abra `services.msc`, avalie cada caso e **mude o tipo de inicialização** ou use o script abaixo **com cautela**.
+
+| Nome em `services.msc` | Nome do serviço (`sc`) | Função | Desativar? |
+|------------------------|-------------------------|--------|------------|
+| **Windows Search** | `WSearch` | Indexação de arquivos e e-mail | Sim |
+| **SysMain** *(Superfetch)* | `SysMain` | Cache e pré-carregamento | Sim |
+| **Optimize Drives** | `defragsvc` | Desfragmentação (HDD) | Sim (VM em disco virtual costuma usar outra estratégia no hospedeiro) |
+| **Windows Error Reporting** | `WerSvc` | Relatórios de erro à Microsoft | Sim |
+| **Diagnostic Policy Service** | `DPS` | Diagnósticos | Sim |
+| **Connected User Experiences and Telemetry** | `DiagTrack` | Telemetria | Sim |
+| **Windows Update Medic Service** | `WaaSMedicSvc` | Tenta restabelecer o Windows Update quando alterado | Sim *(avaliação de risco)* |
+| **Remote Registry** | `RemoteRegistry` | Registro remoto | Sim |
+| **Fax** | `Fax` | Fax | Sim |
+| **Print Spooler** | `Spooler` | Impressão | Sim *(se não imprimir nessa VM)* |
+| **Bluetooth Support Service** | `bthserv` | Bluetooth | Sim |
+| **Smart Card** | `SCardSvr` | Smart card | Sim |
+| **Secondary Logon** | `seclogon` | “Executar como outro usuário” | *Opcional — avalie* |
+| **Microsoft Defender Antivirus** | `WinDefend` | Antivírus integrado | *Só se VM isolada e política aceitar* |
+| **Offline Files** | `CscService` | Arquivos offline | Sim |
+| **Program Compatibility Assistant** | `PcaSvc` | Assistente de compatibilidade | Sim |
 | **Security Center** | `wscsvc` | Central de segurança (alertas) | Sim |
 
-A lista acima, foi tirada do Windows Server, o Windows 11 tem muito mais serviços que estes e levará algum tempo para você complementar a lista.  
-Desativar um serviço de cada vez levará muito tempo, então para agilizar, criei um script `agilizar_vm.bat` que ao rodar uma única vez como administrador, ele desativará vários de uma única vez. Se estiver interessado crie um script `agilizar_vm.bat` com o seguinte cnteúdo:  
+A tabela reflete sobretudo **Windows Server**; o **Windows 11** tem mais serviços — complemente conforme necessidade.
+
+### Script em lote (revisar antes de rodar)
+
+Para **não** editar um por um no `services.msc`, você pode usar um `.cmd` **como administrador**. **Remova** da lista os serviços que **precisa** (por exemplo **Print Spooler**, **Secondary Logon**).
 
 ```cmd
 @echo off
@@ -168,7 +190,7 @@ for %%S in (
 )
 
 echo.
-echo === Concluido! Reinicie o Windows para aplicar todas as alteracoes. ===
+echo === Concluído! Reinicie o Windows para aplicar todas as alterações. ===
 pause
 ```
 Aproveite para remover da lista acima os nomes de serviços que na sua definição lhe são útes, afinal, a lista acima desativa todos os serviços que detalhei na tabela. Eu por exemplo, removo da lista os serviços a serem desativados: **Print Spooler** e **Secondary Logon** porque eles me são uteis, por isso eles estão fora da lista do arquivo .cmd acima.    
@@ -178,7 +200,7 @@ Caso se arrependa de ter desativado algum serviço em particular, execute `servc
 
 **OBSERVAÇÃO**: Você está desativando o `defragsvc`, o que lhe impossibilitará a desfragmentação do disco e deve estar pensando se isso é uma boa idéia, sim, é uma boa idéia porque caso precisemos desfragmentar o disco, não usaremos o desfragmentador do Windows, mas a ferramenta de otimização para arquivos qcow2 que é muito mais eficiente e limpa espaços vazios do disco fazendo recuar o tamanho do arquivo da VM.  
 
-**ATENÇÃO**: Após alguma atualização, pode acontecer de este ou aquele serviço ser religado, então, periodicamente reveja esta configuração.  
+**De novo:** **atualizações** podem **reativar** serviços. Revise periodicamente.
 
 ---
 
@@ -206,13 +228,8 @@ E então terá uma ideia do que está no estado de `Ready`, ou seja, pronto para
 ```cmd
 Disable-ScheduledTask -TaskPath '\Microsoft\Windows\Defrag\' -TaskName 'ScheduledDefrag'
 ```
-E então, lhe será infromado algo como:
-```
-TaskPath                                       TaskName                          State
---------                                       --------                          -----
-\Microsoft\Windows\Defrag\                     ScheduledDefrag                   Disabled
-```
-Confirmando a mudança do estado para **desabilitado**(Disabled).
+
+Exemplos que costumam fazer sentido **revisar** em VM de laboratório (ajuste ao seu cenário):
 
 Abaixo temos a sintaxe para desabilitar os que eu recomendo por considerar inapropriado para uma VM:  
 ```cmd
