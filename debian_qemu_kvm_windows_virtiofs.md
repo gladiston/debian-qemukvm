@@ -196,8 +196,7 @@ Para contornar isso dentro da VM Windows:
 ![Ligando a opção de case insensitive](img/debian_qemu_kvm_windows_virtiofs-01.png)
 6. **Reinicie o serviço** para que o Delphi passe a encontrar os arquivos.
 
-> [!IMPORTANT]
-> Certifique-se de que o parâmetro está presente para garantir a compatibilidade com projetos Delphi/Pascal em volumes compartilhados.
+Embora tenha usado o Pascal como referencia, recomendo este procedimento sempre que criar uma VM Windows com Virtio-FS para garantir que o comportamento seja o mesmo que esperamos com um Windows convencional.
 
 
 
