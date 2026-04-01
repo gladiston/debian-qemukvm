@@ -181,6 +181,26 @@ Os arquivos devem ser os mesmos de `~/Downloads`.
 
 **Outras pastas:** repita o mesmo padrão — pasta vazia dentro de `~/work`, `mount --bind` da origem real para essa pasta, linha correspondente no `fstab` — até tudo o que precisar estiver sob **`/home/gsantana/work`**.
 
+## Sistema de arquivos: Case insensitive
+O Windows e o Linux são divergentes num ponto: o Windows é *case insensitive* (ignora maiúsculas/minúsculas) e o Linux é *case sensitive* (distingue maiúsculas/minúsculas). Isto significa que se você criar uma pasta no Windows com o nome **`Downloads`** e outra com o nome **`downloads`**, o Windows vai considerar que são a mesma pasta, mas o Linux as tratará como diferentes.
+
+Isso causa problemas em linguagens de programação como o Pascal (Delphi), onde `Unit1.pas` e `unit1.pas` são iguais na hora de compilar, mas o Virtio-FS (origem Linux) as verá como arquivos distintos.
+
+Para contornar isso dentro da VM Windows:
+
+1. **Execute o `services.msc` como administrador.**
+2. **Localize o `Virtio-FS Service`.**
+3. **Clique com o botão direito e vá em Propriedades.**
+4. **Pare o serviço.**
+5. **No campo *Parametros de inicialização*, adicione o parâmetro `-o CaseInsensitive=1`**
+![Ligando a opção de case insensitive](img/debian_qemu_kvm_windows_virtiofs-01.png)
+6. **Reinicie o serviço** para que o Delphi passe a encontrar os arquivos.
+
+> [!IMPORTANT]
+> Certifique-se de que o parâmetro está presente para garantir a compatibilidade com projetos Delphi/Pascal em volumes compartilhados.
+
+
+
 ## Permissões: hospedeiro Linux × convidado Windows
 
 **Grupos do login (ex.: `gsantana`):** para usar **virt-manager** / **virsh** sem ser root, o usuário deve estar no grupo **`libvirt`**. Em Debian (e na maioria das instalações com KVM), inclua também o grupo **`kvm`**, que libera acesso a **`/dev/kvm`** (aceleração). Não confunda com **`libvirt-qemu`**: esse é um **usuário de sistema** sob o qual o QEMU costuma rodar; **não** é o grupo em que se coloca a conta pessoal.
