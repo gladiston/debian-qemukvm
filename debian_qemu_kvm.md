@@ -11,15 +11,15 @@ sudo apt install -y libguestfs-tools
 
 O `apt` costuma instalar **dependências** (rede virtual, firmware UEFI, utilitários). A tabela resume o que cada nome costuma representar na prática:
 
-| Pacote | Explicação |
-|:------- |:---------- |
-| **qemu-kvm** | Emulação de CPU/dispositivos e aceleração **KVM** quando o hardware suporta (`/dev/kvm`). É o núcleo que de fato executa a VM. |
-| **libvirt-daemon-system** | Serviço **libvirtd**: API estável para criar, iniciar e gerenciar domínios (VMs), redes e armazenamento. |
-| **libvirt-clients** | Ferramentas de linha de comando (`virsh`, `virt-install`, entre outras) que falam com o libvirt. |
-| **libguestfs-tools** | Utilitários **libguestfs** para trabalhar **em imagens de disco** sem necessariamente **ligar** a VM: inspecionar sistemas de arquivos (`virt-filesystems`, `virt-inspector`), copiar arquivos para dentro/fora da imagem (`virt-copy-in`, `virt-copy-out`), redimensionar disco (`virt-resize`), abrir **guestfish** para navegar partições e arquivos, preparar imagem para compactação (`virt-sparsify`), etc. Úteis para manutenção, backup e scripts. |
-| **dnsmasq-base** *(dependência comum)* | Base para **DNS/DHCP** leve; o libvirt usa isso na rede **NAT padrão** (`virbr0`) para dar IP às VMs. |
-| **ovmf** *(dependência comum)* | Firmware **EDK II/OVMF** para arranque **UEFI** em VM — quase obrigatório para **Windows** recente e muitos Linux em modo EFI. |
-| **isc-dhcp-client** *(dependência comum)* | Cliente DHCP no hospedeiro; aparece na cadeia de dependências do ecossistema de rede. |
+| Pacote                                    | Explicação                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+|:----------------------------------------- |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **qemu-kvm**                              | Emulação de CPU/dispositivos e aceleração **KVM** quando o hardware suporta (`/dev/kvm`). É o núcleo que de fato executa a VM.                                                                                                                                                                                                                                                                                                                             |
+| **libvirt-daemon-system**                 | Serviço **libvirtd**: API estável para criar, iniciar e gerenciar domínios (VMs), redes e armazenamento.                                                                                                                                                                                                                                                                                                                                                   |
+| **libvirt-clients**                       | Ferramentas de linha de comando (`virsh`, `virt-install`, entre outras) que falam com o libvirt.                                                                                                                                                                                                                                                                                                                                                           |
+| **libguestfs-tools**                      | Utilitários **libguestfs** para trabalhar **em imagens de disco** sem necessariamente **ligar** a VM: inspecionar sistemas de arquivos (`virt-filesystems`, `virt-inspector`), copiar arquivos para dentro/fora da imagem (`virt-copy-in`, `virt-copy-out`), redimensionar disco (`virt-resize`), abrir **guestfish** para navegar partições e arquivos, preparar imagem para compactação (`virt-sparsify`), etc. Úteis para manutenção, backup e scripts. |
+| **dnsmasq-base** *(dependência comum)*    | Base para **DNS/DHCP** leve; o libvirt usa isso na rede **NAT padrão** (`virbr0`) para dar IP às VMs.                                                                                                                                                                                                                                                                                                                                                      |
+| **ovmf** *(dependência comum)*            | Firmware **EDK II/OVMF** para arranque **UEFI** em VM — quase obrigatório para **Windows** recente e muitos Linux em modo EFI.                                                                                                                                                                                                                                                                                                                             |
+| **isc-dhcp-client** *(dependência comum)* | Cliente DHCP no hospedeiro; aparece na cadeia de dependências do ecossistema de rede.                                                                                                                                                                                                                                                                                                                                                                      |
 
 ## Permitir uso sem root
 
@@ -83,14 +83,14 @@ Se estiver inativo (`Active: inactive`), suba o daemon:
 sudo systemctl start spice-vdagentd
 ```
 
-| Pacote | Explicação |
-|:------- |:---------- |
-| **virt-manager** | Interface gráfica para criar e gerenciar domínios, redes e volumes; ponto de partida habitual no desktop. |
-| **virtiofsd** | Daemon **Virtio-FS** no hospedeiro: compartilhar pastas com baixa latência (convidado precisa de driver e, no Windows, **WinFsp**). |
-| **virt-viewer** | Visualização SPICE/VNC em janela dedicada (útil para testes ou segundo monitor). |
-| **spice-vdagent** *(guest)* | Clipboard integrado e redimensionamento automático da resolução do guest com o tamanho da janela SPICE. |
-| **spice-webdavd** *(guest)* | Canal **WebDAV** via SPICE para transferir arquivos (alternativa a Virtio-FS). |
-| **qemu-guest-agent** *(guest)* | Canal **qemu-ga** para operações coordenadas (snapshot consistente, relógio, rede, etc.). |
+| Pacote                         | Explicação                                                                                                                          |
+|:------------------------------ |:----------------------------------------------------------------------------------------------------------------------------------- |
+| **virt-manager**               | Interface gráfica para criar e gerenciar domínios, redes e volumes; ponto de partida habitual no desktop.                           |
+| **virtiofsd**                  | Daemon **Virtio-FS** no hospedeiro: compartilhar pastas com baixa latência (convidado precisa de driver e, no Windows, **WinFsp**). |
+| **virt-viewer**                | Visualização SPICE/VNC em janela dedicada (útil para testes ou segundo monitor).                                                    |
+| **spice-vdagent** *(guest)*    | Clipboard integrado e redimensionamento automático da resolução do guest com o tamanho da janela SPICE.                             |
+| **spice-webdavd** *(guest)*    | Canal **WebDAV** via SPICE para transferir arquivos (alternativa a Virtio-FS).                                                      |
+| **qemu-guest-agent** *(guest)* | Canal **qemu-ga** para operações coordenadas (snapshot consistente, relógio, rede, etc.).                                           |
 
 ## Ativar o libvirt no arranque
 
