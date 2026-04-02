@@ -8,7 +8,7 @@ O Debian, por outro lado, mantêm o jeito classico de sempre, editando arquivos 
 
 ---
 
-## Criando uma interface bridge no Debian
+## Criando uma interface de rede tipo bridge no Debian
 
 Siga as instruções no link a seguir:
 
@@ -18,10 +18,6 @@ Siga as instruções no link a seguir:
 
 [Instruções para criar uma interface do tipo bridge no Ubuntu](debian_qemu_kvm_bridge_ponte_ubuntu.md)
 
-
-
 ---
 
 [Retornar](https://github.com/gladiston/debian-qemukvm)
-
-
