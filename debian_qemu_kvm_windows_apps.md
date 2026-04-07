@@ -13,7 +13,7 @@ Pressione `Win + R`, digite `gpedit.msc` e pressione Enter.
 Navegue até:
 **Configuração do Computador** > **Modelos Administrativos** > **Componentes do Windows** > **Criptografia de Unidade de Disco BitLocker** > **Unidades de Dados Fixas**
 Verifique estas políticas:
-* **Negar acesso de gravação a unidades fixas não protegidas pelo BitLocker**: mude para **Desabilitado**.
+* **Negar acesso de gravação a unidades fixas não protegidas pelo BitLocker**: mude para **Desabilitado** (ou Não Configurado).
 * **Configurar uso de criptografia baseada em hardware para unidades de dados fixas**: mude para **Desabilitado** (se não quiser fallback por hardware)
 
 Para aplicar, use `Win + R` novamente e execute:
