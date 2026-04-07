@@ -5,7 +5,7 @@ Um sistema Windows básico em minha opinião, não sobrevive sem estes programas
 **Observação (Windows em VM):** dentro do **convidado** (a VM), **não** instale **Subsistema do Windows para Linux (WSL)**, **Hyper-V** nem **Área Restrita do Windows** (*Windows Sandbox*). Esses recursos pressupõem outro papel para o SO (virtualização aninhada, isolamento de kernel ou acesso a hipervisor) e, em VM sobre QEMU/KVM, em geral **não fazem sentido**, podem **falhar na instalação**, gerar **instabilidade** ou **desperdiçar recursos** sem ganho prático. Para Linux, use o **hospedeiro** ou uma **VM Linux separada**; para testes isolados, use outra máquina virtual em vez de Sandbox/Hyper-V dentro do convidado.
 
 ---
-## BitLocker, ser ou não ser
+## BitLocker, ser ou não ser - eis a questão!
 Algo que precisa entender sobre o comportamento padrão do Windows 11Pro ou Server é que em qualquer VM ou computador que ele detectar o TPM - e precisamos dele para instalar o Windows 11 - ele irá ativar o Bitlocker por padrão. Tanto a unidade C: como novas unidades que forem acrescentadas terão o bitlocker ativado!  
 Isso é bom em Desktops e em especial Notebooks, mas em máquinas virtuais, torna improvável que possamos compartilhar o mesmo disco entre VMs diferentes porque cada VM terá seu próprio chip de TPM. Então eu recomendo que desligue o comportamento padrão de ativar bitlock em qualquer unidade que venhamos a acrescentar. Segue abaixo, o passo a passo:
 ### Desative a criptografia automática via Política de Grupo (GPO)
