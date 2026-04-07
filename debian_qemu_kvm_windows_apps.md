@@ -21,7 +21,7 @@ Para aplicar, use `Win + R` novamente e execute:
 gpupdate /force
 ```
 E a política entrará em vigor imediatamente.  
-Se eventualmente, preferir a criptografia, saiba que a chave de criptografia deve ser exportada para um pendrive ou algo do genero e se estiver usando uma conta online, remova-a de lá porque se sua conta-online vazar ou por determinação judicial a microsoft entregá-la a autoridades, seu disco criptografado estará exposto. 
+Se eventualmente preferir a criptografia, saiba que se estiver usando uma conta online, se sua conta-online vazar ou por determinação judicial a microsoft entregá-la à autoridades, seu disco criptografado estará exposto. A melhor solução para criptografia envolve apenas você ter acesso e o bitlocker permite isso também.
 
 ---
 
