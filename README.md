@@ -34,22 +34,13 @@ Embora você possa ler este Guia passo a Passo diretamente do github, existe a o
 git clone https://github.com/gladiston/debianlinux.git
 ```
 
-Para ler, execute:  
+Para visualizar este documento em formato markdown corretamente, use o programa **Mark Text**:
 
 ```bash
-sudo apt install -y grip
-cd debian-qemukvm
-grip
+flatpak install flathub com.github.marktext.marktext
 ```
 
-Você verá algo como:  
-
-> * Serving Flask app 'grip.app'  
-> * Debug mode: off  
-> * Running on http://localhost:6419  
-
-Então no seu navegador, aponte para o endereço acima e verá o conteúdo desse guia.  Pessoalmente eu gosto do jeito que o github renderiza porque eles colocam um botão de copiar que economiza tempo e a renderização local não faz isso. Em contrapartida, numa cópia local, você verá sempre as imagens sem depender dos limites impostos pelo github.  
-
+Depois execute o `marktext` e abra este arquivo.
 A propósito, sinta-se à vontade para **adaptar os scripts ao seu cenário** pulando o que for indesejado.  
 
 ---
