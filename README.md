@@ -31,7 +31,7 @@ Você lê este guia passo a passo e além de instalar, aprende para quê servem 
 Embora você possa ler este Guia passo a Passo diretamente do github, existe a opção de baixá-lo para lê-lo offline caso precise, eu recomendo fortemente que você **clone este projeto** localmente porque eu usei imagens nela e o github em planos gratuítos tem um limite mensal para a exibição desses objetos então se por acaso este limite for ultrapassado, não irá ver as imagens. Para clonar, execute:  
 
 ```bash
-git clone https://github.com/gladiston/debianlinux.git
+git clone https://github.com/gladiston/debian-qemukvm.git
 ```
 
 Para visualizar este documento em formato markdown corretamente, use o programa **Mark Text**:
