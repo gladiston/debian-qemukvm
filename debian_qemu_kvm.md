@@ -529,3 +529,42 @@ Apague os `.iso` manualmente na pasta se quiser liberar espaço.
 Se o *target* do pool estiver em **Btrfs**, vale ajustar *copy-on-write* e desempenho conforme o guia dedicado:
 
 [Virtualização nativa QEMU/KVM com Btrfs](debian_qemu_kvm_btrfs.md)
+
+
+## Rede
+Até mesmos as redes, dentro do sistema de virtualização são representados por nome. Sempre haverá um `default`, note:
+```bash
+sudo virsh net-list --all
+```
+O resultado provavelmente será:
+```
+ Name      State      Autostart   Persistent
+----------------------------------------------
+ default   inactive   no          yes
+```
+
+No exemplo acima, o campo **State** (Estado) esta marcado como **inactive** (inativo), também o campo **Autostart**(auto-inicio). Nesta situação, esta rede `default` está inoperável. Para ligar:  
+```bash
+sudo virsh net-start default
+sudo virsh net-autostart default
+```
+O resultado do comando acima, seria:
+```
+sudo virsh net-autostart default
+Network default started
+
+Network default marked as autostarted
+```
+
+Agora, repetimos o comando, e veja:
+```bash
+sudo virsh net-list --all
+```
+O resultado provavelmente será:
+```
+ Name      State      Autostart   Persistent
+----------------------------------------------
+default   active   yes         yes
+```
+Agora temos a rede `default` ligada.  
+
