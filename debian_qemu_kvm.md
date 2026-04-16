@@ -2,8 +2,6 @@
 
 O Linux pode atuar como **hypervisor tipo 1**: as máquinas virtuais rodam com desempenho próximo do hardware, mas o ecossistema **libvirt** + **QEMU/KVM** é mais “baixo nível” que produtos como VirtualBox ou VMware em alguns confortos (topologias de rede prontas, clipboard integrado, pastas compartilhadas sem configurar Virtio-FS/SPICE, etc.). Este guia parte do Debian e derivações com `apt`.
 
-
-
 ## Preparando as pastas
 
 Por padrão, o virtualizador deposita suas máquinas virtuais e agregados em: 
@@ -135,7 +133,7 @@ O hypervisore funciona em forma de backend e serviço, ou seja, sua interativida
 Em estação de trabalho - como nosso caso - há outros como `gnome-boxes` e `Cockpit`, porém, o mais popular é o `virt-manager`, vamos instalá-lo:
 
 ```bash
-sudo apt install virt-manager -y
+sudo apt install virt-manager spice-client-gtk gir1.2-spiceclientgtk-3.0 -y
 ```
 
 Com o `virt-manager` voce cria, altera e exclui suas VMs. Ele acompanha um viewer embutido, assim, ao criar por exemplo uma VM com o Windows, você poderá interagir com ele, como formatar e instalar o sistema. Mas existe outro viewer que é um pouco melhor, e na realidade, alguns serviços de interatividade só funcionam com ele, chama-se `virt-viewer`, vamos instalá-lo:
@@ -144,7 +142,7 @@ Com o `virt-manager` voce cria, altera e exclui suas VMs. Ele acompanha um viewe
 sudo apt install virt-viewer -y
 ```
 
-**OBRIGATÓRIO: qemu-guest-agent**
+### OBRIGATÓRIO: qemu-guest-agent
 
 Canal **qemu-ga** para operações coordenadas (snapshot consistente, relógio, rede, etc.).  Instale:
 
@@ -152,7 +150,7 @@ Canal **qemu-ga** para operações coordenadas (snapshot consistente, relógio, 
 sudo apt install qemu-guest-agent -y
 ```
 
-**OBRIGATÓRIO: SPICE-VDAGENT**
+### OBRIGATÓRIO: SPICE-VDAGENT
 
 Ao criar uma VM, em algum momento você configurará a monitor como do tipo SPICE, daí voce poderá ter um clipboard integrado e redimensionamento automático da resolução da tela do convidado com o tamanho da janela.  Instale:
 
@@ -174,9 +172,7 @@ sudo systemctl start spice-vdagentd
 
 Se o serviço não estiver ativo, tampouco o `spice-vdagentd` funcionará nas VMs.
 
-
-
-**OPCIONAL: VIRTIOFSD**
+### OPCIONAL: VIRTIOFSD
 
 O pacote virtiofsd serve para compartilhar uma pasta do hospedeiro lINUX com a máquina virtual (Windows e Linux) usando virtio-fs. Em termos simples, ele é o daemon do lado do host que implementa esse compartilhamento para o QEMU/KVM. 
 
@@ -191,15 +187,14 @@ sudo apt install virtiofsd -y
 
 Se vocÊ instalá-lo, lembre-se de que no Windows precisará também dos drivers `virtiofsd` para que ele possa enxergar as pastas que compartilhou com o host. Pessoalmente, no Windows, eu acho ele problemático com algumas aplicações. Como arquivos Linux são case sensitive, isso significa que podem existir arquivos de mesmo nome com maiusculas e minusculas diferente, e alguns aplicativos Windows se perdem com isso, por exemplo o **Rad  Studio Delphi e C++ Builder**.
 
-
-
-**OPCIONAL: WEBDAV**
+### OPCIONAL: WEBDAV
 
 Nas configurações da VM, você pode criar um canal  **WebDAV** via SPICE para transferir arquivos entre hospedeiro e convidado, é similar ao Virtio-FS, mas para fazer este compartilhamento usa-se o protocolo HTTP/HTTPS. Este tipo de compartilhamento é conhecido pelos programadores, ele é bem mais lento que o `Virtio-FS` e geralmente você só usaria ele com projetos de programação bem estruturados que funcione muito bem offline, mas que no final, precise sincronizar seus arquivos. Usá-lo como unidade de rede é praticamente inviável. Para tê-lo, instale:
 
 ```bash
 sudo apt install spice-webdavd -y
 ```
+
 Depois de instalá-lo, confira se o serviço está habilitado:
 
 ```bash
@@ -261,18 +256,24 @@ sudo tree -ug --dirsfirst /var/lib/libvirt
 ```
 
 Exemplo de saída:[root     root    ]  /var/lib/libvirt  
+[root     root    ]  /var/lib/libvirt  
 ├── [root     root    ]  boot  
-├── [root     root    ]  images  
+├── [root     root    ]  dnsmasq  
+│   ├── [root     root    ]  default.addnhosts  
+│   ├── [root     root    ]  default.conf  
+│   ├── [root     root    ]  default.hostsfile  
+│   ├── [root     root    ]  virbr0.macs  
+│   └── [root     root    ]  virbr0.status  
+├── [libvirt-qemu libvirt-qemu]  images  
 ├── [libvirt-qemu libvirt-qemu]  qemu  
 │   ├── [libvirt-qemu libvirt-qemu]  checkpoint  
 │   ├── [libvirt-qemu libvirt-qemu]  dump  
 │   ├── [libvirt-qemu libvirt-qemu]  nvram  
+│   │   └── [libvirt-qemu libvirt-qemu]  win11-dx11_VARS.fd  
 │   ├── [libvirt-qemu libvirt-qemu]  ram  
 │   ├── [libvirt-qemu libvirt-qemu]  save  
 │   └── [libvirt-qemu libvirt-qemu]  snapshot  
 └── [root     root    ]  NAO_ME_APAGUE.txt  
-
-10 directories, 1 file
 
 Mais abaixo, se você mover o armazenamento para `/home`, será preciso **reproduzir donos e permissões**; esta árvore é a referência.
 
@@ -432,6 +433,7 @@ Ao **importar** uma imagem copiada de fora para o pool **`default`**, ajuste don
 
 ```bash
 sudo chmod g+s /outro/lugar/images
+sudo chmod 770 /outro/lugar/images
 sudo chmod -R 660 /outro/lugar/images
 ```
 
@@ -467,21 +469,25 @@ Como sabemos que `/var/lib/libvirt` é um `bind mount` para `/home/libvirt` ent�
 Garanta que o dono/grupo `libvirt-qemu` tenha permissão de escrita/leitura(chmod 660):
 
 ```bash
-sudo chmod g+s /home/libvirt/images
+sudo chmod 770 /var/lib/libvirt/images
 sudo chmod -R 660 /var/lib/libvirt/images
 ```
 
 Sei que é tentador dar permissão a si mesmo, mas a verdade é que vocÊ não precisa, tudo que fizer dentro da VM estará sendo feito por um usuário/grupo chamado `libvirt-qemu` e também porque você precisa se proteger de si mesmo, isto é, evitando que por acidente possa apagar o que não deve:
 
 ```bash
-sudo chown -R libvirt-qemu:libvirt-qemu /home/libvirt/images
+sudo chown -R libvirt-qemu:libvirt-qemu /var/lib/libvirt/images
 ```
 
-Em vez de **`chown`** a cada importação ou cópia de arquivos, use **ACL**  para garantir uma regra de recursividade para novos arquivos nesta mesma pasta:
+Em vez de **`chown`** a cada importação ou cópia de arquivos, podemos usar **ACL**  para garantir uma regra de recursividade para novos arquivos nesta mesma pasta:
 
 ```bash
-sudo setfacl -R -d -m u:libvirt-qemu:rwx /home/libvirt/images
-sudo setfacl -R -m u:libvirt-qemu:rwx /home/libvirt/images
+sudo chown libvirt-qemu:libvirt-qemu /var/lib/libvirt/images
+sudo chmod 2770 /var/lib/libvirt/images
+sudo setfacl -m u:libvirt-qemu:rwx /var/lib/libvirt/images
+sudo setfacl -m m:rwx /var/lib/libvirt/images
+sudo setfacl -d -m u:libvirt-qemu:rwx /var/lib/libvirt/images
+sudo setfacl -d -m m:rwx /var/lib/libvirt/images
 ```
 
 Se você criar novos pools, não precisa se preocupar com permissões novamente, no entanto, caso copie imagens de outros lugares para esses pools, você deverá dar permissão como fizemos acima, caso contrário poderá ter problemas ao criar snapshots ou até ao rodar a VM.
@@ -532,13 +538,16 @@ Se o *target* do pool estiver em **Btrfs**, vale ajustar *copy-on-write* e desem
 
 [Virtualização nativa QEMU/KVM com Btrfs](debian_qemu_kvm_btrfs.md)
 
-
 ## Rede
+
 Até mesmos as redes, dentro do sistema de virtualização são representados por nome. Sempre haverá um `default`, note:
+
 ```bash
 sudo virsh net-list --all
 ```
+
 O resultado provavelmente será:
+
 ```
  Name      State      Autostart   Persistent
 ----------------------------------------------
@@ -546,11 +555,14 @@ O resultado provavelmente será:
 ```
 
 No exemplo acima, o campo **State** (Estado) esta marcado como **inactive** (inativo), também o campo **Autostart**(auto-inicio). Nesta situação, esta rede `default` está inoperável. Para ligar:  
+
 ```bash
 sudo virsh net-start default
 sudo virsh net-autostart default
 ```
+
 O resultado do comando acima, seria:
+
 ```
 sudo virsh net-autostart default
 Network default started
@@ -559,14 +571,17 @@ Network default marked as autostarted
 ```
 
 Agora, repetimos o comando, e veja:
+
 ```bash
 sudo virsh net-list --all
 ```
+
 O resultado provavelmente será:
+
 ```
  Name      State      Autostart   Persistent
 ----------------------------------------------
 default   active   yes         yes
 ```
-Agora temos a rede `default` ligada.  
 
+Agora temos a rede `default` ligada.  
