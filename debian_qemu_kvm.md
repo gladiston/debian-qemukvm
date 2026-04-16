@@ -126,7 +126,7 @@ getent group libvirt
 
 Sem acesso a estes grupos, o usuário não **acessa** os mesmos *sockets* e dispositivos que o daemon usa, e o **virt-manager** / **virsh** podem falhar ou pedir senha de administrador.
 
-## ## Desktop: interface gráfica e integração com o convidado
+## Desktop: interface gráfica e integração com o convidado
 
 O hypervisore funciona em forma de backend e serviço, ou seja, sua interatividade com o serviço de virtualização é apenas pelo terminal e para alguns de nós isso é uma 'sofrência' que dá dó. Mesmo em servidores usamos um sistema de gerenciamento com um frontend agradável como o **Proxmox**  para gerenciá-lo sem precisar requerer ao terminal.
 
@@ -197,6 +197,12 @@ Nas configurações da VM, você pode criar um canal  **WebDAV** via SPICE para 
 
 ```bash
 sudo apt install spice-webdavd -y
+```
+Depois de instalá-lo, confira se o serviço está habilitado:
+
+```bash
+sudo systemctl status spice-vdagentd
+sudo systemctl start spice-webdavd # caso esteja desativado
 ```
 
 Ele também irá requerer o driver para convidado na máquina Windows.
