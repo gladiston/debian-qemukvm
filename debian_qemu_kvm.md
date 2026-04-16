@@ -73,7 +73,8 @@ Pode parecer um aviso idiota, mas a mente de cada um funciona de um jeito difere
 ## Pacotes principais do hypervisor
 
 ```bash
-sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients libguestfs-tools -y
+sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients \
+  libguestfs-tools ovmf isc-dhcp-client dnsmasq-base -y
 ```
 
 O `apt` costuma instalar **dependências** (rede virtual, firmware UEFI, utilitários). A tabela resume o que cada nome costuma representar na prática:
