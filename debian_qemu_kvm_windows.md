@@ -6,14 +6,33 @@ Neste guia, você verá como criar uma máquina virtual Windows otimizada, usand
 Agora que você entende o contexto, vamos começar preparando o ambiente com o pacote de drivers VirtIO.
 
 O `virtio-win.iso` é um pacote de drivers e utilitários da Red Hat criado para melhorar o desempenho e a compatibilidade de máquinas virtuais Windows executadas em hipervisores baseados em KVM/QEMU (como Virt-Manager, Proxmox, Xen, etc.).
-Se pretende virtualizar máquinas windows precisará dessa .iso em seu sistema. Em nosso exemplo anterior, o pool de arquivos `.iso` é a pasta de **/home/libvirt/isos**, então vamos baixá-lo lá, execute:  
+Se pretende virtualizar máquinas windows precisará dessa .iso em seu sistema. Em nosso exemplo anterior, o pool de arquivos `isos` para guardar este tipo de arquivo, qual sua localização, vejamos:
+```bash
+sudo virsh pool-dumpxml isos
 ```
-cd /home/libvirt/isos
+Vai mostrar dentro de um texto longo algo como:
+```bash
+  <target>
+    <path>/var/lib/libvirt/isos</path>
+  </target>
+```
+Agora que sabemos para onde o pool `isos` aponta, vamos para lá:
+```
+cd /var/lib/libvirt/isos
+```
+Então vamos baixá-lo lá, execute:  
+```
 wget -vc https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
 ```
 
-Se estiver pensando em ambiente de desenvolvimento, a ISO do Windows Server é melhor, tem menor footprint de consumo de memória e CPU, e também, geralmente as atualizações dele não quebram o sistema como as atualizações da versão Workstation. Embora não exista uma `.iso` em português para o Windows Server, fique tranquilo, desde a edição do Windows Server 2012 é possivel modificar o idioma após a instalação. O link para download é:  
+Se estiver pensando em ambiente de desenvolvimento, a ISO do Windows Server é melhor, tem menor footprint de consumo de memória e CPU, e também, geralmente as atualizações dele não quebram o sistema como as atualizações da versão Workstation. Também, ela funciona por 90 dias e permite que você possa extender este período por mais 3 vezes sem recorrer a pirataria. 
+Embora não exista uma `.iso` em português para o Windows Server, fique tranquilo, desde a edição do Windows Server 2012 é possivel modificar o idioma após a instalação. O link para download é:  
 [Site oficial da Microsoft para baixar o Windows Server](https://www.microsoft.com/pt-br/evalcenter/download-windows-server-2025)  
+
+Se utilizar o Windows 11, provavelmente você precisa aplicar scripts ou programas como o do Chris Titus após a instalação:   
+[Chris Titus Tech's Windows Utility](https://github.com/christitustech/winutil)  
+Este script está mencionado neste artigo.
+Minha preferencia neste artigo, é a utilização do Windows Server.
 
 ## SERVIÇOS ESSENCIAIS
 O sistema hospedeiro precisa ter os serviços abaixo rodando, eles são importantes para que possamos tem alguma integração entre o hospedeiro e máquinas windows, são eles:
