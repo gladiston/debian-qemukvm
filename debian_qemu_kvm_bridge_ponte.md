@@ -14,10 +14,12 @@ Siga as instruções no link a seguir:
 
 [Instruções para criar uma interface do tipo bridge no Debian](debian_qemu_kvm_bridge_ponte_debian.md)
 
-## Criando uma interface bridge no Ubuntu
+## Criando uma interface de rede tipo bridge no Ubuntu
 
 [Instruções para criar uma interface do tipo bridge no Ubuntu](debian_qemu_kvm_bridge_ponte_ubuntu.md)
 
 ---
 
 [Retornar](https://github.com/gladiston/debian-qemukvm)
+
+

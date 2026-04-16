@@ -2,17 +2,84 @@
 
 O Linux pode atuar como **hypervisor tipo 1**: as máquinas virtuais rodam com desempenho próximo do hardware, mas o ecossistema **libvirt** + **QEMU/KVM** é mais “baixo nível” que produtos como VirtualBox ou VMware em alguns confortos (topologias de rede prontas, clipboard integrado, pastas compartilhadas sem configurar Virtio-FS/SPICE, etc.). Este guia parte do Debian e derivações com `apt`.
 
+
+
+## Preparando as pastas
+
+Por padrão, o virtualizador deposita suas máquinas virtuais e agregados em: 
+
+```
+/var/lib/libvirt
+```
+
+E isso está correto para servidores onde **/var** é uma partição/disco em separado, porém nossa máquina é um desktop e geralmente não usamos **/var** porque ele é um agregadinho do **/(root)** onde deixamos um espaço livre minimo para apenas a instalação do Linux. Assim, eu recomendo que façamos uma mudança para:
+
+```
+/home/libvirt
+```
+
+Nosso **/home** , geralmente foi formatado para ser uma partição em separado e durar para sempre e por isso, geralmente é a partição que terá bem mais espaço disponível, então vamos, criar as pastas:
+
+```bash
+sudo mkdir -p /var/lib/libvirt
+sudo mkdir -p /home/libvirt
+```
+
+Por ora, não vamos nos preocupar com permissões, trataremos disso mais tarde. Agora precisaremos de um **bind mount,** isto é, fazer com que **/var/lib/libvirt** seja um ponto de montagem para **/home/libvirt**, assim, quando instalarmos nossa ferramenta de virtualização, a mesma seguirá seu roteira padrão pensando que seus arquivos estão sendo depositados em **/var/lib/libvirt**, mas na verdade estará em **/home/libvirt**. Execute:
+
+```bash
+sudo editor /etc/fstab
+```
+
+E adicione a seguinte linha ao final deste arquivo:
+
+```
+# bind: conteúdo real em /home/libvirt, visível em /var/lib/libvirt
+/home/libvirt  /var/lib/libvirt  none  bind  0  0
+```
+
+Salve o arquivo e saia do editor.
+
+Depois vamos recarregar a configuração do /etc/fstab, execute:
+
+```bash
+sudo systemctl daemon-reload
+```
+
+Agora vamos montá-lo:
+
+```bash
+sudo mount /var/lib/libvirt
+```
+
+E assim, teremos uma pasta com bind mount, criando a ilusão para o libvirt de que ele está usando /var/lib/libvirt. Mas agora precisamos nos precaver de nós mesmos, quando alguém olhar /var/lib/libvirt e olhar /home/libvirt poderá achar que se trata de uma duplicação, então para minimizar esse dano, vamos criar um arquivo de aviso, por isso, seu nome estará em maiusculo, execute:
+
+```bash
+sudo editor /var/lib/libvirt/NAO_ME_APAGUE.txt
+```
+
+E cole o seguinte conteúdo:
+
+```
+Este é um ponto de montagem de/para:
+/var/lib/libvirt para /home/libvirt
+Se apagar daqui, estará apagando de lá.
+```
+
+Salve o arquivo e saia para o terminal.
+
+Pode parecer um aviso idiota, mas a mente de cada um funciona de um jeito diferente e avisos assim são importantes.
+
 ## Pacotes principais do hypervisor
 
 ```bash
-sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients
-sudo apt install -y libguestfs-tools
+sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients libguestfs-tools -y
 ```
 
 O `apt` costuma instalar **dependências** (rede virtual, firmware UEFI, utilitários). A tabela resume o que cada nome costuma representar na prática:
 
 | Pacote                                    | Explicação                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-|:----------------------------------------- |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **qemu-kvm**                              | Emulação de CPU/dispositivos e aceleração **KVM** quando o hardware suporta (`/dev/kvm`). É o núcleo que de fato executa a VM.                                                                                                                                                                                                                                                                                                                             |
 | **libvirt-daemon-system**                 | Serviço **libvirtd**: API estável para criar, iniciar e gerenciar domínios (VMs), redes e armazenamento.                                                                                                                                                                                                                                                                                                                                                   |
 | **libvirt-clients**                       | Ferramentas de linha de comando (`virsh`, `virt-install`, entre outras) que falam com o libvirt.                                                                                                                                                                                                                                                                                                                                                           |
@@ -31,19 +98,19 @@ Confira se existe o grupo `kvm`:
 getent group kvm
 ```
 
-Se aparecer uma linha do tipo `kvm:x:993:`, inclua o usuário:
+Verá algo como: 
+
+> kvm:x:993
+
+Se não aparecer `kvm:x:993:gsantana` onde `gsantana` é o seu usuário, então incliá-o:  
 
 ```bash
 sudo usermod -aG kvm $USER
-```
-
-Valide de novo:
-
-```bash
+sudo newgrp
 getent group kvm
 ```
 
-O ideal é ver o seu login no fim da linha (por exemplo `kvm:x:993:gsantana`). Em seguida faça o mesmo raciocínio para **`libvirt`**:
+O ideal é ver o seu login no fim da linha (por exemplo `kvm:x:993:gsantana`). Em seguida aplique o mesmo raciocínio para **`libvirt`**:
 
 ```bash
 getent group libvirt
@@ -53,44 +120,86 @@ Deve existir algo como `libvirt:x:117:`. Inclua o usuário:
 
 ```bash
 sudo usermod -aG libvirt $USER
+sudo newgrp
 getent group libvirt
 ```
 
-Confirme que o login aparece em ambos os grupos. **Feche a sessão gráfica ou reinicie** (ou use `newgrp`) para o shell atual herdar os grupos novos.
+Sem acesso a estes grupos, o usuário não **acessa** os mesmos *sockets* e dispositivos que o daemon usa, e o **virt-manager** / **virsh** podem falhar ou pedir senha de administrador.
 
-Sem estes grupos, o usuário não **acessa** os mesmos *sockets* e dispositivos que o daemon usa, e o **virt-manager** / **virsh** podem falhar ou pedir senha de administrador.   
+## ## Desktop: interface gráfica e integração com o convidado
 
-## Desktop: interface gráfica e integração com o convidado
+O hypervisore funciona em forma de backend e serviço, ou seja, sua interatividade com o serviço de virtualização é apenas pelo terminal e para alguns de nós isso é uma 'sofrência' que dá dó. Mesmo em servidores usamos um sistema de gerenciamento com um frontend agradável como o **Proxmox**  para gerenciá-lo sem precisar requerer ao terminal.
 
-Em estação de trabalho vale instalar também o **virt-manager**, o **virtiofsd** (compartilhamento **Virtio-FS** com convidados que suportam), o **virt-viewer** (janela SPICE/VNC sem o painel completo do virt-manager) e os agentes **SPICE** / **qemu-guest-agent** — estes últimos **dentro do convidado** Linux (via `apt` no guest), para clipboard, resolução e relógio.
-
-No **hospedeiro**:
+Em estação de trabalho - como nosso caso - há outros como `gnome-boxes` e `Cockpit`, porém, o mais popular é o `virt-manager`, vamos instalá-lo:
 
 ```bash
-sudo apt install -y virt-manager virtiofsd virt-viewer
+sudo apt install virt-manager -y
 ```
 
-No **Linux convidado** (quando aplicável), instale os agentes e confira o serviço:
+Com o `virt-manager` voce cria, altera e exclui suas VMs. Ele acompanha um viewer embutido, assim, ao criar por exemplo uma VM com o Windows, você poderá interagir com ele, como formatar e instalar o sistema. Mas existe outro viewer que é um pouco melhor, e na realidade, alguns serviços de interatividade só funcionam com ele, chama-se `virt-viewer`, vamos instalá-lo:
 
 ```bash
-sudo apt install -y spice-vdagent spice-webdavd qemu-guest-agent
-systemctl status spice-vdagentd
+sudo apt install virt-viewer -y
 ```
 
-Se estiver inativo (`Active: inactive`), suba o daemon:
+**OBRIGATÓRIO: qemu-guest-agent**
+
+Canal **qemu-ga** para operações coordenadas (snapshot consistente, relógio, rede, etc.).  Instale:
+
+```bash
+sudo apt install qemu-guest-agent -y
+```
+
+**OBRIGATÓRIO: SPICE-VDAGENT**
+
+Ao criar uma VM, em algum momento você configurará a monitor como do tipo SPICE, daí voce poderá ter um clipboard integrado e redimensionamento automático da resolução da tela do convidado com o tamanho da janela.  Instale:
+
+```bash
+sudo apt install spice-vdagent -y
+```
+
+Depois de instalá-lo, confira se o serviço está habilitado:
+
+```bash
+sudo systemctl status spice-vdagentd
+```
+
+E caso esteja inoperante, você o inicia:
 
 ```bash
 sudo systemctl start spice-vdagentd
 ```
 
-| Pacote                         | Explicação                                                                                                                          |
-|:------------------------------ |:----------------------------------------------------------------------------------------------------------------------------------- |
-| **virt-manager**               | Interface gráfica para criar e gerenciar domínios, redes e volumes; ponto de partida habitual no desktop.                           |
-| **virtiofsd**                  | Daemon **Virtio-FS** no hospedeiro: compartilhar pastas com baixa latência (convidado precisa de driver e, no Windows, **WinFsp**). |
-| **virt-viewer**                | Visualização SPICE/VNC em janela dedicada (útil para testes ou segundo monitor).                                                    |
-| **spice-vdagent** *(guest)*    | Clipboard integrado e redimensionamento automático da resolução do guest com o tamanho da janela SPICE.                             |
-| **spice-webdavd** *(guest)*    | Canal **WebDAV** via SPICE para transferir arquivos (alternativa a Virtio-FS).                                                      |
-| **qemu-guest-agent** *(guest)* | Canal **qemu-ga** para operações coordenadas (snapshot consistente, relógio, rede, etc.).                                           |
+Se o serviço não estiver ativo, tampouco o `spice-vdagentd` funcionará nas VMs.
+
+
+
+**OPCIONAL: VIRTIOFSD**
+
+O pacote virtiofsd serve para compartilhar uma pasta do hospedeiro lINUX com a máquina virtual (Windows e Linux) usando virtio-fs. Em termos simples, ele é o daemon do lado do host que implementa esse compartilhamento para o QEMU/KVM. 
+
+Não, ele não é obrigatório em toda instalação de QEMU/KVM.
+Um detalhe importante: o virtiofsd é do lado do host, mas a VM também precisa de suporte ao virtio-fs para montar esse compartilhamento. Em alguns casos, recursos como migração/snapshot com memória podem ter restrições dependendo da versão do virtiofsd
+
+No **hospedeiro**:
+
+```bash
+sudo apt install virtiofsd -y
+```
+
+Se vocÊ instalá-lo, lembre-se de que no Windows precisará também dos drivers `virtiofsd` para que ele possa enxergar as pastas que compartilhou com o host. Pessoalmente, no Windows, eu acho ele problemático com algumas aplicações. Como arquivos Linux são case sensitive, isso significa que podem existir arquivos de mesmo nome com maiusculas e minusculas diferente, e alguns aplicativos Windows se perdem com isso, por exemplo o **Rad  Studio Delphi e C++ Builder**.
+
+
+
+**OPCIONAL: WEBDAV**
+
+Nas configurações da VM, você pode criar um canal  **WebDAV** via SPICE para transferir arquivos entre hospedeiro e convidado, é similar ao Virtio-FS, mas para fazer este compartilhamento usa-se o protocolo HTTP/HTTPS. Este tipo de compartilhamento é conhecido pelos programadores, ele é bem mais lento que o `Virtio-FS` e geralmente você só usaria ele com projetos de programação bem estruturados que funcione muito bem offline, mas que no final, precise sincronizar seus arquivos. Usá-lo como unidade de rede é praticamente inviável. Para tê-lo, instale:
+
+```bash
+sudo apt install spice-webdavd -y
+```
+
+Ele também irá requerer o driver para convidado na máquina Windows.
 
 ## Ativar o libvirt no arranque
 
@@ -107,53 +216,97 @@ O `enable` pode mostrar linhas sobre *SysV* — é normal. Confirme:
 sudo systemctl status libvirtd
 ```
 
-Procure **`Active: active (running)`** e serviço **enabled**. Em versões recentes também pode haver *sockets* `libvirtd.socket`; o conjunto deve permitir `virsh list` sem erro de permissão (após grupos e nova sessão).
+E mostrará algo como:
+
+```textile
+● libvirtd.service - libvirt legacy monolithic daemon
+     Loaded: loaded (/usr/lib/systemd/system/libvirtd.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-04-15 18:29:06 -03; 17s ago
+ Invocation: 66bf2356ca0a4da78d45f1edb7ea6dda
+TriggeredBy: ● libvirtd.socket
+             ● libvirtd-ro.socket
+             ● libvirtd-admin.socket
+       Docs: man:libvirtd(8)
+             https://libvirt.org/
+   Main PID: 11927 (libvirtd)
+      Tasks: 21 (limit: 32768)
+     Memory: 6.1M (peak: 9.4M)
+        CPU: 177ms
+     CGroup: /system.slice/libvirtd.service
+             └─11927 /usr/sbin/libvirtd --timeout 120
+
+abr 15 18:29:06 ti-01 systemd[1]: Starting libvirtd.service - libvirt legacy monolithic daemon...
+abr 15 18:29:06 ti-01 systemd[1]: Started libvirtd.service - libvirt legacy monolithic daemon.
+```
+
+Procure **`Active: active (running)`** e serviço **enabled**. Em versões recentes também pode haver *sockets* `libvirtd.socket`; o conjunto deve permitir `virsh list` sem erro de permissão (após grupos e nova sessão). Neste momento, é criado a pasta `/var/lib/libvirt` com toda a estrutura necessária para a virtualização.
 
 ### Primeira execução do virt-manager
 
 Abra o **virt-manager**. Na árvore à esquerda, em **QEMU/KVM**, clique com o botão direito e escolha **Conectar**:  
 ![Executando o virt-manager pela primeira vez](img/debian_qemu_kvm01.png)
 
-Na primeira conexão, o libvirt cria a árvore sob **`/var/lib/libvirt`**. Vale inspecionar donos e grupos (útil antes de mudar o pool para outro disco):
+Dê uma olhada na árvore sob **`/var/lib/libvirt`**. Vale inspecionar donos e grupos (útil antes de mudar o pool para outro disco):
 
 ```bash
 sudo tree -ug --dirsfirst /var/lib/libvirt
 ```
 
-Exemplo de saída:
+Exemplo de saída:[root     root    ]  /var/lib/libvirt  
+├── [root     root    ]  boot  
+├── [root     root    ]  images  
+├── [libvirt-qemu libvirt-qemu]  qemu  
+│   ├── [libvirt-qemu libvirt-qemu]  checkpoint  
+│   ├── [libvirt-qemu libvirt-qemu]  dump  
+│   ├── [libvirt-qemu libvirt-qemu]  nvram  
+│   ├── [libvirt-qemu libvirt-qemu]  ram  
+│   ├── [libvirt-qemu libvirt-qemu]  save  
+│   └── [libvirt-qemu libvirt-qemu]  snapshot  
+└── [root     root    ]  NAO_ME_APAGUE.txt  
 
-```
-[root     root    ]  /var/lib/libvirt
-├── [root     root    ]  boot
-├── [root     root    ]  dnsmasq
-│   ├── [root     root    ]  default.addnhosts
-│   ├── [root     root    ]  default.conf
-│   ├── [root     root    ]  default.hostsfile
-│   └── [root     root    ]  virbr0.status
-├── [root     root    ]  images
-├── [libvirt-qemu kvm     ]  qemu
-│   ├── [libvirt-qemu kvm     ]  checkpoint
-│   ├── [libvirt-qemu kvm     ]  dump
-│   ├── [libvirt-qemu kvm     ]  nvram
-│   ├── [libvirt-qemu kvm     ]  ram
-│   ├── [libvirt-qemu kvm     ]  save
-│   └── [libvirt-qemu kvm     ]  snapshot
-└── [root     root    ]  sanlock
-
-12 directories, 4 files
-```
+10 directories, 1 file
 
 Mais abaixo, se você mover o armazenamento para `/home`, será preciso **reproduzir donos e permissões**; esta árvore é a referência.
 
 ### Onde o pool `default` guarda discos por omissão
 
-Depois da primeira ligação ao **QEMU/KVM**, o libvirt expõe o *pool* **`default`**, normalmente em **`/var/lib/libvirt/images`**. Em **servidor**, `/var` muitas vezes está num volume grande e dedicado; em **desktop** costuma **compartilhar o mesmo disco** que `/` e ficar **apertado** se `/home` estiver em outro disco com muito mais espaço.
+Depois da primeira ligação ao **QEMU/KVM**, o libvirt expõe o *pool* **`default`**, normalmente em **`/var/lib/libvirt/images`**.  Mas vamos confirmar, execute:
 
-**Nota:** ter **`/home` numa partição separada** facilita reinstalar o sistema sem perder dados do usuário.
+```bash
+sudo virsh pool-list --all --details
+```
 
-Se quiser as imagens **num caminho com mais espaço** (ex.: **`/home/libvirt`**) sem link simbólico (o **AppArmor** e políticas de segurança tratam *bind mount* de forma mais previsível que symlinks para `/var/lib/libvirt`), use **bind mount**: o kernel mostra o conteúdo de `/home/libvirt` **no sítio** `/var/lib/libvirt`, transparente para o libvirt.
+A saída será similar a essa:
 
-#### Bind mount: `/var/lib/libvirt` → `/home/libvirt`
+```context
+ Name      State     Autostart   Persistent   Capacity     Allocation   Available
+------------------------------------------------------------------------------------
+ default   running   yes         yes          937,82 GiB   750,83 GiB   187,00 GiB
+```
+
+O pool `default` onde está sendo gravado? Vamos ver, execute:
+
+```bash
+sudo virsh pool-dumpxml default
+```
+
+Vai mostrar dentro de um texto longo algo como:
+
+```textile
+  <target>
+    <path>/var/lib/libvirt/images</path>
+  </target>
+```
+
+Isso indica exatamente onde nossas imagens serão criadas com o pool `default`. E se você fez isso com o bind mount então notará que a pasta `/var/lib/libvirt` é na verade `/home/libvirt`.
+
+Caso não tenha criado o `bind mount` porque você já tinha máquinas virtuais pré-existentes em `/var/lib/libvirt/images` então o tópico MAQUINAS VIRTUAIS PRÉ-EXISTENTES é para você
+
+## Máquinas virtuais pré-existentes
+
+Se você conseguiu o `bind ount` no inicio do artigo e fez a instalação seguindo este procedimento então pode pular este tópico, ele é apenas para quem que já tinha qemu+kvm já instalado e por isso já tinha `/var/lib/libvirt` e não pôde criar o `bind mount` do jeito que fizemos.
+
+#### Bind mount para nosso home: `/var/lib/libvirt` → `/home/libvirt`
 
 **Parar tudo** — desligue as VMs e pare o libvirt:
 
@@ -161,7 +314,7 @@ Se quiser as imagens **num caminho com mais espaço** (ex.: **`/home/libvirt`**)
 sudo systemctl stop libvirtd.service libvirtd.socket
 ```
 
-**Replicar dados** para o destino definitivo:
+**Replicar dados existentes **para o destino definitivo:
 
 ```bash
 sudo mkdir -p /home/libvirt
@@ -172,6 +325,27 @@ sudo rsync -aX /var/lib/libvirt/ /home/libvirt/
 
 ```bash
 sudo mv /var/lib/libvirt /var/lib/libvirt.bak
+```
+
+Se o comando acima falhar com  a mensagem:  
+
+> mv: não foi possível mover '/var/lib/libvirt' para '/var/lib/libvirt.bak': Dispositivo ou recurso está ocupado
+
+Então use o `fuse` para detectar quem ou o que está bloqueando a pasta:
+
+```bash
+fuser -v /var/lib/libvirt
+```
+
+E finalmente, depois de ter conseguido desbloquear, então repita o comando:
+
+```bash
+sudo mv /var/lib/libvirt /var/lib/libvirt.bak
+```
+
+Após ter mantido o backup desta pasta, vamos recriá-la, porém vazia:
+
+```bash
 sudo mkdir /var/lib/libvirt
 ```
 
@@ -201,7 +375,9 @@ Reinicie o libvirt:
 sudo systemctl start libvirtd.service libvirtd.socket
 ```
 
-### Pools de armazenamento (VMs e ISOs)
+Para testar, crie uma nova VM com um disco associado, depois observe se a imagem desse disco foi parar em `/home/libvirt/images/`. Se existir, tá tudo certo.
+
+## O pool está no inicio automático?
 
 Cada **pool** tem um nome e aponta para um diretório (ou outro tipo de armazenamento). Liste com detalhe:
 
@@ -220,33 +396,21 @@ Exemplo de saída (nomes de estado dependem do idioma da instalação):
 **Observação:** se não aparecer nenhum pool, verifique se o **libvirt** está ativo e se o **virt-manager** já conectou ao **QEMU/KVM** pelo menos uma vez.
 
 **Capacidade** e **disponível** referem-se ao volume onde o *target* do pool está montado (por exemplo `/home` após o bind mount acima).
-Se o estado do pool **`default`** não for **running** (ou **executando** no locale em português), inicie:
+Se o estado do pool **`default`** não for **running** (ou **executando** ), inicie:
 
 ```bash
 sudo virsh pool-start default
 ```
 
-Se **autostart** não estiver ativo, habilite:  
+Se **autostart** (ou **autoiniciar**) não estiver ativo, habilite:  
 
 ```bash
 sudo virsh pool-autostart default
 ```
 
-### Onde ficam as imagens das VMs?
+## Criando novos pools
 
-Com o cenário deste guia, os discos `.qcow2` (ou `.img`) costumam ficar em:
-
-> `/home/libvirt/images`
-
-É possível definir **outro** diretório como pool:
-
-```bash
-sudo mkdir -p /outro/lugar/images
-sudo chmod g+s /outro/lugar/images
-sudo chown -R libvirt-qemu:libvirt-qemu /outro/lugar/images
-```
-
-Registre o pool no libvirt:
+O pool `defalt` para desktops é suficiente para o armazenamento de imagens de VMs. Mas caso queira criar novos pools para seprar VMs por grupo, exemplo, dekstops, servirores, isos, etc... o procedimento é o seguinte:
 
 ```bash
 sudo virsh pool-define-as nome-do-pool dir --target /outro/lugar/images
@@ -256,39 +420,71 @@ sudo virsh pool-start nome-do-pool
 
 Para uso só em desktop, um pool **`default`** bem dimensionado costuma bastar.
 
-Ao **importar** uma imagem copiada de fora para o pool **`default`**, ajuste dono e modo para o QEMU conseguir abrir:  
+Ao **importar** uma imagem copiada de fora para o pool **`default`**, ajuste dono e modo para o QEMU conseguir abrir:
 
 ```bash
-# Ajusta o dono apenas para o arquivo da imagem específica
-sudo chown libvirt-qemu:libvirt-qemu /var/lib/libvirt/images/sua-vm-importada.qcow2
-
-# Garante que o grupo tenha permissão de escrita/leitura
-sudo chmod 660 /var/lib/libvirt/images/sua-vm-importada.qcow2
+sudo chmod g+s /outro/lugar/images
+sudo chmod -R 660 /outro/lugar/images
 ```
 
 Em vez de **`chown`** a cada importação, use **ACL** no diretório **`images`**: regra **default** para arquivos e pastas **novos** e regra para o que **já existe**.
 
 ```bash
-sudo setfacl -R -d -m u:libvirt-qemu:rwx /var/lib/libvirt/images
-sudo setfacl -R  -m u:libvirt-qemu:rwx /var/lib/libvirt/images
+sudo setfacl -R -d -m u:libvirt-qemu:rwx /outro/lugar/images
+sudo setfacl -R -m u:libvirt-qemu:rwx /outro/lugar/images
 ```
 
 (Ajuste o caminho se o *target* do pool for outro; após bind mount, `/var/lib/libvirt/images` e `/home/libvirt/images` apontam para o mesmo conteúdo.)
 
-### Pool em sistema de arquivos Btrfs
+## Permissões de pasta
 
-Se o *target* do pool estiver em **Btrfs**, vale ajustar *copy-on-write* e desempenho conforme o guia dedicado:
+As imagens criadas pelo qemu+kvm tem sua extensão `.qcow2` (ou `.img`) e costumam ficar no pool `default`, mas onde fica mesmo este pool?  Existe mais de um? As vezes, isso confunde. Você pode usar o `virt-manager` para descobrir para onde os pools  apontam, mas caso esteja no terminal, execute:
 
-[Virtualização nativa QEMU/KVM com Btrfs](debian_qemu_kvm_btrfs.md)
+```bash
+sudo virsh pool-dumpxml default
+```
 
-### Pool de ISOs
+Vai mostrar um texto, procure por:
+
+```textile
+  <target>
+    <path>/var/lib/libvirt/images</path>
+  </target>
+```
+
+Como sabemos que `/var/lib/libvirt` é um `bind mount` para `/home/libvirt` então a pasta real é:
+
+> `/home/libvirt/images`
+
+Garanta que o dono/grupo `libvirt-qemu` tenha permissão de escrita/leitura(chmod 660):
+
+```bash
+sudo chmod g+s /home/libvirt/images
+sudo chmod -R 660 /var/lib/libvirt/images
+```
+
+Sei que é tentador dar permissão a si mesmo, mas a verdade é que vocÊ não precisa, tudo que fizer dentro da VM estará sendo feito por um usuário/grupo chamado `libvirt-qemu` e também porque você precisa se proteger de si mesmo, isto é, evitando que por acidente possa apagar o que não deve:
+
+```bash
+sudo chown -R libvirt-qemu:libvirt-qemu /home/libvirt/images
+```
+
+Em vez de **`chown`** a cada importação ou cópia de arquivos, use **ACL**  para garantir uma regra de recursividade para novos arquivos nesta mesma pasta:
+
+```bash
+sudo setfacl -R -d -m u:libvirt-qemu:rwx /home/libvirt/images
+sudo setfacl -R -m u:libvirt-qemu:rwx /home/libvirt/images
+```
+
+Se você criar novos pools, não precisa se preocupar com permissões novamente, no entanto, caso copie imagens de outros lugares para esses pools, você deverá dar permissão como fizemos acima, caso contrário poderá ter problemas ao criar snapshots ou até ao rodar a VM.
+
+## Pool de ISOs
 
 ISOs de instalação são grandes e pouco usadas depois da instalação; muita gente **as guarda** em disco **mais barato** (HDD) e deixa **SSDs** para imagens de VM — é sugestão, não regra.
 
 Este exemplo usa **`/home/libvirt/isos`**:
 
 ```bash
-mkdir -p /home/libvirt/isos
 sudo virsh pool-define-as isos dir - - - - "/home/libvirt/isos"
 ```
 
@@ -321,3 +517,9 @@ sudo virsh pool-undefine isos
 ```
 
 Apague os `.iso` manualmente na pasta se quiser liberar espaço.  
+
+## Pool em sistema de arquivos Btrfs
+
+Se o *target* do pool estiver em **Btrfs**, vale ajustar *copy-on-write* e desempenho conforme o guia dedicado:
+
+[Virtualização nativa QEMU/KVM com Btrfs](debian_qemu_kvm_btrfs.md)
