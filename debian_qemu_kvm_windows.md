@@ -50,28 +50,6 @@ E o resultado:
 TriggeredBy: ○ spice-vdagentd.socket
 ```
 
-
-### Serviço `spice-webdavd`
-Este é um serviço que lhe permitirá compartilhar arquivos entre hospedeiro e convidado, veja se o serviço está habilitado e rodando, execute:  
-```bash
-sudo systemctl status spice-webdavd
-```
-E o resultado:  
-```
-○ spice-vdagentd.service - Agent daemon for Spice guests
-     Loaded: loaded (/usr/lib/systemd/system/spice-vdagentd.service; indirect; preset: enabled)
-     Active: inactive (dead)
-TriggeredBy: ○ spice-vdagentd.socket
-```
-Se estes serviços não estiverem rodando, avalie os passos anteriores porque prosseguir sem eles torna a sua VM Windows muito limitada, mas na maioria das vezes, apenas o comando a seguir resolve:  
-```bash
-sudo systemctl start spice-vdagentd
-sudo systemctl start spice-webdavd
-```
-Se não resolver, ou após o boot, estiverem novamente desligados, provavelmente faltou habilitar o "start"  junto com o boot `sudo systemctl enable [serviço]`.  
-
----
-
 ## Instalando o Windows dentro de uma VM
 Siga as instruções abaixo:  
 [Instalando o Windows dentro de uma VM](debian_qemu_kvm_windows_inst.md)   
