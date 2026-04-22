@@ -1,6 +1,6 @@
 # INSTALANDO O WINDOWS DENTRO DE UMA VM
 Vamos ao passo a passo, mas antes de iniciarmos, atente-se:  
-Em algumas oportunidades, o ponteiro do mouse ficará travado dentro da VM e nesse interim, se desejar ir para o host, precisará dessa combinação no teclado:   
+Em algumas oportunidades, o ponteiro do mouse ficará travado dentro da VM e, nesse ínterim, se desejar ir para o host, precisará desta combinação no teclado:   
 **CTRL + ALT** (lado esquerdo)   
 Faça o teste logo no início; se não gostar dessa combinação, poderá trocá-la nas preferências do **virt-manager**. Em geral, essa combinação atende bem à maioria dos casos.  
 
@@ -61,12 +61,12 @@ $ ls -lh /home/libvirt/images
 total 196K
 -rw------- 1 root kvm 196K Oct 17 14:31 win2k25.qcow2
 ```
-Como pôde ver, um disco de 200GB que ocupa apenas 196K no sistema. É claro que a medida que formos instalar o sistema e todas as demais coisas, este arquivo subirá de tamanho. Na minha modesta opinião, eu criaria discos apenas pelo terminal porque podemos criar vários em sequencia, evitando o wizard burocrático e repetitivo para cada um deles.  
+Como pôde ver, um disco de 200GB que ocupa apenas 196K no sistema. É claro que, à medida que formos instalar o sistema e todas as demais coisas, este arquivo subirá de tamanho. Na minha modesta opinião, eu criaria discos apenas pelo terminal, porque podemos criar vários em sequência, evitando o wizard burocrático e repetitivo para cada um deles.  
 
 ### VIRT-MANAGER - CRIANDO A VM
 Vá em **Arquivo|Nova máquina virtual**, depois selecione **Mídia de instalação** e prossiga.
 
-O assistente **Nova máquina virtual** tem **cinco telas** numeradas abaixo. Depois que você clicar em **Concluir** na última tela, abre-se a janela de **detalhes da VM** (personalização); essa parte não é mais “tela 6” do assistente — ela está na secção **Personalização da VM (antes de instalar)**, com passos numerados à parte.
+O assistente **Nova máquina virtual** tem **cinco telas** numeradas abaixo. Depois que você clicar em **Concluir** na última tela, abre-se a janela de **detalhes da VM** (personalização); essa parte não é mais “tela 6” do assistente — ela está na seção **Personalização da VM (antes de instalar)**, com passos numerados à parte.
 
 #### Tela 1 de 5 — Tipo de mídia
 Na tela **Escolha a mídia de instalação ISO ou CDROM** e então prossiga.  
@@ -75,21 +75,24 @@ Na tela **Escolha a mídia de instalação ISO ou CDROM** e então prossiga.
 Nesta tela, escolha a `.iso` de instalação do Windows e então prossiga:   
 ![Habilitar edição de XML](img/debian_qemu_kvm_windows05.png)     
 
-E ao escolher a iso, defina corretamente o sistema convidado e não confie na opção auto-detecção porque as vezes ela falha, especialmente ao detectar edições do Windows Server:  
+E ao escolher a ISO, defina corretamente o sistema convidado e não confie na opção de auto-detecção porque, às vezes, ela falha, especialmente ao detectar edições do Windows Server:  
 ![Habilitar edição de XML](img/debian_qemu_kvm_windows06.png)   
 
 Atenção, no caso do Windows, só escolha as edições suportadas pelo virtualizador. Caso surja uma nova versão do Windows, mas ela não apareça na lista de sistemas suportados, não tente prosseguir.  
 
 #### Tela 3 de 5 — Memória e CPUs
-Quando prosseguir, precisará decidir quanto de memória precisará usar e quantas CPUs. A quantidade de memória que escolher é definido pelos requisitos de programas que irá usar, no meu caso será 8GB de RAM usando 8 CPUs, que é metade do que tenho. Eu não costumo usar mais do que 1 VM por vez, geralmente concentro VMs por tarefas que desempenho, então quando vou programar usando o Windows tenho uma VM só para ela, para testes de automação tenho outra e assim por diante. Essa é uma dica importante, prefira ter VMs por atividade, não crie uma VM para todas as coisas porque elas podem ser voláteis, uma ora ou outra precisam ser recriadas:   
+Quando prosseguir, precisará decidir quanta memória usará e quantas CPUs. A quantidade de memória escolhida é definida pelos requisitos dos programas que você vai usar; no meu caso, serão 8GB de RAM usando 8 CPUs, que é metade do que tenho. Eu não costumo usar mais do que 1 VM por vez; geralmente concentro VMs por tarefas que desempenho: quando vou programar usando o Windows, tenho uma VM só para isso; para testes de automação, tenho outra; e assim por diante. Essa é uma dica importante: prefira ter VMs por atividade. Não crie uma VM “para tudo”, porque elas podem ser voláteis e, uma hora ou outra, precisam ser recriadas:   
 ![Habilitar edição de XML](img/debian_qemu_kvm_windows07.png)     
 
 #### Tela 4 de 5 — Disco da VM
 Nesta janela, ligue a opção **Habilitar armazenamento para esta máquina virtual** e vá em **Selecionar ou criar um armazenamento personalizado**, ao clicar em **Gerenciar...** selecione o disco virtual que criamos anteriormente, ou vá para o terminal e crie uma com o comando:   
-```
+```bash
 sudo virsh vol-create-as default win2k25-dx.qcow2 200G --format qcow2
 ```
 No exemplo acima, estou criando um disco virtual com o nome `win2k25-dx` onde `win2k25` é um prefixo que me lembra `Windows 2025` e o sufixo `dx` me lembra o ambiente que vou instalar depois. Preparar nomes assim não é uma regra, mas ajuda bastante. E então escolha no pool `default` o seu disco virtual:  
+
+**Nota importante (TPM/BitLocker e perda de desempenho):** Se você adicionar **TPM** na VM e deixar o instalador do Windows **criar/formatar** o disco “do zero” durante o setup, em muitas situações o Windows habilita **criptografia automática (BitLocker / Device Encryption)** no volume do sistema. Para virtualização isso é **ruim** porque adiciona overhead de I/O, desperdiça tempo e atrapalha operações comuns (cópia, compactação/otimização do qcow2, backup, migração).  
+O recomendado é **ter o disco previamente criado e já formatado** (quando fizer sentido no seu fluxo) ou usar uma **mídia de instalação do Windows criada com o Rufus**, conforme seu cenário, para evitar surpresas com criptografia automática.
 
 ![Habilitar edição de XML](img/debian_qemu_kvm_windows08.png)   
 
@@ -200,7 +203,7 @@ No elemento `<driver .../>` acrescente os atributos que faltam, por exemplo:
 Clique em **Aplicar** para salvar. É possível que o editor visual reordene atributos; isso é normal.
 
 #### Passo 5 — Segundo CD-ROM (virtio-win.iso)
-Com o disco em **VirtIO**, o instalador do Windows não reconhece o volume até carregar o driver. Como não dá para trocar o único CD-ROM do instalador pelo `virtio-win.iso` sem quebrar o fluxo, adicione **um segundo** CD-ROM: o primeiro fica com a ISO do Windows; o segundo, com **virtio-win.iso** (veja a secção **Pré-requisitos** no início deste artigo). Vá em **Adicionar hardware** → **Dispositivo CD-ROM** → **Gerenciar...** → selecione **virtio-win.iso** → **Concluir**:   
+Com o disco em **VirtIO**, o instalador do Windows não reconhece o volume até carregar o driver. Como não dá para trocar o único CD-ROM do instalador pelo `virtio-win.iso` sem quebrar o fluxo, adicione **um segundo** CD-ROM: o primeiro fica com a ISO do Windows; o segundo, com **virtio-win.iso** (veja a seção **Pré-requisitos** no início deste artigo). Vá em **Adicionar hardware** → **Dispositivo CD-ROM** → **Gerenciar...** → selecione **virtio-win.iso** → **Concluir**:   
 
 ![Dispositivo CDROM](img/debian_qemu_kvm_windows16.png)   
 
@@ -250,7 +253,7 @@ Sem isso, algumas edições do Windows - como o Windows 11 - não funcionarão:
 Finalmente podemos começar a instalação: clique em **Iniciar a instalação** no topo da janela de detalhes da VM:  
 ![Iniciar instalação](img/debian_qemu_kvm_windows23.png)
 
-A instalação começará, e trata-se de uma instalação comum, no entanto, seu ponteiro de mouse estará preso à essa janela, para sair dela use as teclas **Ctrl** e **Alt** do lado esquerdo do teclado.
+A instalação começará e trata-se de uma instalação comum. No entanto, seu ponteiro de mouse estará preso a esta janela; para sair dela, use as teclas **Ctrl** e **Alt** do lado esquerdo do teclado.
 
 ### Instalador do Windows (drivers VirtIO durante o setup)
 
@@ -258,11 +261,11 @@ A instalação começará, e trata-se de uma instalação comum, no entanto, seu
 
 ![Carregar Driver durante a instalação](img/debian_qemu_kvm_windows24.png)   
 
-2. Aponte para a pasta (Browse) na segunda unidade de CDROM onde temos o iso do VirtIO drivers para convidado, geralmente a unidade E: na pasta:   
+2. Aponte para a pasta (Browse) na segunda unidade de CD-ROM, onde temos a ISO do VirtIO (drivers para convidado), geralmente a unidade E:, na pasta:   
 ```
 E:\VioStor\2k25\amd64
 ```
-Onde `2k25` é os drivers para Windows 2025, para o Windows 11 seria `w11` e assim por diante.
+Onde `2k25` são os drivers para Windows 2025; para o Windows 11 seria `w11`, e assim por diante.
 ![Carregar Driver durante a instalação](img/debian_qemu_kvm_windows25.png)   
 
 3. Confirme a instalação deste driver:  
@@ -271,11 +274,11 @@ Onde `2k25` é os drivers para Windows 2025, para o Windows 11 seria `w11` e ass
 O disco deve aparecer na lista:
 ![Incluindo o driver de disco VirtIO](img/debian_qemu_kvm_windows27.png)   
 
-4. Ainda falta o driver de rede: vá novamente em **Load Driver** e aponte para a pasta (Browse) na segunda unidade de CDROM onde temos o iso do VirtIO drivers para convidado, geralmente a unidade E: na pasta:   
+4. Ainda falta o driver de rede: vá novamente em **Load Driver** e aponte para a pasta (Browse) na segunda unidade de CD-ROM, onde temos a ISO do VirtIO (drivers para convidado), geralmente a unidade E:, na pasta:   
 ```
 E:\NetKVM\2k25\amd64
 ```
-Onde `2k25` é os drivers para Windows 2025, para o Windows 11 seria `w11` e assim por diante:
+Onde `2k25` são os drivers para Windows 2025; para o Windows 11 seria `w11`, e assim por diante:
 ![Incluindo o driver de rede VirtIO](img/debian_qemu_kvm_windows28.png)   
 
 5. Confirme a instalação do driver de rede:  
@@ -302,16 +305,16 @@ Para verificar se os drivers gráficos/SPICE já respondem, no virt-manager use 
 ![Incluindo o driver de rede VirtIO](img/debian_qemu_kvm_windows33.png)   
 
 Depois disso, costuma ser possível soltar o cursor sem **Ctrl+Alt** (esquerdo) e o Windows acompanha o tamanho da janela ao redimensionar o virt-manager.   
-Se você for no topo ao centro e ficar com o ponteiro do mouse ali parado por 1s, aparecerá dois botões que estavam camuflados, um deles é para sair de tela cheia e o outro para enviar combinações de tecla como Ctrl+Alt+Del.  
+Se você for ao topo (ao centro) e ficar com o ponteiro do mouse ali parado por 1s, aparecerão dois botões que estavam camuflados; um deles é para sair de tela cheia e o outro para enviar combinações de tecla como Ctrl+Alt+Del.  
 
 Ainda nos resta instalar um driver muito importante, o `WinFsp`, sem ele, não poderemos compartilhar arquivos entre hospedeiro e convidado.  
-Visite à página:  
+Visite a página:  
 [https://github.com/winfsp/winfsp/releases](https://github.com/winfsp/winfsp/releases)   
 
 E então baixe a versão mais recente.  
 ![página WinSFP](img/debian_qemu_kvm_windows59.png)   
 
-Depois de instalado, execute `services.msc` como administrador e procure pelo serviço **VirtIO-FS Service**, e habilite-o para iniciar junto com o Windows:  
+Depois de instalado, execute `services.msc` como administrador, procure pelo serviço **VirtIO-FS Service** e habilite-o para iniciar junto com o Windows:  
 
 ![VirtIO-FS Service](img/debian_qemu_kvm_windows60.png)   
 
@@ -323,7 +326,61 @@ Quando não precisar mais da ISO **virtio-win** na VM, pode ejetá-la no Explora
 - **Gerenciador de Dispositivos** (`devmgmt.msc`): não deve restar muitos “Dispositivo desconhecido” após o `virtio-win-guest-tools.exe` (salvo hardware que você não adicionou, ex.: impressora).
 - **Serviços** (`services.msc`): procure **QEMU Guest Agent** (ou nome semelhante) **Em execução** após o pacote VirtIO — coerente com o canal configurado no **Passo 7** deste artigo.
 - **Rede**: com NAT na VM, confira acesso à internet (navegador ou `ping 1.1.1.1`).
-- **Hospedeiro Linux**: para clipboard SPICE estável, mantenha **spice-vdagentd** (e, se for usar WebDAV depois, **spice-webdavd**) conforme a secção **SERVIÇOS ESSENCIAIS** em [VM Windows](debian_qemu_kvm_windows.md).
+- **Hospedeiro Linux**: para clipboard SPICE estável, mantenha **spice-vdagentd** (e, se for usar WebDAV depois, **spice-webdavd**) conforme a seção **SERVIÇOS ESSENCIAIS** em [VM Windows](debian_qemu_kvm_windows.md).
+
+
+## Desabilitar a criptografia no volume (depois de criado)
+Você fez a instalação do Windows 11 (a versão mais recente)?  
+Então você deve ter notado que o disco **C:** pode ficar criptografado com BitLocker.  
+Quando o Windows detecta o TPM (um dos pré-requisitos do Windows 11), ele pode assumir que volumes devem ser criptografados automaticamente.  
+Em um notebook isso pode fazer sentido; em uma VM, volumes criptografados normalmente só **roubam desempenho**. Além disso, dependendo do contexto, não é uma proteção tão confiável: se você usa uma conta online, a chave de recuperação pode ficar associada à conta na nuvem (e pode ser obtida por meios legais).  
+
+Recomendamos fortemente desabilitar a criptografia. Abra o `cmd` como administrador e execute:  
+
+```cmd
+manage-bde -status
+```
+Assim, você perceberá quais unidades estão criptografadas; provavelmente listará a unidade **C:**.  
+```text
+Os volumes de disco podem ser protegidos com
+Criptografia de Unidade de Disco BitLocker:
+Volume C: [Windows_OS]
+[Volume de SO]
+
+    Tamanho:                   199,05 GB
+    Versão do BitLocker:       2.0
+    Status da Conversão:       Apenas Espaço Usado Criptografado
+    Porcentagem Criptografada: 100,0%
+    Método de Criptografia:    XTS-AES 128
+    Status de Proteção:        Proteção Desativada
+    Status do Bloqueio:        Desbloqueado
+    Campo de Identificação:    Desconhecido
+    Protetores de Chave:       Nenhum Localizado
+```
+Como pode ver acima, 100% da unidade está criptografada. Vamos descriptografar:  
+```cmd
+manage-bde -off C:
+```
+Será exibida uma mensagem como:
+>  Descriptografia em andamento.   
+
+É muito importante, neste momento, **não desligar a VM** até que o processo esteja concluído. E como saberemos? Continue executando, de tempos em tempos, o comando `manage-bde -status` até ele mostrar a mensagem:
+```text
+Criptografia de Unidade de Disco BitLocker:
+Volume C: [Windows_OS]
+[Volume de SO]
+
+    Tamanho:                   199,05 GB
+    Versão do BitLocker:       Nenhum
+    Status da Conversão:       Totalmente Descriptografado
+    Porcentagem Criptografada: 0,0%
+    Método de Criptografia:    Nenhum
+    Status de Proteção:        Proteção Desativada
+    Status do Bloqueio:        Desbloqueado
+    Campo de Identificação:    Nenhum
+    Protetores de Chave:       Nenhum Localizado
+```
+Notou `Totalmente Descriptografado`? Então está concluído. Se desejar, já pode desligar a VM. Repita o processo caso queira acrescentar novos discos; e é melhor fazer isso logo após a formatação, pois a descriptografia tende a ser mais rápida (quanto menos dados gravados no volume, menos trabalho há para desfazer a criptografia).
 
 ---
 

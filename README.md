@@ -213,6 +213,14 @@ O QCOW2 é um formato copy-on-write com recursos como snapshots, compressão e a
 
 ---
 
+## Criando e anexando discos extras (QCOW2)
+
+Quando precisar de mais espaço, um volume separado para dados, ou quiser anexar discos adicionais por VM (ao invés de aumentar o disco principal), siga o guia abaixo:
+
+[Criando e anexando discos extras](debian_qemu_kvm_disco_extra.md)
+
+---
+
 ## Backup de Máquinas Virtuais em QEMU+KVM
 
 **Backup de máquina virtual** é a replicação sistemática dos arquivos de disco (imagens QCOW2, RAW, VDI, etc.) e metadados de configuração (arquivos XML do libvirt) para um local independente, garantindo recuperação em caso de corrupção, falha de hardware, exclusão acidental ou desastre. Diferencia-se de snapshots, que são pontos de restauração locais; backups são cópias isoladas em mídia ou storage separado.  

@@ -49,14 +49,22 @@ Os ajustes mencionados a seguir foram feitos nos passos anteriores deste guia, n
 ### Pelo virt-manager (GUI)
 
 1. **Abra o virt-manager** e selecione a VM desejada.
+
 2. Clique no ícone de informações **“i” (Mostrar detalhes da máquina virtual)**.
+
 3. No painel esquerdo, clique em **Disco VirtIO 1(VirtIO Disk)** — ou o nome do disco principal.
+
 4. Na aba Detalhes, expanda **Opções avançadas** (Advanced options).
+
 5. Ele mostrará:
+   
    * **Modo do cachê(Cache mode):** `none`
+   
    * **Modo de descarte(Discard):** `unmap`
      Mas em algumas distros - e Debian incluso - não mostrará essas opções:  
+   
    * **IO mode:** `native`  
+   
    * **Detect zeroes:** `unmap` *(ou `on`, se `unmap` não estiver disponível)*
      Então você precisa adicioná-las manualmente, vá na aba **XML**, e localize o bloco `<disk …>` e provavelmente estará assim:
      
