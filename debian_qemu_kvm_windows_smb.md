@@ -135,7 +135,7 @@ Defina `gsantana` como dono (se necessário):
 sudo chown -R gsantana:smbwork /home/w
 ```
 
-Garanta permissões coerentes para o grupo `smbwork`:  
+Garanta permissões coerentes para o usuário e grupo:  
 
 ```
 sudo find /home/w -type d -exec chmod 2770 {} +
