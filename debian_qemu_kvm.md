@@ -26,8 +26,11 @@ Nosso **/home** , geralmente foi formatado para ser uma partição em separado e
 sudo mkdir -p /var/lib/libvirt
 sudo mkdir -p /home/libvirt
 ```
-
-Por ora, não vamos nos preocupar com permissões, trataremos disso mais tarde. Agora precisaremos de um **bind mount,** isto é, fazer com que **/var/lib/libvirt** seja um ponto de montagem para **/home/libvirt**, assim, quando instalarmos nossa ferramenta de virtualização, a mesma seguirá seu roteira padrão pensando que seus arquivos estão sendo depositados em **/var/lib/libvirt**, mas na verdade estará em **/home/libvirt**. Execute:
+Nossa pasta `/home/libvirt` precisa de permissõs adequadas:
+```bash
+sudo chmod 755 /home/libvirt
+```
+Agora precisaremos de um **bind mount,** isto é, fazer com que **/var/lib/libvirt** seja um ponto de montagem para **/home/libvirt**, assim, quando instalarmos nossa ferramenta de virtualização, a mesma seguirá seu roteira padrão pensando que seus arquivos estão sendo depositados em **/var/lib/libvirt**, mas na verdade estará em **/home/libvirt**. Execute:
 
 ```bash
 sudo editor /etc/fstab
@@ -39,8 +42,8 @@ E adicione a seguinte linha ao final deste arquivo:
 # bind: conteúdo real em /home/libvirt, visível em /var/lib/libvirt
 /home/libvirt  /var/lib/libvirt  none  bind  0  0
 ```
-
 Salve o arquivo e saia do editor.
+Porque usar `bind mount`? Porque programas como o **AppArmor** (ou equivalente) costuma **confiar** em bind mount ao caminho **canônico** esperado, teríamos problemas se usassemos  symlink aqui.
 
 Depois vamos recarregar a configuração do /etc/fstab, execute:
 
@@ -65,6 +68,7 @@ E cole o seguinte conteúdo:
 ```
 Este é um ponto de montagem de/para:
 /var/lib/libvirt para /home/libvirt
+NÃO SÃO DUAS PASTAS DUPLICADAS, MAS ESPELHADAS
 Se apagar daqui, estará apagando de lá.
 ```
 
@@ -75,7 +79,7 @@ Pode parecer um aviso idiota, mas a mente de cada um funciona de um jeito difere
 ## Pacotes principais do hypervisor
 
 ```bash
-sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients \
+sudo apt install tree libvirt-daemon-system libvirt-clients \
   libguestfs-tools ovmf isc-dhcp-client dnsmasq-base swtpm swtpm-tools \
   qemu-system-modules-spice qemu-utils qemu-system-gui -y
 ```
@@ -104,35 +108,53 @@ getent group kvm
 
 Verá algo como: 
 
-> kvm:x:993
+> kvm:x:993  
+ou  
+> kvm:x:991:libvirt-qemu  
 
-Se não aparecer `kvm:x:993:gsantana` onde `gsantana` é o seu usuário, então incliá-o:  
+O comando acima indica quais usuários estão no grupo `kvm`, note que nosso usuário não está nele, então vamos incluí-lo:
+
 
 ```bash
 sudo usermod -aG kvm $USER
 sudo newgrp
+```
+Agora, vamos confirmar:
+```bash
 getent group kvm
 ```
-
-O ideal é ver o seu login no fim da linha (por exemplo `kvm:x:993:gsantana`). Em seguida aplique o mesmo raciocínio para **`libvirt`**:
+O resultado agora incluirá o nosso usuário(ex gsantana):  
+> kvm:x:993,**gsantana**    
+ou  
+> kvm:x:991:libvirt-qemu,**gsantana**  
+  
+Ao ver o seu login no fim da linha (por exemplo `gsantana`) significa que tudo deu certo. 
+Em seguida aplique o mesmo raciocínio para **`libvirt`**:
 
 ```bash
 getent group libvirt
 ```
-
-Deve existir algo como `libvirt:x:117:`. Inclua o usuário:
-
+Listará algo como:
+> libvirt:x:975  
+Se não apareceu seu usuário(ex `gsantana`), então precisará incluí-lo:
+  
 ```bash
 sudo usermod -aG libvirt $USER
 sudo newgrp
+```
+Depois confira novamente:
+```bash
 getent group libvirt
 ```
+Listará algo como:
+> libvirt:x:975:gsantana  
+Ao ver o seu login no fim da linha (por exemplo `gsantana`) significa que tudo deu certo. 
 
-Sem acesso a estes grupos, o usuário não **acessa** os mesmos *sockets* e dispositivos que o daemon usa, e o **virt-manager** / **virsh** podem falhar ou pedir senha de administrador.
+Sem acesso a estes grupos, o usuário não **acessa** os mesmos recursos que o daemon usa, e o **virt-manager** / **virsh** podem falhar ou pedir senha de administrador.
 
 ## Desktop: interface gráfica e integração com o convidado
 
-O hypervisore funciona em forma de backend e serviço, ou seja, sua interatividade com o serviço de virtualização é apenas pelo terminal e para alguns de nós isso é uma 'sofrência' que dá dó. Mesmo em servidores usamos um sistema de gerenciamento com um frontend agradável como o **Proxmox**  para gerenciá-lo sem precisar requerer ao terminal.
+O hypervisor funciona em forma de backend e serviço, ou seja, sua interatividade com o serviço de virtualização é apenas pelo terminal e para alguns de nós isso é uma 'sofrência' que dá dó. Mesmo em servidores usamos um sistema de gerenciamento com um frontend agradável como o **Proxmox**  para gerenciá-lo sem precisar requerer ao terminal.
 
 Em estação de trabalho - como nosso caso - há outros como `gnome-boxes` e `Cockpit`, porém, o mais popular é o `virt-manager`, vamos instalá-lo:
 
@@ -259,7 +281,8 @@ Dê uma olhada na árvore sob **`/var/lib/libvirt`**. Vale inspecionar donos e g
 sudo tree -ug --dirsfirst /var/lib/libvirt
 ```
 
-Exemplo de saída:[root     root    ]  /var/lib/libvirt  
+Exemplo de saída:
+```
 [root     root    ]  /var/lib/libvirt  
 ├── [root     root    ]  boot  
 ├── [root     root    ]  dnsmasq  
@@ -278,7 +301,7 @@ Exemplo de saída:[root     root    ]  /var/lib/libvirt
 │   ├── [libvirt-qemu libvirt-qemu]  save  
 │   └── [libvirt-qemu libvirt-qemu]  snapshot  
 └── [root     root    ]  NAO_ME_APAGUE.txt  
-
+```
 Mais abaixo, se você mover o armazenamento para `/home`, será preciso **reproduzir donos e permissões**; esta árvore é a referência.
 
 ### Onde o pool `default` guarda discos por omissão
@@ -421,6 +444,23 @@ Se **autostart** (ou **autoiniciar**) não estiver ativo, habilite:
 sudo virsh pool-autostart default
 ```
 
+## Movendo VMs para cá
+Para reutilizar as VMs antigas neste novo servidor é simples, mas antes de copiar as VMs, faça o seguinte ajuste:
+```bash
+sudo chown -R libvirt-qemu:kvm /var/lib/libvirt/images
+sudo chmod -R 660 /var/lib/libvirt/images
+```
+As permissões acima é o padrão a ser usada para a pasta que contêm as imagens de VMs, agora basta copiar as VMs que precisa - geralmente arquivos .qcow2 - para a nova pasta, exemplo:
+```bash
+sudo mv /home/libvirt.old/images/*.qcow2 /var/lib/libvirt/images
+```
+Mas ao copiar VMs para lá, os donos dos arquivos que forem para lá provavelmente serão o `root` porque você usou o `sudo` nestas cópias e daí vamos repetir as permissões:
+```bash
+sudo chown -R libvirt-qemu:kvm /var/lib/libvirt/images
+sudo chmod -R 660 /var/lib/libvirt/images
+```
+Agora, podemos usar o gerenciador de virtualização e importar essas VMs.  
+
 ## Criando novos pools
 
 O pool `defalt` para desktops é suficiente para o armazenamento de imagens de VMs. Mas caso queira criar novos pools para seprar VMs por grupo, exemplo, dekstops, servirores, isos, etc... o procedimento é o seguinte:
@@ -436,18 +476,9 @@ Para uso só em desktop, um pool **`default`** bem dimensionado costuma bastar.
 Ao **importar** uma imagem copiada de fora para o pool **`default`**, ajuste dono e modo para o QEMU conseguir abrir:
 
 ```bash
-sudo chmod g+s /outro/lugar/images
-sudo chmod 770 /outro/lugar/images
-sudo chmod -R 660 /outro/lugar/images
+sudo chown libvirt-qemu:kvm /outro/lugar/images/*.qcow2
+sudo chmod 660 /outro/lugar/images/*.qcow2
 ```
-
-Em vez de **`chown`** a cada importação, use **ACL** no diretório **`images`**: regra **default** para arquivos e pastas **novos** e regra para o que **já existe**.
-
-```bash
-sudo setfacl -R -d -m u:libvirt-qemu:rwx /outro/lugar/images
-sudo setfacl -R -m u:libvirt-qemu:rwx /outro/lugar/images
-```
-
 (Ajuste o caminho se o *target* do pool for outro; após bind mount, `/var/lib/libvirt/images` e `/home/libvirt/images` apontam para o mesmo conteúdo.)
 
 ## Permissões de pasta
@@ -473,28 +504,13 @@ Como sabemos que `/var/lib/libvirt` é um `bind mount` para `/home/libvirt` ent�
 Garanta que o dono/grupo `libvirt-qemu` tenha permissão de escrita/leitura(chmod 660):
 
 ```bash
-sudo chmod 770 /var/lib/libvirt/images
+sudo chown -R libvirt-qemu:kvm /var/lib/libvirt/images
 sudo chmod -R 660 /var/lib/libvirt/images
 ```
 
-Sei que é tentador dar permissão a si mesmo, mas a verdade é que vocÊ não precisa, tudo que fizer dentro da VM estará sendo feito por um usuário/grupo chamado `libvirt-qemu` e também porque você precisa se proteger de si mesmo, isto é, evitando que por acidente possa apagar o que não deve:
+Agora, podemos usar as VMs e importá-las para nosso gerenciador de virtualização.  
+Sei que é tentador dar permissão a si mesmo, mas a verdade é que vocÊ não precisa, tudo que fizer dentro da VM estará sendo feito por um usuário/grupo chamado `libvirt-qemu` e também porque você precisa se proteger de si mesmo, isto é, evitando que por acidente possa apagar o que não deve
 
-```bash
-sudo chown -R libvirt-qemu:libvirt-qemu /var/lib/libvirt/images
-```
-
-Em vez de **`chown`** a cada importação ou cópia de arquivos, podemos usar **ACL**  para garantir uma regra de recursividade para novos arquivos nesta mesma pasta:
-
-```bash
-sudo chown libvirt-qemu:libvirt-qemu /var/lib/libvirt/images
-sudo chmod 2770 /var/lib/libvirt/images
-sudo setfacl -m u:libvirt-qemu:rwx /var/lib/libvirt/images
-sudo setfacl -m m:rwx /var/lib/libvirt/images
-sudo setfacl -d -m u:libvirt-qemu:rwx /var/lib/libvirt/images
-sudo setfacl -d -m m:rwx /var/lib/libvirt/images
-```
-
-Se você criar novos pools, não precisa se preocupar com permissões novamente, no entanto, caso copie imagens de outros lugares para esses pools, você deverá dar permissão como fizemos acima, caso contrário poderá ter problemas ao criar snapshots ou até ao rodar a VM.
 
 ## Pool de ISOs
 
