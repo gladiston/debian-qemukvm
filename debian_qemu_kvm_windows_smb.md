@@ -134,13 +134,15 @@ Defina `gsantana` como dono (se necessário):
 ```bash
 sudo chown -R gsantana:sambashare /home/w
 ```
-
-Garanta permissões coerentes para o usuário e grupo:  
-
+Após definir gsantana como dono e sambashare como grupo, então aplicamos ao que já existe (-R recursivo, -m modificar): 
+```bash
+sudo setfacl -R -m g:sambashare:rwx /home/w
 ```
-sudo find /home/w -type d -exec chmod 2770 {} +
-sudo find /home/w -type f -exec chmod 0660 {} +
+Depois, define o "Default" (-d), garantindo a herança para novos arquivos/pastas
+```bash
+sudo setfacl -R -d -m g:sambashare:rwx /home/w
 ```
+
 
 ### 1.6. Reinício e Teste do Serviço
 
