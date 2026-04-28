@@ -481,37 +481,6 @@ sudo chmod 660 /outro/lugar/images/*.qcow2
 ```
 (Ajuste o caminho se o *target* do pool for outro; após bind mount, `/var/lib/libvirt/images` e `/home/libvirt/images` apontam para o mesmo conteúdo.)
 
-## Permissões de pasta
-
-As imagens criadas pelo qemu+kvm tem sua extensão `.qcow2` (ou `.img`) e costumam ficar no pool `default`, mas onde fica mesmo este pool?  Existe mais de um? As vezes, isso confunde. Você pode usar o `virt-manager` para descobrir para onde os pools  apontam, mas caso esteja no terminal, execute:
-
-```bash
-sudo virsh pool-dumpxml default
-```
-
-Vai mostrar um texto, procure por:
-
-```textile
-  <target>
-    <path>/var/lib/libvirt/images</path>
-  </target>
-```
-
-Como sabemos que `/var/lib/libvirt` é um `bind mount` para `/home/libvirt` então a pasta real é:
-
-> `/home/libvirt/images`
-
-Garanta que o dono/grupo `libvirt-qemu` tenha permissão de escrita/leitura(chmod 660):
-
-```bash
-sudo chown -R libvirt-qemu:kvm /var/lib/libvirt/images
-sudo chmod -R 660 /var/lib/libvirt/images
-```
-
-Agora, podemos usar as VMs e importá-las para nosso gerenciador de virtualização.  
-Sei que é tentador dar permissão a si mesmo, mas a verdade é que vocÊ não precisa, tudo que fizer dentro da VM estará sendo feito por um usuário/grupo chamado `libvirt-qemu` e também porque você precisa se proteger de si mesmo, isto é, evitando que por acidente possa apagar o que não deve
-
-
 ## Pool de ISOs
 
 ISOs de instalação são grandes e pouco usadas depois da instalação; muita gente **as guarda** em disco **mais barato** (HDD) e deixa **SSDs** para imagens de VM — é sugestão, não regra.
