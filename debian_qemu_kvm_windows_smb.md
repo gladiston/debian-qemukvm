@@ -26,21 +26,21 @@ Mas, dependendo da distro Debian-like ou Ubuntu-like, o servidor de domínios ta
 sudo systemctl disable samba-ad-dc
 ```
 
-### 1.2. Criação do grupo `smbwork` e associação ao usuário
+### 1.2. Criação do grupo `sambashare` e associação ao usuário
 É necessário criar um grupo para que os compartilhamentos possam ser feitos a mais de um usuário.  
-Adiante no artigo, criaremos uma pasta comum que será compartilhada com todos os membros do grupo `smbwork`.  
+Adiante no artigo, criaremos uma pasta comum que será compartilhada com todos os membros do grupo `sambashare`.  
 
 Então, **crie o grupo** e **adicione** o usuário `gsantana` nele:
 
 ```bash
-sudo groupadd -f smbwork
-sudo usermod -aG smbwork gsantana
+sudo groupadd -f sambashare
+sudo usermod -aG sambashare gsantana
 ```
 
 Para a sessão atual reconhecer o novo grupo sem reboot/logout, você pode abrir um novo terminal ou usar:
 
 ```bash
-newgrp smbwork
+newgrp sambashare
 ```
 
 ### 1.3. Criação e Configuração do Usuário Samba
@@ -97,16 +97,16 @@ Edite o arquivo principal de configuração para definir o novo recurso de compa
    Se você tiver um domínio em sua rede, troque **WORKGROUP** pelo nome do seu domínio, por exemplo **LOCALDOMAIN**. Isso acelera o trabalho porque, ao mapear unidades, você não precisa informar o usuário como **localdomain\gsantana**; apenas **gsantana** será suficiente.      
 
 4. **Adicionar o novo compartilhamento:**
-   Adicione a seção a seguir ao **final** do arquivo. Ela restringe o acesso ao usuário `gsantana` e aos membros do grupo `smbwork`, permitindo leitura/escrita.
+   Adicione a seção a seguir ao **final** do arquivo. Ela restringe o acesso ao usuário `gsantana` e aos membros do grupo `sambashare`, permitindo leitura/escrita.
 
 ```ini
 [w]
-    comment = Pasta de Trabalho W
+    comment = Pasta de Trabalho
     path = /home/w
     browseable = yes
     read only = no
-    # Permite acesso ao usuário e também a membros do grupo smbwork
-    valid users = gsantana @smbwork
+    # Permite acesso ao usuário e também a membros do grupo sambashare
+    valid users = gsantana @sambashare
     public = no
     writable = yes
     follow symlinks = yes
@@ -120,7 +120,7 @@ Edite o arquivo principal de configuração para definir o novo recurso de compa
 
     # Configurações de segurança para mapeamento de usuário
     force user = gsantana
-    force group = smbwork
+    force group = sambashare
     inherit permissions = yes
 ```
 
@@ -132,7 +132,7 @@ Confirme se o usuário `gsantana` possui as permissões corretas no sistema de a
 Defina `gsantana` como dono (se necessário):  
 
 ```bash
-sudo chown -R gsantana:smbwork /home/w
+sudo chown -R gsantana:sambashare /home/w
 ```
 
 Garanta permissões coerentes para o usuário e grupo:  
