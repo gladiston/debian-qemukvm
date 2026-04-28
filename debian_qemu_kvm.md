@@ -2,20 +2,24 @@
 
 O Linux pode atuar como **hypervisor tipo 1**: as máquinas virtuais rodam com desempenho próximo do hardware, mas o ecossistema **libvirt** + **QEMU/KVM** é mais “baixo nível” que produtos como VirtualBox ou VMware em alguns confortos (topologias de rede prontas, clipboard integrado, pastas compartilhadas sem configurar Virtio-FS/SPICE, etc.). Este guia parte do Debian e derivações com `apt`.
 
-## Preparando as pastas
+## Conferência inicial
 
 Por padrão, o virtualizador deposita suas máquinas virtuais e agregados em: 
 
 ```
 /var/lib/libvirt
 ```
+A pasta acima já existe em seu sistema?
+Se sim, o qem+kvm já foi instalado. Isso pode ter sido feito durante a instalação limpa ou depois, mas não importa, neste caso você terá de pular as instruções e seguir o artigo:
+[Movendo QEMU+KVM pre-instalado para /home](debian_qemu_kvm_home.md)  
+
+## Criando a pasta-base
 
 E isso está correto para servidores onde **/var** é uma partição/disco em separado, porém nossa máquina é um desktop e geralmente não usamos **/var** porque ele é um agregadinho do **/(root)** onde deixamos um espaço livre minimo para apenas a instalação do Linux. Assim, eu recomendo que façamos uma mudança para:
 
 ```
 /home/libvirt
 ```
-
 Nosso **/home** , geralmente foi formatado para ser uma partição em separado e durar para sempre e por isso, geralmente é a partição que terá bem mais espaço disponível, então vamos, criar as pastas:
 
 ```bash
