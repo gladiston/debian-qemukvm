@@ -110,7 +110,8 @@ O Linux é capaz de criar máquinas virtuais e ele mesmo ser o hypervisor. Será
 Siga os tópicos e saiba que eles estão na ordem que deveriam ser seguidos, e fica a vontade para pular os que não precisa, de maneira geral não há dependencias aqui, ou seja, para um tópico funcionar precisa ter feito o tópico anterior. O único ponto fixo é realmente é a **INSTALAÇÃO**, sem ela, nada funcionará, obviamente.  
 Vamos agora executar a instalação do QEMU+KVM, siga o link:  
 
-[Instalando o QEMU+KVM](debian_qemu_kvm.md)
+[Instalando o QEMU+KVM do zero em /home](debian_qemu_kvm.md)
+[Movendo QEMU+KVM pre-instalado para /home] (debian_qemu_kvm.md)  
 
 ---
 
