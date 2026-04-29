@@ -290,7 +290,7 @@ sudo mv /home/libvirt /home/libvirt.old
 Agora vamos criar uma pasta vazia:  
 ```bash
 sudo mkdir -p /home/libvirt
-sudo chmod 755 /home/libvirt
+sudo chmod 775 /home/libvirt
 ```
 
 Agora que já temos a pasta vazia `/home/libvirt`, podemos transferir para ela o conteúdo original de `/var/lib/libvirt`:
@@ -323,7 +323,7 @@ Após ter mantido o backup desta pasta, vamos recriá-la, porém vazia:
 
 ```bash
 sudo mkdir /var/lib/libvirt
-sudo chmod 755 /var/lib/libvirt
+sudo chmod 775 /var/lib/libvirt
 ```
 
 **`/etc/fstab`** — adicione a linha do bind (ajuste o editor se preferir `nano`):  
