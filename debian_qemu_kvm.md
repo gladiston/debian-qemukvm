@@ -28,7 +28,7 @@ sudo mkdir -p /home/libvirt
 ```
 Nossa pasta `/home/libvirt` precisa de permissõs adequadas:
 ```bash
-sudo chmod 755 /home/libvirt
+sudo chmod 775 /home/libvirt
 ```
 Agora precisaremos de um **bind mount,** isto é, fazer com que **/var/lib/libvirt** seja um ponto de montagem para **/home/libvirt**, assim, quando instalarmos nossa ferramenta de virtualização, a mesma seguirá seu roteira padrão pensando que seus arquivos estão sendo depositados em **/var/lib/libvirt**, mas na verdade estará em **/home/libvirt**. Execute:
 
@@ -448,7 +448,7 @@ sudo virsh pool-autostart default
 Para reutilizar as VMs antigas neste novo servidor é simples, mas antes de copiar as VMs, faça o seguinte ajuste:
 ```bash
 sudo chown -R libvirt-qemu:kvm /var/lib/libvirt/images
-sudo chmod -R 660 /var/lib/libvirt/images
+sudo chmod -R 775 /var/lib/libvirt/images
 ```
 As permissões acima é o padrão a ser usada para a pasta que contêm as imagens de VMs, agora basta copiar as VMs que precisa - geralmente arquivos .qcow2 - para a nova pasta, exemplo:
 ```bash
@@ -457,7 +457,7 @@ sudo mv /home/libvirt.old/images/*.qcow2 /var/lib/libvirt/images
 Mas ao copiar VMs para lá, os donos dos arquivos que forem para lá provavelmente serão o `root` porque você usou o `sudo` nestas cópias e daí vamos repetir as permissões:
 ```bash
 sudo chown -R libvirt-qemu:kvm /var/lib/libvirt/images
-sudo chmod -R 660 /var/lib/libvirt/images
+sudo chmod -R 775 /var/lib/libvirt/images
 ```
 Agora, podemos usar o gerenciador de virtualização e importar essas VMs.  
 
@@ -477,7 +477,7 @@ Ao **importar** uma imagem copiada de fora para o pool **`default`**, ajuste don
 
 ```bash
 sudo chown libvirt-qemu:kvm /outro/lugar/images/*.qcow2
-sudo chmod 660 /outro/lugar/images/*.qcow2
+sudo chmod 775 /outro/lugar/images/*.qcow2
 ```
 (Ajuste o caminho se o *target* do pool for outro; após bind mount, `/var/lib/libvirt/images` e `/home/libvirt/images` apontam para o mesmo conteúdo.)
 
